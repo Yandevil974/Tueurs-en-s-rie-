@@ -110,4 +110,9 @@ export const endpoints = {
   favourite: (slug: string) => `/progress/favourite/${slug}`,
   badge: (key: string) => `/progress/badge/${key}`,
   voices: () => "/auth/me/voices",
+  adminStats: () => "/admin/stats",
+  adminRevisions: () => "/admin/revisions",
+  adminReseed: () => "/admin/reseed",
+  adminPatchCase: (slug: string) => `/admin/cases/${slug}`,
+  adminVerifySource: (id: number) => `/admin/sources/${id}/verify`,
 };

@@ -65,6 +65,7 @@ export default function Account() {
     <section className="card" style={{ marginBottom: 12 }}><div className="eyebrow blood">🏅 {tr(lang, "account.badges")}</div><p className="small">{lang === "fr" ? "Les badges récompensent la compréhension, l'analyse, les chronologies et la mémoire. Jamais la violence." : "Badges reward understanding, analysis, timelines and memory. Never violence."}</p><Link className="btn sm ghost" to="/memoire">🕯 {tr(lang, "nav.memory")}</Link></section>
 
     <Link className="card" style={{ display: "block", marginBottom: 14 }} to="/ethique"><div className="eyebrow blood">⚖ {tr(lang, "nav.ethics")}</div><div className="h2" style={{ fontSize: 14, marginTop: 5 }}>{lang === "fr" ? "Lire la charte éditoriale" : "Read the editorial charter"} →</div></Link>
+    {user.role === "admin" && <Link className="card" style={{ display: "block", marginBottom: 14 }} to="/admin"><div className="eyebrow blood">⚙ {lang === "fr" ? "Administration" : "Administration"}</div><div className="h2" style={{ fontSize: 14, marginTop: 5 }}>{lang === "fr" ? "Santé du catalogue et journal" : "Catalogue health and revision log"} →</div></Link>}
   </>;
 }
 
