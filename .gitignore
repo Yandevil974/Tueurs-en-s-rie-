@@ -1,0 +1,43 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# --- Node / frontend ---
+node_modules/
+dist/
+build/
+.vite/
+.cache/
+*.local
+
+# --- Runtime data (la base est régénérée par `python -m app.seed`) ---
+data/*.sqlite3
+data/*.sqlite3-journal
+data/*.db
+content/media/*.mp3
+content/media/*.wav
+content/media/*.m4a
+content/media/*.ogg
+
+# --- Secrets & local config ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# --- Logs ---
+*.log
+logs/
