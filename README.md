@@ -100,7 +100,7 @@ yanisx/
 │       ├── models.py        21 tables (cases, victims, memorials, timeline, evidence,
 │       │                    investigation, psychology, victimology, courts, experts,
 │       │                    counterfactuals, episodes, questions, media, sources,
-│       │                    countries, courses, glossary, users, voice_profiles,
+│   │                    countries, courses, glossary, users, voice_profiles,
 │       │                    revisions, user_progress)
 │       ├── ethics.py        constantes éditoriales, niveaux, badges, interdictions
 │       ├── reference.py     pays, glossaire, formations
@@ -108,14 +108,15 @@ yanisx/
 │       ├── seed.py          Python dossiers → SQLite (idempotent) + moteur ET SI ?
 │       ├── auth.py          JWT, tiers FREE/PREMIUM, rôles
 │       ├── routes/          auth, cases, episodes, counterfactuals, explore,
-│       │                    reference, search, progress, media, admin
+│       │                    memory, reference, search, progress, media, admin
 │       └── cases_data/      les 8 dossiers bilingues, faits sourcés
-└── frontend/                Vite + React + TypeScript (en construction)
+└── frontend/                Vite + React 19 + TypeScript + zustand (application mobile/web)
 ```
 
 - **Authentification** : JWT (PBKDF2-SHA256), tiers `FREE` / `PREMIUM`, rôles `user` / `editor` / `admin`.
-- **Audio** : diffusion avec support HTTP Range (seek + reprise).
+- **Audio** : diffusion avec support HTTP Range (seek + reprise) ; trois narrations françaises produites dans `content/media/`.
 - **Progression** : reprise audio, sections lues, réponses, favoris, réflexions, badges sobres.
+- **Frontend** : navigation mobile, lecteur persistant, pauses pédagogiques, transcription synchronisée, carte, recherche, mémoire, i18n FR/EN et studio « Ma voix ».
 - **Administration** : reseed, historique des révisions, audit de santé du catalogue
   (victimes non sourcées, mémoire payante, épisodes sans transcription).
 - **Bilingue** FR + EN dès le lancement ; architecture prête pour DE / ES / IT / PT.
@@ -148,7 +149,9 @@ Comptes de démonstration / demo accounts:
 # 2. Frontend
 cd frontend
 npm install
-npm run dev
+npm run dev                 # http://localhost:5173 ; /api est proxyé vers :8000
+npm run build               # vérification de production
+npm test                    # tests unitaires
 ```
 
 Variables d'environnement / environment variables : `YANISX_DB`, `YANISX_MEDIA`, `YANISX_SECRET`,
