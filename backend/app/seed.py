@@ -379,7 +379,11 @@ def seed_cases(db) -> None:
         for ep in _list(data.get("episodes")):
             transcript = ep.get("transcript") or {}
             segments = _list(transcript.get("segments"))
-            duration = int(segments[-1]["t"]) + 90 if segments else 0
+            # Production narration may be shorter than the editorial script
+            # timestamps. When an explicit media duration exists, keep that
+            # measured duration; legacy script-only episodes retain the
+            # segment-derived fallback.
+            duration = int(ep.get("duration_sec") or (int(segments[-1]["t"]) + 90 if segments else 0))
             row = Episode(case_id=case.id, number=int(ep.get("number", 1)), title=_bi(ep.get("title")),
                           description=_bi(ep.get("description")), modes=_list(ep.get("modes")) or ["documentary"],
                           duration_sec=duration, audio=ep.get("audio", ""),

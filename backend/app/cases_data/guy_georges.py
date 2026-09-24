@@ -692,14 +692,14 @@ EPISODES = [
         "description": txt("1991-1997 : sept femmes, un secteur, et des traces que personne ne compare.",
                            "1991-1997: seven women, one sector, and traces nobody compares."),
         "modes": ["documentary", "investigation", "chronology", "victims", "express", "psychology", "expert"],
-        "audio_status": "produced", "voice_profile": "yanis-real",
+        "audio_status": "produced", "audio": "episode-05-guy-georges.wav", "duration_sec": 116, "voice_profile": "yanis-real",
         "chapters": [
             {"at": 0, "title": txt("Ouverture", "Opening")},
-            {"at": 60, "title": txt("Janvier 1991", "January 1991")},
-            {"at": 200, "title": txt("Des scènes qui se ressemblent", "Scenes that look alike")},
-            {"at": 380, "title": txt("Les survivantes", "The survivors")},
-            {"at": 520, "title": txt("Et maintenant, une question", "And now, a question")},
-            {"at": 560, "title": txt("La trace commune", "The common trace")},
+            {"at": 8, "title": txt("Janvier 1991", "January 1991")},
+            {"at": 27, "title": txt("Des scènes qui se ressemblent", "Scenes that look alike")},
+            {"at": 51, "title": txt("Les survivantes", "The survivors")},
+            {"at": 70, "title": txt("Et maintenant, une question", "And now, a question")},
+            {"at": 76, "title": txt("La trace commune", "The common trace")},
         ],
         "transcript": {"segments": [
             {"id": "g1", "t": 0, "speaker": "yanis",
@@ -707,14 +707,14 @@ EPISODES = [
                      "qui a changé la police scientifique française. Sept femmes. Six ans. Un secteur de Paris.",
              "text_en": "You are on YANIS//X, through my eyes. Today we return to a case that changed French forensic "
                         "science. Seven women. Six years. One sector of Paris."},
-            {"id": "g2", "t": 60, "speaker": "yanis",
+            {"id": "g2", "t": 8, "speaker": "yanis",
              "text": "16 janvier 1991. Guy Georges est en permission de sortie. Il exécute une peine à la centrale de "
                      "Caen, il prend le train pour Paris. Ce soir-là, Pascale Escarfail est violée et tuée dans son "
                      "studio. Elle est la première victime d'une série qui n'a pas encore de nom.",
              "text_en": "16 January 1991. Guy Georges is on leave. He is serving a sentence at Caen prison; he takes "
                         "the train to Paris. That evening, Pascale Escarfail is raped and killed in her studio. She is "
                         "the first victim of a series that does not yet have a name."},
-            {"id": "g3", "t": 200, "speaker": "yanis",
+            {"id": "g3", "t": 27, "speaker": "yanis",
              "text": "Les scènes se ressemblent. On entre chez les victimes. On les attache, on les bâillonne avec du "
                      "sparadrap. On les viole, on les tue. Catherine Rocher, vingt-sept ans. Elsa Benady, vingt-deux "
                      "ans. Agnès Nijkamp, trente-deux ans, architecte d'intérieur néerlandaise, retrouvée près de la "
@@ -724,7 +724,7 @@ EPISODES = [
                         "tape. Raped, killed. Catherine Rocher, twenty-seven. Elsa Benady, twenty-two. Agnès Nijkamp, "
                         "thirty-two, a Dutch interior architect, found near the Bastille. Hélène Frinking, "
                         "twenty-seven, a student. Magalie Sirotti, nineteen. Estelle Magd, twenty-five."},
-            {"id": "g4", "t": 380, "speaker": "yanis",
+            {"id": "g4", "t": 51, "speaker": "yanis",
              "text": "Et il y a celles qui ont survécu. Élisabeth Ortega, vingt-trois ans, s'enfuit. Une empreinte "
                      "est relevée, avec un signe distinctif : un pied égyptien, le second orteil plus long que le "
                      "pouce. Mélanie Bacou échappe à son agresseur, qui fuit en laissant tomber son portefeuille. Ces "
@@ -733,10 +733,10 @@ EPISODES = [
                         "recorded, with a distinctive feature: an Egyptian foot, the second toe longer than the big "
                         "toe. Mélanie Bacou escapes her attacker, who flees dropping his wallet. These two women did "
                         "not only survive: they produced elements."},
-            {"id": "g5", "t": 520, "speaker": "yanis",
+            {"id": "g5", "t": 70, "speaker": "yanis",
              "text": "Et maintenant, une question. Pas un jugement. Une réflexion.",
              "text_en": "And now, a question. Not a judgement. A reflection."},
-            {"id": "g6", "t": 560, "speaker": "yanis",
+            {"id": "g6", "t": 76, "speaker": "yanis",
              "text": "En décembre 1994, de l'ADN est découvert au domicile d'Agnès Nijkamp. En 1995, des traces sont "
                      "relevées lors de l'agression d'Élisabeth Ortega. Paris Match relèvera plus tard qu'aucune "
                      "comparaison similaire n'a été effectuée entre ces deux jeux de traces. Il faudra attendre le "
@@ -747,7 +747,7 @@ EPISODES = [
                         "comparison was made between those two sets of traces. It took until the last murder, in "
                         "November 1997, for a common trace to be identified — and two more days for Guy Georges to be "
                         "arrested."},
-            {"id": "g7", "t": 720, "speaker": "yanis",
+            {"id": "g7", "t": 97, "speaker": "yanis",
              "text": "Le 5 avril 2001, la cour d'assises de Paris condamne Guy Georges à la réclusion criminelle à "
                      "perpétuité, assortie d'une période de sûreté de vingt-deux ans. En 1998, la France avait créé "
                      "le FNAEG, le fichier national automatisé des empreintes génétiques. C'est la conséquence "
@@ -755,7 +755,7 @@ EPISODES = [
              "text_en": "On 5 April 2001, the Paris assize court sentenced Guy Georges to life imprisonment with a "
                         "twenty-two-year minimum term. In 1998, France had created the FNAEG, the national automated "
                         "database of genetic fingerprints. That is the structural consequence of this case."},
-            {"id": "g8", "t": 860, "speaker": "yanis",
+            {"id": "g8", "t": 116, "speaker": "yanis",
              "text": "Écouter les histoires. Comprendre les affaires. Ne jamais oublier les victimes : Pascale, "
                      "Catherine, Elsa, Agnès, Hélène, Magalie, Estelle.",
              "text_en": "Listen to the stories. Understand the cases. Never forget the victims: Pascale, Catherine, "
@@ -769,14 +769,14 @@ EPISODES = [
                            "How a biological comparison ended six years of investigation — and what was not compared."),
         "modes": ["documentary", "investigation", "expert", "express"],
         "audio_status": "script_only", "voice_profile": "yanis-real",
-        "chapters": [{"at": 0, "title": txt("Ouverture", "Opening")}, {"at": 90, "title": txt("Le laboratoire", "The laboratory")}],
+        "chapters": [{"at": 0, "title": txt("Ouverture", "Opening")}, {"at": 12, "title": txt("Le laboratoire", "The laboratory")}],
         "transcript": {"segments": [
             {"id": "h1", "t": 0, "speaker": "yanis",
              "text": "Vous êtes sur YANIS//X. Cet épisode porte sur un objet invisible : une trace. Et sur une "
                      "question de méthode : à quel moment compare-t-on ce que l'on a déjà ?",
              "text_en": "You are on YANIS//X. This episode is about an invisible object: a trace. And about a question "
                         "of method: at what point do we compare what we already have?"},
-            {"id": "h2", "t": 90, "speaker": "yanis",
+            {"id": "h2", "t": 12, "speaker": "yanis",
              "text": "Le laboratoire du docteur Olivier Pascal identifie un profil. La presse décrit cette "
                      "identification comme obtenue presque par hasard. Deux jours plus tard, l'homme est arrêté. Ce "
                      "que l'histoire retient, c'est l'efficacité de la science. Ce que le dossier montre, c'est que "
@@ -790,7 +790,7 @@ EPISODES = [
 ]
 
 QUESTIONS = [
-    question("1", 520, "evidence",
+    question("1", 70, "evidence",
              "Deux jeux de traces biologiques existent, l'un en 1994, l'autre en 1995. Aucune comparaison n'est faite. Que produit cette absence ?",
              "Two sets of biological traces exist, one in 1994, one in 1995. No comparison is made. What does that absence produce?",
              [("a", "Rien : les traces n'étaient pas comparables", "Nothing: the traces were not comparable"),
@@ -810,7 +810,7 @@ QUESTIONS = [
                      "whatYouCouldNotKnow": "You could not know that the 1998 identification would come two days after a common trace was highlighted.",
                      "answer_note": "The expected answer is C. It describes a documented temporal consequence, without judging the investigators."}},
              "parismatch-archives"),
-    question("1", 380, "victimology",
+    question("1", 51, "victimology",
              "Trois femmes ont survécu à des agressions. Que produisent leurs témoignages dans ce dossier ?",
              "Three women survived attacks. What do their testimonies produce in this file?",
              [("a", "Uniquement un récit complémentaire", "Only a complementary account"),
@@ -830,7 +830,7 @@ QUESTIONS = [
                      "whatYouCouldNotKnow": "You could not know, in 1995, that these elements would serve a series tried in 2001.",
                      "answer_note": "The expected answer is B. Survivors' testimony is here a vehicle for material traces."}},
              "sudouest-parcours"),
-    question("1", 780, "bias",
+    question("1", 105, "bias",
              "Après l'arrestation, la presse parle d'une identification obtenue « presque par hasard ». Quel risque de lecture cette formule fait-elle courir ?",
              "After the arrest, the press speaks of an identification obtained 'almost by chance'. What reading risk does that phrase create?",
              [("a", "Elle minimise un travail de laboratoire et un rapprochement de scènes", "It minimises laboratory work and a linkage of scenes"),

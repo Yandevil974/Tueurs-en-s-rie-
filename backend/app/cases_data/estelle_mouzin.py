@@ -1141,24 +1141,26 @@ EPISODES = [
         ),
         "modes": ["documentary", "investigation", "chronology", "victims", "express", "psychology", "expert"],
         "audio_status": "produced",
+        "audio": "episode-01-estelle-mouzin.wav",
+        "duration_sec": 133,
         "voice_profile": "yanis-real",
-        "chapters": [
+        "chapters": [ 
             {"at": 0, "title": txt("Ouverture", "Opening")},
-            {"at": 60, "title": txt("17 h : l'absence", "5 p.m.: the absence")},
-            {"at": 180, "title": txt("Une commune au crible", "A commune under the sieve")},
-            {"at": 300, "title": txt("Une piste déjà connue", "A lead already known")},
-            {"at": 420, "title": txt("L'alibi", "The alibi")},
-            {"at": 540, "title": txt("Et maintenant, une question", "And now, a question")},
+            {"at": 9, "title": txt("17 h : l'absence", "5 p.m.: the absence")},
+            {"at": 28, "title": txt("Une commune au crible", "A commune under the sieve")},
+            {"at": 46, "title": txt("Une piste déjà connue", "A lead already known")},
+            {"at": 65, "title": txt("L'alibi", "The alibi")},
+            {"at": 84, "title": txt("Et maintenant, une question", "And now, a question")},
         ],
         "transcript": {
             "segments": [
                 {"id": "s1", "t": 0, "speaker": "yanis", "text": SIGNATURE_INTRO_FR, "text_en": SIGNATURE_INTRO_EN},
-                {"id": "s2", "t": 60, "speaker": "yanis",
+                {"id": "s2", "t": 9, "speaker": "yanis",
                  "text": "Le 9 janvier 2003, à Guermantes, en Seine-et-Marne, Estelle Mouzin a neuf ans. Elle rentre "
                          "de l'école à pied. Le trajet est court, connu, quotidien. Elle n'arrivera pas chez elle.",
                  "text_en": "On 9 January 2003, in Guermantes, Seine-et-Marne, Estelle Mouzin is nine years old. She "
                             "walks home from school. The journey is short, known, daily. She will not arrive home."},
-                {"id": "s3", "t": 180, "speaker": "yanis",
+                {"id": "s3", "t": 28, "speaker": "yanis",
                  "text": "Ce soir-là, la réponse est massive. Les quelque mille quatre cents habitants de la commune "
                          "sont interrogés. Les logements sont perquisitionnés. Les bois autour de Guermantes sont "
                          "ratissés. Une information judiciaire est ouverte à Meaux pour enlèvement et séquestration "
@@ -1166,7 +1168,7 @@ EPISODES = [
                  "text_en": "That evening, the response is massive. The commune's roughly fourteen hundred inhabitants "
                             "are questioned. Homes are searched. The woods around Guermantes are combed. A judicial "
                             "investigation is opened in Meaux for abduction and confinement of a minor under fifteen."},
-                {"id": "s4", "t": 300, "speaker": "yanis",
+                {"id": "s4", "t": 46, "speaker": "yanis",
                  "text": "Et très tôt, une piste apparaît. Elle porte le nom d'un homme déjà connu de la justice : "
                          "Michel Fourniret. Lors des perquisitions, on trouve une cassette vidéo contenant un "
                          "reportage sur la disparition d'Estelle. Sur son ordinateur, des photographies de l'enfant. "
@@ -1175,7 +1177,7 @@ EPISODES = [
                             "system: Michel Fourniret. During searches, a video cassette containing a report on "
                             "Estelle's disappearance is found. On his computer, photographs of the child. He denies it, "
                             "and speaks of an interest in the disappearance."},
-                {"id": "s5", "t": 420, "speaker": "yanis",
+                {"id": "s5", "t": 65, "speaker": "yanis",
                  "text": "Puis vient l'alibi. Le soir du 9 janvier 2003, un appel est passé depuis Sart-Custinne, en "
                          "Belgique, à environ deux cent cinquante kilomètres de Guermantes. Michel Fourniret souhaite "
                          "un bon anniversaire à son fils. Les relevés téléphoniques attestent cet appel. Les "
@@ -1184,10 +1186,10 @@ EPISODES = [
                             "Sart-Custinne, in Belgium, about two hundred and fifty kilometres from Guermantes. Michel "
                             "Fourniret wishes his son a happy birthday. Phone records attest this call. Investigators "
                             "deem the alibi solid. The lead is set aside."},
-                {"id": "s6", "t": 540, "speaker": "yanis",
+                {"id": "s6", "t": 84, "speaker": "yanis",
                  "text": "Et maintenant, une question. Pas un jugement. Une réflexion.",
                  "text_en": "And now, a question. Not a judgement. A reflection."},
-                {"id": "s7", "t": 560, "speaker": "yanis",
+                {"id": "s7", "t": 87, "speaker": "yanis",
                  "text": "Seize ans plus tard, en 2019, le dossier est dépaysé à Paris. En 2020, Michel Fourniret "
                          "déclare devant la juge d'instruction : « Je reconnais là un être qui n'est plus là par ma "
                          "faute. » En août 2020, une trace d'ADN partiel d'Estelle est retrouvée sur un matelas saisi "
@@ -1196,7 +1198,7 @@ EPISODES = [
                             "declares before the investigating judge: 'I acknowledge here a being who is no longer "
                             "there through my fault.' In August 2020, a partial DNA trace of Estelle is found on a "
                             "mattress seized in 2003. The body was never recovered."},
-                {"id": "s8", "t": 700, "speaker": "yanis",
+                {"id": "s8", "t": 108, "speaker": "yanis",
                  "text": "Le 19 décembre 2023, Monique Olivier est condamnée à la réclusion criminelle à perpétuité, "
                          "assortie d'une période de sûreté de vingt ans, pour complicité. Le 3 septembre 2025, l'État "
                          "est condamné pour faute lourde dans la conduite de l'enquête. Le jugement cite le manque de "
@@ -1209,7 +1211,7 @@ EPISODES = [
                             "resources, the succession of ten magistrates, the absence of a synthesis report, and a "
                             "file never paginated. It also says something else: investigative acts of exceptional "
                             "scale were carried out."},
-                {"id": "s9", "t": 860, "speaker": "yanis",
+                {"id": "s9", "t": 133, "speaker": "yanis",
                  "text": "Estelle Mouzin avait neuf ans. Avant d'être un dossier, elle était une élève, une fille, "
                          "une enfant qui rentrait chez elle. C'est cela que cette application retient d'abord.",
                  "text_en": "Estelle Mouzin was nine years old. Before being a file, she was a pupil, a daughter, a "
@@ -1277,6 +1279,8 @@ EPISODES = [
         ),
         "modes": ["victims", "documentary", "express"],
         "audio_status": "produced",
+        "audio": "episode-03-estelle-mouzin-memoire.wav",
+        "duration_sec": 54,
         "voice_profile": "yanis-real",
         "chapters": [{"at": 0, "title": txt("Qui était Estelle ?", "Who was Estelle?")}],
         "transcript": {
@@ -1286,14 +1290,14 @@ EPISODES = [
                          "Estelle. Elle avait neuf ans. Elle vivait à Guermantes. Elle rentrait de l'école à pied.",
                  "text_en": "This episode is not an investigation. There is no question at the end. There is a first "
                             "name: Estelle. She was nine years old. She lived in Guermantes. She walked home from school."},
-                {"id": "e3s2", "t": 60, "speaker": "yanis",
+                {"id": "e3s2", "t": 12, "speaker": "yanis",
                  "text": "Les sources publiques consultées ne décrivent pas ses passions, ses amis, ses projets. Cette "
                          "application ne les inventera pas. Ce silence dans le dossier est aussi une information : il "
                          "dit ce qui appartient à une famille et ce qui appartient à la justice.",
                  "text_en": "The public sources consulted do not describe her passions, her friends, her plans. This "
                             "application will not invent them. That silence in the file is also information: it says "
                             "what belongs to a family and what belongs to justice."},
-                {"id": "e3s3", "t": 150, "speaker": "yanis",
+                {"id": "e3s3", "t": 29, "speaker": "yanis",
                  "text": "Ce que l'on sait, c'est ce que son père a fait pendant plus de vingt ans : des marches, des "
                          "demandes d'actes, une assignation de l'État. Le 3 septembre 2025, le tribunal judiciaire de "
                          "Paris a reconnu une faute lourde et lui a accordé cinquante mille euros au titre du "
@@ -1302,7 +1306,7 @@ EPISODES = [
                             "investigative acts, a suit against the State. On 3 September 2025, the Paris judicial "
                             "court recognised gross negligence and awarded him fifty thousand euros for moral damages. "
                             "Estelle's body was never recovered."},
-                {"id": "e3s4", "t": 280, "speaker": "yanis",
+                {"id": "e3s4", "t": 54, "speaker": "yanis",
                  "text": "Écouter les histoires. Comprendre les affaires. Ne jamais oublier les victimes.",
                  "text_en": "Listen to the stories. Understand the cases. Never forget the victims."},
             ],
@@ -1313,7 +1317,7 @@ EPISODES = [
 # ------------------------------------------------------- QUESTIONS (§26) ----
 QUESTIONS = [
     question(
-        "1", 540, "investigation",
+        "1", 84, "investigation",
         "À ce stade de l'enquête, en 2003, que feriez-vous de la piste Michel Fourniret ?",
         "At this stage of the investigation, in 2003, what would you do with the Michel Fourniret lead?",
         [
@@ -1373,7 +1377,7 @@ QUESTIONS = [
         "franceinfo-chronologie",
     ),
     question(
-        "3", 780, "bias",
+        "3", 35, "bias",
         "Un jugement reconnaît à la fois une faute lourde de l'État et des actes d'investigation d'une ampleur exceptionnelle. Quel biais évite-t-on en tenant les deux ensemble ?",
         "A ruling recognises both gross negligence by the State and investigative acts of exceptional scale. Which bias is avoided by holding both together?",
         [
