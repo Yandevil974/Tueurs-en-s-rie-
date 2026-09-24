@@ -1,4 +1,4 @@
-from . import (admin, auth, cases, counterfactuals, episodes, explore, media, progress, reference, search)
+from . import (admin, auth, cases, counterfactuals, episodes, explore, media, memory, progress, reference, search)
 
 ROUTERS = [
     auth.router,
@@ -6,6 +6,7 @@ ROUTERS = [
     episodes.router,
     counterfactuals.router,
     explore.router,
+    memory.router,
     reference.router,
     search.router,
     progress.router,

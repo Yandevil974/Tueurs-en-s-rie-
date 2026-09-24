@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0c0e" />
+    <meta
+      name="description"
+      content="YANIS//X — à travers mon regard. Podcast documentaire interactif, dossiers d'affaires criminelles réelles et sourcées, criminologie, victimologie, archives et mémoire."
+    />
+    <title>YANIS//X — à travers mon regard</title>
+    <style>
+      /* Amorçage : aucun asset externe, premier peintre déjà aux couleurs de l'identité. */
+      :root {
+        color-scheme: dark;
+        --ink: #0b0c0e;
+        --bone: #e8e4dc;
+        --blood: #8e2233;
+      }
+      html,
+      body,
+      #root {
+        height: 100%;
+        margin: 0;
+        background: var(--ink);
+        color: var(--bone);
+        font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      #boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        font-size: 12px;
+      }
+      #boot b {
+        font-size: 20px;
+        letter-spacing: 0.34em;
+        font-weight: 600;
+      }
+      #boot i {
+        display: block;
+        width: 120px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--blood), transparent);
+        animation: pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 0.25;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <div id="boot">
+        <b>YANIS//X</b>
+        <i></i>
+        <span>à travers mon regard</span>
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

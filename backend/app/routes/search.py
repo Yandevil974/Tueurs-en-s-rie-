@@ -18,7 +18,8 @@ router = APIRouter(tags=["search"])
 
 INSUFFICIENT = ethics.INSUFFICIENT_DATA
 STOPWORDS = {"le", "la", "les", "de", "des", "du", "un", "une", "et", "en", "dans", "sur", "pour", "par", "au", "aux",
-             "que", "qui", "the", "a", "an", "of", "in", "on", "and", "to", "for", "with", "was", "were", "is", "are"}
+             "que", "qui", "quoi", "quelle", "quelles", "quel", "quels", "était", "sont", "est", "ont", "a", "à",
+             "the", "a", "an", "of", "in", "on", "and", "to", "for", "with", "was", "were", "is", "are", "what", "who", "where", "when", "how"}
 
 
 def _flatten(value: Any) -> str:
@@ -49,6 +50,26 @@ def _score(haystack: str, tokens: list[str]) -> int:
     return score
 
 
+def _analyst_relevant(extract: dict[str, Any], tokens: list[str]) -> bool:
+    """Reject weak single-word hits in the retrieval-only Analyst.
+
+    A long summary containing one generic word (for example ``crime``) must
+    not be presented as an answer to a multi-word question. Two independent
+    token matches are the minimum for a multi-token question; a single token
+    is accepted only when it is specific or repeated. This filters relevance,
+    never fabricates a result.
+    """
+    if not tokens:
+        return False
+    hay = _flatten([extract.get("label"), extract.get("body")]).lower()
+    coverage = sum(1 for token in tokens if token in hay)
+    score = int(extract.get("score") or 0)
+    if len(tokens) == 1:
+        return coverage > 0 and (score >= 6 or (len(tokens[0]) >= 5 and score >= 3))
+    minimum_coverage = max(1, (len(tokens) + 1) // 2)
+    return coverage >= minimum_coverage and score >= 6
+
+
 @router.get("/search")
 def search(q: str = Query(min_length=1), limit: int = 20, db: Session = Depends(get_db)):
     tokens = _tokens(q)
@@ -64,7 +85,7 @@ def search(q: str = Query(min_length=1), limit: int = 20, db: Session = Depends(
         if s:
             results.append({"type": "case", "score": s, "label": c.title,
                             "context": {"fr": c.period_label.get("fr", ""), "en": c.period_label.get("en", "")},
-                            "href": f"/cases/{c.slug}", "data": case_card(c, countries.get(c.country_code))})
+                            "href": f"/dossiers/{c.slug}", "data": case_card(c, countries.get(c.country_code))})
 
     for v in db.query(Victim).all():
         hay = _flatten([v.first_name, v.last_name, v.life, v.disappearance, v.note])
@@ -74,7 +95,7 @@ def search(q: str = Query(min_length=1), limit: int = 20, db: Session = Depends(
                             "label": {"fr": f"{v.first_name} {v.last_name}".strip(),
                                       "en": f"{v.first_name} {v.last_name}".strip()},
                             "context": v.life.get("fr", {}).get("headline", "") if isinstance(v.life, dict) else "",
-                            "href": f"/cases/{v.case.slug}/victimes#{v.id}",
+                            "href": f"/dossiers/{v.case.slug}/victimes#{v.id}",
                             "data": {"id": v.id, "case": v.case.slug, "age": v.age, "reliability": v.reliability}})
 
     for t in db.query(TimelineEvent).all():
@@ -82,7 +103,7 @@ def search(q: str = Query(min_length=1), limit: int = 20, db: Session = Depends(
         s = _score(hay, tokens)
         if s:
             results.append({"type": "timeline", "score": s, "label": t.title or {"fr": t.date, "en": t.date},
-                            "context": {"fr": t.date, "en": t.date}, "href": f"/cases/{t.case.slug}/chronologie",
+                            "context": {"fr": t.date, "en": t.date}, "href": f"/dossiers/{t.case.slug}/chronologie",
                             "data": {"id": t.id, "case": t.case.slug, "date": t.date, "reliability": t.reliability}})
 
     for s_row in db.query(Source).all():
@@ -91,7 +112,7 @@ def search(q: str = Query(min_length=1), limit: int = 20, db: Session = Depends(
         if s:
             results.append({"type": "source", "score": s, "label": s_row.title,
                             "context": {"fr": s_row.publisher, "en": s_row.publisher},
-                            "href": f"/cases/{s_row.case.slug}/sources" if s_row.case else "/archives",
+                            "href": f"/dossiers/{s_row.case.slug}/sources" if s_row.case else "/archives",
                             "data": {"id": s_row.id, "url": s_row.url, "reliability": s_row.reliability,
                                      "verified_at": s_row.verified_at}})
 
@@ -122,7 +143,7 @@ def search(q: str = Query(min_length=1), limit: int = 20, db: Session = Depends(
         s = _score(hay, tokens)
         if s:
             results.append({"type": "evidence", "score": s, "label": ev.title, "context": ev.description,
-                            "href": f"/cases/{ev.case.slug}/indices",
+                            "href": f"/dossiers/{ev.case.slug}/indices",
                             "data": {"id": ev.id, "kind": ev.kind, "reliability": ev.reliability}})
 
     for x in db.query(Expert).all():
@@ -130,7 +151,7 @@ def search(q: str = Query(min_length=1), limit: int = 20, db: Session = Depends(
         s = _score(hay, tokens)
         if s:
             results.append({"type": "expert", "score": s, "label": x.label, "context": x.position,
-                            "href": f"/psychologie/{x.case.slug}", "data": {"id": x.id, "field": x.field}})
+                            "href": f"/dossiers/{x.case.slug}", "data": {"id": x.id, "field": x.field}})
 
     results.sort(key=lambda r: -r["score"])
     limited = results[:limit]
@@ -179,7 +200,7 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
     for c in pool_cases:
         s = _score(_flatten([c.title, c.summary, c.subtitle]), tokens)
         if s:
-            push("summary", c, c.title, c.summary, "CONFIRMED", None, s, f"/cases/{c.slug}")
+            push("summary", c, c.title, c.summary, "CONFIRMED", None, s, f"/dossiers/{c.slug}")
 
     for v in db.query(Victim).all():
         if v.case_id not in case_ids:
@@ -189,7 +210,7 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
             src = db.get(Source, v.source_id) if v.source_id else None
             push("victim", v.case, {"fr": f"{v.first_name} {v.last_name}".strip(),
                                     "en": f"{v.first_name} {v.last_name}".strip()},
-                 v.life, v.reliability, src, s, f"/cases/{v.case.slug}/victimes#{v.id}")
+                 v.life, v.reliability, src, s, f"/dossiers/{v.case.slug}/victimes#{v.id}")
 
     for t in db.query(TimelineEvent).all():
         if t.case_id not in case_ids:
@@ -198,7 +219,7 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
         if s:
             src = db.get(Source, t.source_id) if t.source_id else None
             push("timeline", t.case, t.title or {"fr": t.date, "en": t.date}, t.body, t.reliability, src, s,
-                 f"/cases/{t.case.slug}/chronologie")
+                 f"/dossiers/{t.case.slug}/chronologie")
 
     for ev in db.query(Evidence).all():
         if ev.case_id not in case_ids:
@@ -207,7 +228,7 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
         if s:
             src = db.get(Source, ev.source_id) if ev.source_id else None
             push("evidence", ev.case, ev.title, ev.description, ev.reliability, src, s,
-                 f"/cases/{ev.case.slug}/indices")
+                 f"/dossiers/{ev.case.slug}/indices")
 
     for p in db.query(Psychology).all():
         if p.case_id not in case_ids:
@@ -216,7 +237,7 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
             s = _score(_flatten(b), tokens)
             if s:
                 push("behaviour", p.case, b.get("title", {}), b.get("body") or b.get("items"),
-                     b.get("reliability", "UNKNOWN"), None, s, f"/psychologie/{p.case.slug}")
+                     b.get("reliability", "UNKNOWN"), None, s, f"/dossiers/{p.case.slug}/psychologie")
 
     for vm in db.query(Victimology).all():
         if vm.case_id not in case_ids:
@@ -225,7 +246,7 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
             s = _score(_flatten(b), tokens)
             if s:
                 push("victimology", vm.case, b.get("title", {}), b.get("body") or b.get("items"),
-                     b.get("reliability", "UNKNOWN"), None, s, f"/cases/{vm.case.slug}/victimes")
+                     b.get("reliability", "UNKNOWN"), None, s, f"/dossiers/{vm.case.slug}/victimes")
 
     for x in db.query(Expert).all():
         if x.case_id not in case_ids:
@@ -233,7 +254,7 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
         s = _score(_flatten([x.label, x.position]), tokens)
         if s:
             src = db.get(Source, x.source_id) if x.source_id else None
-            push("expert", x.case, x.label, x.position, "PROBABLE", src, s, f"/psychologie/{x.case.slug}")
+            push("expert", x.case, x.label, x.position, "PROBABLE", src, s, f"/dossiers/{x.case.slug}/psychologie")
 
     for g in db.query(GlossaryEntry).all():
         s = _score(_flatten([g.term, g.simple, g.deep]), tokens)
@@ -249,8 +270,11 @@ def analyst(payload: dict[str, Any], db: Session = Depends(get_db)):
             s = _score(_flatten([court.jurisdiction, court.verdict, court.sentence, court.consequences]), tokens)
             if s:
                 push("court", c_row, court.jurisdiction, {"verdict": court.verdict, "sentence": court.sentence},
-                     (court.sentence or {}).get("reliability", "CONFIRMED"), None, s, f"/cases/{c_row.slug}/justice")
+                     (court.sentence or {}).get("reliability", "CONFIRMED"), None, s, f"/dossiers/{c_row.slug}/justice")
 
+    # A retrieval hit is not automatically an answer. Apply a conservative
+    # relevance threshold before exposing extracts to the Analyst UI.
+    extracts = [e for e in extracts if _analyst_relevant(e, tokens)]
     extracts.sort(key=lambda e: -e["score"])
     top = extracts[:8]
 

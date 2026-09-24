@@ -1,14 +1,16 @@
 {
-  "name": "frontend",
+  "name": "yanisx-frontend",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "type": "module",
+  "description": "YANIS//X — à travers mon regard. Interface documentaire interactive.",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -22,7 +24,6 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
     "happy-dom": "^20.14.5",
-    "jsdom": "^29.1.1",
     "typescript": "^7.0.2",
     "vite": "^8.3.0",
     "vitest": "^4.1.11"
