@@ -95,11 +95,13 @@ export default function CasePage() {
   const { slug = "" } = useParams();
   const lang = useLang();
   const { data, loading, error, reload } = useCase(slug);
+  const recommendations = useApi<Any>(endpoints.recommendations(slug), [slug]);
   const nav = useNavigate();
   const gate = useSensitiveGate(data?.case, slug);
   const toggleFavourite = useApp((s) => s.toggleFavourite);
   const favourites = useApp((s) => s.favourites);
   const c = data?.case;
+  const recs: Any[] = recommendations.data?.recommendations || [];
 
   if (loading) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -186,6 +188,18 @@ export default function CasePage() {
           <Link className="btn sm ghost" to={`/dossiers/${c.slug}/memoire`}>{tr(lang, "common.open")}</Link>
         </div>
       </section>
+
+      {recs.length > 0 && (
+        <section className="block-sec">
+          <div className="between" style={{ marginBottom: 8 }}>
+            <h2 className="h3">{tr(lang, "case.similar")}</h2>
+            <span className="tiny">{lang === "fr" ? "contexte · période · géographie · enquête" : "context · period · geography · investigation"}</span>
+          </div>
+          <div className="rail">
+            {recs.map((r: Any) => <CaseCard key={r.case.slug} c={r.case} compact />)}
+          </div>
+        </section>
+      )}
 
       {gate.show && <SensitiveSheet onContinue={gate.close} onBack={() => nav(-1)} />}
     </>
