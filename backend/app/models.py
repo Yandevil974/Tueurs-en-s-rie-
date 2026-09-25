@@ -77,6 +77,21 @@ class User(Base):
     progresses: Mapped[list["UserProgress"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 
+class Notification(Base):
+    """A user-facing editorial notification (§39). Content is authored and bilingual."""
+
+    __tablename__ = "notifications"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    kind: Mapped[str] = mapped_column(String(30), default="editorial")
+    title: Mapped[dict[str, str]] = mapped_column(JSON, default=dict)
+    body: Mapped[dict[str, str]] = mapped_column(JSON, default=dict)
+    href: Mapped[str] = mapped_column(String(240), default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+
 class VoiceProfile(Base):
     """🎙 MA VOIX (§58-§60): the creator's narration voice."""
 

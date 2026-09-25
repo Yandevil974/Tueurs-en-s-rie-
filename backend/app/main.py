@@ -133,6 +133,7 @@ def index() -> dict:
             "auth": "/api/auth/register, /api/auth/login, /api/auth/me",
             "progress": "/api/progress, /api/progress/resume, /api/progress/favourite/{slug}",
             "voices": "/api/auth/me/voices",
-            "admin": "/api/admin/stats, /api/admin/revisions, /api/admin/reseed",
+            "notifications": "/api/notifications, /api/notifications/{id}/read, /api/notifications/read-all",
+            "admin": "/api/admin/stats, /api/admin/revisions, /api/admin/reseed, /api/admin/notifications",
         },
     }

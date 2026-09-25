@@ -115,4 +115,8 @@ export const endpoints = {
   adminReseed: () => "/admin/reseed",
   adminPatchCase: (slug: string) => `/admin/cases/${slug}`,
   adminVerifySource: (id: number) => `/admin/sources/${id}/verify`,
+  adminBroadcastNotification: () => "/admin/notifications",
+  notifications: () => "/notifications",
+  notificationRead: (id: number) => `/notifications/${id}/read`,
+  notificationsReadAll: () => "/notifications/read-all",
 };

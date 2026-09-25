@@ -16,6 +16,9 @@ export default function Admin() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<Any | null>(null);
+  const [notification, setNotification] = useState({ titleFr: "", titleEn: "", bodyFr: "", bodyEn: "", href: "", reason: "" });
+  const [notificationBusy, setNotificationBusy] = useState(false);
+  const [notificationResult, setNotificationResult] = useState<Any | null>(null);
   const isAdmin = user?.role === "admin";
   const stats = useApi<Any>(isAdmin ? endpoints.adminStats() : null, [isAdmin]);
   const revisions = useApi<Any>(isAdmin ? endpoints.adminRevisions() : null, [isAdmin]);
@@ -59,6 +62,28 @@ export default function Admin() {
       setMessage({ error: e.message });
     } finally {
       setBusy(false);
+    }
+  };
+
+  const publishNotification = async () => {
+    if (!notification.titleFr.trim() || !notification.bodyFr.trim()) return;
+    setNotificationBusy(true);
+    setNotificationResult(null);
+    try {
+      const result = await api.post<Any>(endpoints.adminBroadcastNotification(), {
+        title: { fr: notification.titleFr.trim(), en: notification.titleEn.trim() || notification.titleFr.trim() },
+        body: { fr: notification.bodyFr.trim(), en: notification.bodyEn.trim() || notification.bodyFr.trim() },
+        href: notification.href.trim(),
+        kind: "editorial",
+        reason: notification.reason.trim() || "editorial notification",
+      });
+      setNotificationResult(result);
+      setNotification({ titleFr: "", titleEn: "", bodyFr: "", bodyEn: "", href: "", reason: "" });
+      await revisions.reload();
+    } catch (e: any) {
+      setNotificationResult({ error: e.message });
+    } finally {
+      setNotificationBusy(false);
     }
   };
 
@@ -107,6 +132,21 @@ export default function Admin() {
         {message?.reseeded && <div className="note" style={{ marginTop: 10 }}>{lang === "fr" ? "Catalogue reconstruit." : "Catalogue rebuilt."} · {message.counts?.cases} {lang === "fr" ? "dossiers" : "dossiers"}</div>}
       </section>
 
+      <section className="card" style={{ marginBottom: 12 }}>
+        <div className="eyebrow blood">🔔 {lang === "fr" ? "Notification éditoriale" : "Editorial notification"}</div>
+        <p className="small">{lang === "fr" ? "Message explicitement rédigé par l'équipe, envoyé aux comptes existants. Aucun texte automatique n'est inventé." : "A message explicitly authored by the team, sent to existing accounts. No automatic text is invented."}</p>
+        <div className="grid2">
+          <Field label="Titre FR" value={notification.titleFr} onChange={(v) => setNotification({ ...notification, titleFr: v })} />
+          <Field label="Title EN" value={notification.titleEn} onChange={(v) => setNotification({ ...notification, titleEn: v })} />
+        </div>
+        <label className="lbl">{lang === "fr" ? "Message FR" : "Message FR"}<textarea className="ta" style={{ minHeight: 74 }} value={notification.bodyFr} onChange={(e) => setNotification({ ...notification, bodyFr: e.target.value })} /></label>
+        <label className="lbl">Message EN<textarea className="ta" style={{ minHeight: 74 }} value={notification.bodyEn} onChange={(e) => setNotification({ ...notification, bodyEn: e.target.value })} /></label>
+        <div className="grid2"><Field label="Lien interne" value={notification.href} onChange={(v) => setNotification({ ...notification, href: v })} placeholder="/dossiers/..." /><Field label={lang === "fr" ? "Motif journal" : "Log reason"} value={notification.reason} onChange={(v) => setNotification({ ...notification, reason: v })} /></div>
+        <button className="btn primary" style={{ marginTop: 9 }} disabled={notificationBusy || !notification.titleFr.trim() || !notification.bodyFr.trim()} onClick={publishNotification}>{notificationBusy ? "…" : lang === "fr" ? "Publier la notification" : "Publish notification"}</button>
+        {notificationResult?.error && <div className="note warn" style={{ marginTop: 10 }}>{notificationResult.error}</div>}
+        {notificationResult?.published && <div className="note" style={{ marginTop: 10 }}>{notificationResult.recipients} {lang === "fr" ? "destinataire(s)" : "recipient(s)"}</div>}
+      </section>
+
       <section className="block-sec">
         <div className="between" style={{ marginBottom: 8 }}><h2 className="h3">{lang === "fr" ? "Journal des révisions" : "Revision log"}</h2><button className="btn sm ghost" onClick={revisions.reload}>{tr(lang, "common.retry")}</button></div>
         {revisions.loading && <Loading />}
@@ -115,6 +155,10 @@ export default function Admin() {
       </section>
     </>
   );
+}
+
+function Field({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (value: string) => void; placeholder?: string }) {
+  return <label className="lbl">{label}<div className="field" style={{ width: "100%", borderRadius: 9 }}><input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} /></div></label>;
 }
 
 function Metric({ value, label }: { value: React.ReactNode; label: string }) {
