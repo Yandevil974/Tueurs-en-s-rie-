@@ -4,7 +4,7 @@ import { api, endpoints, type Any } from "../lib/api";
 import { LANGS, pick, tr } from "../lib/i18n";
 import { useApp } from "../state/app";
 import { PlayerBar, QuestionSheet } from "./Player";
-import { Bi_, Reliability, SourceLine, useLang } from "./ui";
+import { Bi_, Loading, Reliability, SourceLine, useLang } from "./ui";
 
 const PRIMARY = [
   { to: "/", k: "nav.home", ico: "🏠" },
@@ -80,6 +80,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <Link className="iconbtn" to="/rechercher" aria-label={tr(lang, "nav.search")}>
             🔎
           </Link>
+          <NotificationBell />
           <Link className="iconbtn" to="/compte" aria-label={tr(lang, "nav.account")}>
             {user ? "★" : "👤"}
           </Link>
@@ -154,6 +155,81 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       {analyst && <AnalystPanel onClose={() => setAnalyst(false)} />}
     </div>
   );
+}
+
+/* ---------------------------------------------------------- 🔔 notifications */
+function NotificationBell() {
+  const lang = useLang();
+  const user = useApp((s) => s.user);
+  const [open, setOpen] = useState(false);
+  const [payload, setPayload] = useState<Any | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const load = async () => {
+    if (!user) return;
+    setLoading(true);
+    try {
+      setPayload(await api.get<Any>(endpoints.notifications()));
+    } catch {
+      setPayload({ unread: 0, notifications: [] });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) load();
+    else setPayload(null);
+  }, [user]);
+
+  if (!user) return null;
+  const rows: Any[] = payload?.notifications || [];
+  const unread = payload?.unread || 0;
+
+  const mark = async (id: number) => {
+    try {
+      await api.post(endpoints.notificationRead(id));
+      setPayload({ ...payload, unread: Math.max(0, unread - 1), notifications: rows.map((n) => n.id === id ? { ...n, read: true } : n) });
+    } catch {
+      /* no destructive UI change when offline */
+    }
+  };
+
+  const markAll = async () => {
+    try {
+      await api.post(endpoints.notificationsReadAll());
+      setPayload({ ...payload, unread: 0, notifications: rows.map((n) => ({ ...n, read: true })) });
+    } catch {
+      /* keep server state visible */
+    }
+  };
+
+  return <>
+    <button className="iconbtn" onClick={() => { setOpen(true); load(); }} aria-label={lang === "fr" ? "Notifications" : "Notifications"} style={{ position: "relative" }}>
+      🔔
+      {unread > 0 && <span style={{ position: "absolute", top: -3, right: -3, minWidth: 16, height: 16, padding: "0 3px", borderRadius: 9, background: "var(--blood-bright)", color: "#fff", fontFamily: "var(--sans)", fontSize: 9, lineHeight: "16px" }}>{unread > 9 ? "9+" : unread}</span>}
+    </button>
+    {open && <div className="scrim center" role="dialog" aria-modal="true" aria-label={lang === "fr" ? "Notifications" : "Notifications"} onClick={() => setOpen(false)}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()} style={{ maxHeight: "78dvh" }}>
+        <div className="grab" />
+        <div className="between" style={{ marginBottom: 10 }}>
+          <div className="eyebrow blood">🔔 {lang === "fr" ? "Notifications" : "Notifications"}</div>
+          <div className="row" style={{ gap: 6 }}>
+            {unread > 0 && <button className="btn sm ghost" onClick={markAll}>{lang === "fr" ? "Tout lire" : "Mark all read"}</button>}
+            <button className="iconbtn" onClick={() => setOpen(false)} aria-label={tr(lang, "common.close")}>✕</button>
+          </div>
+        </div>
+        {loading && <Loading />}
+        {!loading && rows.length === 0 && <div className="empty">{lang === "fr" ? "Aucune notification." : "No notifications."}</div>}
+        <div className="stack">
+          {rows.map((n) => {
+            const content = <><div className="between"><span className={`eyebrow ${n.read ? "" : "blood"}`}>{n.kind || "editorial"}</span><span className="tiny mono">{n.created_at?.slice(0, 10)}</span></div><div className="h2" style={{ fontSize: 14, marginTop: 5 }}><Bi_ v={n.title} /></div><div className="small" style={{ marginTop: 4 }}><Bi_ v={n.body} /></div></>;
+            return n.href ? <Link key={n.id} to={n.href} className={`card tight ${n.read ? "" : ""}`} onClick={() => { mark(n.id); setOpen(false); }}>{content}</Link> : <article key={n.id} className="card tight" onClick={() => !n.read && mark(n.id)}>{content}</article>;
+          })}
+        </div>
+      </div>
+    </div>}
+  </>;
 }
 
 /* ---------------------------------------------------------- 🧠 L'ANALYSTE */

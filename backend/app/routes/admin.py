@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from .. import ethics
 from ..auth import require_admin
 from ..db import get_db
-from ..models import Case, Episode, Memorial, Revision, Source, Victim
+from ..models import Case, Episode, Memorial, Notification, Revision, Source, User, Victim
 from ..seed import seed as run_seed
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -52,6 +52,34 @@ def stats(user=Depends(require_admin), db: Session = Depends(get_db)):
         },
         "checked_at": datetime.now(timezone.utc).isoformat(),
     }
+
+
+@router.post("/notifications")
+def broadcast_notification(payload: dict[str, Any], user=Depends(require_admin), db: Session = Depends(get_db)):
+    """Publish an explicit, authored message to all accounts."""
+    def bilingual(value: Any) -> dict[str, str]:
+        if isinstance(value, dict):
+            fr = str(value.get("fr", "")).strip()
+            en = str(value.get("en", fr)).strip()
+            return {"fr": fr, "en": en}
+        text = str(value or "").strip()
+        return {"fr": text, "en": text}
+
+    title = bilingual((payload or {}).get("title"))
+    body = bilingual((payload or {}).get("body"))
+    if not title["fr"] or not body["fr"]:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY,
+                            "Titre et message requis dans au moins une langue / Title and message required")
+    kind = str((payload or {}).get("kind", "editorial"))[:30] or "editorial"
+    href = str((payload or {}).get("href", ""))[:240]
+    users = db.query(User).all()
+    rows = [Notification(user_id=recipient.id, kind=kind, title=title, body=body, href=href)
+            for recipient in users]
+    db.add_all(rows)
+    _log(db, user, "notification", "broadcast", {"kind": kind, "href": href, "recipients": len(rows)},
+         str((payload or {}).get("reason", "editorial notification")))
+    db.commit()
+    return {"published": True, "recipients": len(rows), "kind": kind, "href": href}
 
 
 @router.get("/revisions")
