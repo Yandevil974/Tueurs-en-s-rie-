@@ -224,3 +224,14 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
   2. Incorporation de toutes les données du catalogue (9 dossiers, mémoires, cours, épisodes) directement dans le bundle JavaScript (`src/lib/data.ts`).
   3. Nettoyage explicite de l'élément d'amorce `#boot` au montage de React.
 - **Résultat** : L'APK fonctionne de manière 100 % autonome et synchrone sans latence réseau.
+
+## 12. Intégration complète des pistes audio & Résolution du son dans l'APK (2026-09-28)
+
+- **Diagnostic de l'absence de son** :
+  1. `frontend/src/state/player.ts` effectuait une requête réseau `fetch(url, { method: "HEAD" })` avant de lancer la lecture audio. En environnement APK local, cette requête échouait et l'application basculait automatiquement en mode muet (`usingAudio: false`, défilement de texte seul).
+  2. Les fichiers audio originaux `.wav` (Estelle Mouzin, Guy Georges) n'avaient pas été recopiés dans le dossier public web lors du build de l'APK.
+- **Correctif** :
+  1. Suppression du test `fetch HEAD` : l'élément `new Audio(url)` est instancié directement avec un écouteur d'erreur de repli.
+  2. Résolution du chemin audio en relatif direct (`audio/...`) compatible Capacitor WebView.
+  3. Intégration de l'ensemble des 4 pistes audio produites (`yanisx-robert-pickton-ep1-nobodies.mp3` + les 3 pistes `.wav`) dans les assets de l'APK.
+  4. L'APK final pèse 33,9 Mo et embarque tout son contenu sonore en local.
