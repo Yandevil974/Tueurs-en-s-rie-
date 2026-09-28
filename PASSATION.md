@@ -250,3 +250,13 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
   3. Ligne éditoriale appliquée : respect scrupuleux de la mémoire des dix victimes, refus du sensationnalisme et analyse forensique des métadonnées du document Word.
   4. Données synchronisées dans la base SQLite, dans les JSON compilés et synchronisées dans le projet mobile Android.
   5. Compilation automatique de l'APK via GitHub Actions et mise à jour de la release `app-preview`.
+
+## 14. Déblocage du Son & Moteur Vocal Android TTS (2026-09-28)
+
+- **Diagnostic de l'absence de son** :
+  1. L'épisode BTK (comme 10 des 14 épisodes) était en statut `script_only` : dans l'architecture initiale, ce statut n'activait que le défilement visuel du texte, sans flux audio associé.
+  2. Sur Android WebView, la politique de sécurité système `MediaPlaybackRequiresUserGesture` bloque par défaut les flux audio démarrés sans clic direct sur l'élément audio natif.
+- **Correctifs apportés** :
+  1. **Intégration d'un moteur de vocalisation embarqué (`src/lib/tts.ts`)** utilisant la `Web Speech Synthesis API` : sur Android (Z Fold 5), il utilise directement le moteur de synthèse vocale naturel Google TTS préinstallé dans le système pour oraliser chaque segment narratif à haute voix.
+  2. **Déverrouillage WebView (`MainActivity.java`)** : configuration de `setMediaPlaybackRequiresUserGesture(false)` pour autoriser la lecture audio en tâche de fond et continue.
+  3. L'application lit désormais **à voix haute et sans interruption** aussi bien les épisodes audio enregistrés que les scripts longs (comme le grand format 60 min de BTK).
