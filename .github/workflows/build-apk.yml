@@ -45,19 +45,31 @@ jobs:
           cd frontend/android
           chmod +x gradlew
           ./gradlew assembleDebug --stacktrace
+          # Rename APK for clarity
+          cp app/build/outputs/apk/debug/app-debug.apk ../../yanisx-debug.apk
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: yanisx-app-debug
-          path: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          path: yanisx-debug.apk
           if-no-files-found: error
           retention-days: 30
 
-      - name: Attach APK to GitHub Release (on tag)
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Attach APK to Release or Update Nightly Release
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/arena/01a0e7ec-tueurs-en-s-rie'
         with:
-          files: frontend/android/app/build/outputs/apk/debug/app-debug.apk
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'app-preview' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Application Android YANIS//X (APK)' }}
+          body: |
+            ## Application Android YANIS//X (APK direct)
+            
+            Fichier APK prêt à installer sur Android (Samsung Z Fold 5, One UI) :
+            - **Nom :** YANIS//X
+            - **Package :** `app.yanisx.android`
+            - **Usage en voiture :** Prise en charge Bluetooth intégrée et Media Session.
+            - **Accès complet :** Mode Premium déverrouillé directement pour vos tests.
+          files: yanisx-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
