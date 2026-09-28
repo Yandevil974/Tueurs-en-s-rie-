@@ -1,0 +1,56 @@
+{
+  "id": "/?source=pwa",
+  "name": "YANIS//X — à travers mon regard",
+  "short_name": "YANIS//X",
+  "description": "Podcast documentaire interactif, dossiers d'affaires criminelles réelles et sourcées, criminologie, victimologie, archives et mémoire. 9 dossiers bilingues, mémoire des victimes gratuite.",
+  "lang": "fr",
+  "dir": "ltr",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#0b0c0e",
+  "theme_color": "#0b0c0e",
+  "categories": ["education", "news", "music", "books"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Podcasts",
+      "short_name": "Podcasts",
+      "url": "/podcasts",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Mémoire",
+      "short_name": "Mémoire",
+      "url": "/memoire",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Rechercher",
+      "short_name": "Recherche",
+      "url": "/rechercher",
+      "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

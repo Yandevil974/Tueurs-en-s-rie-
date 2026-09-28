@@ -55,6 +55,118 @@ let audioEl: HTMLAudioElement | null = null;
 let timer: number | null = null;
 let lastSave = 0;
 
+/* ---------------------------------------------------------------
+ * Restitution Bluetooth (voiture).
+ *
+ * Android ne diffuse en Bluetooth que le lecteur « actif » du système. Sans
+ * Media Session, un `<audio>` joué dans une page web n'apparaît ni sur l'écran
+ * de bord, ni dans la notification de verrouillage, et les boutons au
+ * volant ne font rien — le conducteur n'a alors aucun moyen de changer de
+ * piste sans déverrouiller le téléphone.
+ *
+ * `setActionHandler` publie ces commandes. Précision importante : `previoustrack`
+ * et `nexttrack` ne changent pas d'épisode ici, ils sautent d'un chapitre à
+ * l'autre. C'est ce que le conducteur attend d'un bouton « précédent /
+ * suivant » sur un trajet, et cela fonctionne même quand un seul épisode est
+ * chargé.
+ * --------------------------------------------------------------- */
+let mediaSessionBound = false;
+let wakeLock: { release: () => Promise<void> } | null = null;
+
+const mediaSessionSupported = () =>
+  typeof navigator !== "undefined" && "mediaSession" in navigator;
+
+/** L'écran ne doit pas s'éteindre pendant une écoute en voiture. */
+const acquireWakeLock = async () => {
+  if (!("wakeLock" in navigator) || wakeLock) return;
+  try {
+    wakeLock = await (navigator as unknown as { wakeLock: { request: (t: string) => Promise<{ release: () => Promise<void> }> } }).wakeLock.request("screen");
+  } catch {
+    /* refusé (batterie, onglet caché) : sans gravité */
+  }
+};
+const releaseWakeLock = async () => {
+  try {
+    await wakeLock?.release();
+  } catch {
+    /* déjà relâché */
+  }
+  wakeLock = null;
+};
+
+const episodeLabel = (ep: Any | null) => {
+  if (!ep) return "";
+  const t = ep.title;
+  return (t && typeof t === "object" ? t.fr || t.en : t) || "";
+};
+
+const publishMetadata = (ep: Any | null) => {
+  if (!mediaSessionSupported() || !ep) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: episodeLabel(ep),
+      artist: "YANIS//X",
+      album: "à travers mon regard",
+      artwork: [
+        { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+        { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      ],
+    });
+  } catch {
+    /* métadonnées indisponibles : la lecture continue */
+  }
+};
+
+const publishState = (playing: boolean) => {
+  if (!mediaSessionSupported()) return;
+  try {
+    navigator.mediaSession.playbackState = playing ? "playing" : "paused";
+  } catch {
+    /* ignoré */
+  }
+};
+
+const chapterJump = (get: () => PlayerState, dir: 1 | -1) => {
+  const st = get();
+  const chs: number[] = Array.isArray(st.episode?.chapters)
+    ? st.episode.chapters.map((c: Any) => c.at).filter((n: unknown): n is number => typeof n === "number")
+    : [];
+  if (!chs.length) {
+    st.seek(Math.max(0, Math.min(st.duration, st.position + dir * 30)));
+    return;
+  }
+  const ordered = [...chs].sort((a, b) => a - b);
+  const next =
+    dir === 1
+      ? ordered.find((t) => t > st.position + 1)
+      : [...ordered].reverse().find((t) => t < st.position - 1);
+  st.seek(next == null ? (dir === 1 ? ordered[ordered.length - 1] : 0) : next);
+};
+
+const bindMediaSession = (get: () => PlayerState) => {
+  if (!mediaSessionSupported() || mediaSessionBound) return;
+  mediaSessionBound = true;
+  const handlers: [MediaSessionAction, (d: never) => void][] = [
+    ["play", () => get().play()],
+    ["pause", () => get().pause()],
+    ["stop", () => get().stop()],
+    ["seekbackward", (d: { seekOffset?: number } | null) => get().nudge(-(d?.seekOffset || 15))],
+    ["seekforward", (d: { seekOffset?: number } | null) => get().nudge(d?.seekOffset || 30)],
+    ["seekto", (d: { seekTime?: number } | null) => {
+      if (typeof d?.seekTime === "number") get().seek(d.seekTime);
+    }],
+    ["previoustrack", () => chapterJump(get, -1)],
+    ["nexttrack", () => chapterJump(get, 1)],
+  ];
+  for (const [action, fn] of handlers) {
+    try {
+      navigator.mediaSession.setActionHandler(action, fn as MediaSessionActionHandler);
+    } catch {
+      /* action non supportée par ce navigateur : ignorée */
+    }
+  }
+};
+
 const stopTimer = () => {
   if (timer !== null) {
     clearInterval(timer);
@@ -96,12 +208,15 @@ export const usePlayer = create<PlayerState>((set, get) => {
     if (q) {
       if (audioEl) audioEl.pause();
       set({ playing: false, pending: q, explanation: null });
+      publishState(false);
       save();
       return;
     }
     if (pos >= st.duration && st.duration > 0) {
       set({ playing: false });
       if (audioEl) audioEl.pause();
+      publishState(false);
+      releaseWakeLock();
       save();
     } else {
       save();
@@ -112,6 +227,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
     stopTimer();
     timer = window.setInterval(tick, 250);
   };
+
+  bindMediaSession(() => get());
 
   return {
     episode: null,
@@ -150,7 +267,11 @@ export const usePlayer = create<PlayerState>((set, get) => {
             usingAudio = true;
             audioEl = new Audio(audioUrl(ep.audio));
             audioEl.preload = "auto";
-            audioEl.addEventListener("ended", () => set({ playing: false }));
+            audioEl.addEventListener("ended", () => {
+              set({ playing: false });
+              publishState(false);
+              releaseWakeLock();
+            });
           } else {
             audioMissing = true;
           }
@@ -171,6 +292,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
           explanation: null,
         });
         if (usingAudio && audioEl) audioEl.currentTime = start;
+        publishMetadata(ep);
+        publishState(false);
         startTimer();
       } catch (e: any) {
         set({ loading: false, error: e.message || "episode" });
@@ -186,11 +309,15 @@ export const usePlayer = create<PlayerState>((set, get) => {
         audioEl.play().catch(() => set({ usingAudio: false }));
       }
       set({ playing: true });
+      publishState(true);
+      acquireWakeLock();
       startTimer();
     },
     pause: () => {
       if (audioEl) audioEl.pause();
       set({ playing: false });
+      publishState(false);
+      releaseWakeLock();
       save();
     },
     toggle: () => (get().playing ? get().pause() : get().play()),
@@ -211,6 +338,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
         audioEl.pause();
         audioEl = null;
       }
+      publishState(false);
+      releaseWakeLock();
       set({ episode: null, playing: false, position: 0, pending: null, explanation: null, usingAudio: false });
     },
 

@@ -5,6 +5,7 @@ import { LANGS, pick, tr } from "../lib/i18n";
 import { useApp } from "../state/app";
 import { PlayerBar, QuestionSheet } from "./Player";
 import { Bi_, Loading, Reliability, SourceLine, useLang } from "./ui";
+import InstallCard from "./InstallCard";
 
 const PRIMARY = [
   { to: "/", k: "nav.home", ico: "🏠" },
@@ -92,6 +93,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {metaError} — <button className="btn sm ghost" onClick={loadMeta}>{tr(lang, "common.retry")}</button>
         </div>
       )}
+
+      <InstallCard />
 
       <main id="main">{children}</main>
 
