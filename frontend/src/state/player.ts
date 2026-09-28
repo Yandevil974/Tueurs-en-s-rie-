@@ -262,19 +262,20 @@ export const usePlayer = create<PlayerState>((set, get) => {
         let usingAudio = false;
         let audioMissing = false;
         if (ep.audio_status === "produced" && ep.audio) {
-          const probe = await fetch(audioUrl(ep.audio), { method: "HEAD" }).catch(() => null);
-          if (probe && probe.ok) {
-            usingAudio = true;
-            audioEl = new Audio(audioUrl(ep.audio));
-            audioEl.preload = "auto";
-            audioEl.addEventListener("ended", () => {
-              set({ playing: false });
-              publishState(false);
-              releaseWakeLock();
-            });
-          } else {
-            audioMissing = true;
-          }
+          // Sur mobile / Capacitor ou web, on charge directement l'élément Audio
+          usingAudio = true;
+          const url = audioUrl(ep.audio);
+          audioEl = new Audio(url);
+          audioEl.preload = "auto";
+          audioEl.addEventListener("ended", () => {
+            set({ playing: false });
+            publishState(false);
+            releaseWakeLock();
+          });
+          audioEl.addEventListener("error", () => {
+            // Repli sur le script synchronisé si le fichier audio échoue
+            set({ usingAudio: false, audioMissing: true });
+          });
         } else if (ep.audio_status === "produced" && !ep.audio) {
           audioMissing = true;
         }

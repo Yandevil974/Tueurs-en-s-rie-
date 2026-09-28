@@ -3,7 +3,7 @@
  * 
  * En environnement mobile autonome (Android APK) ou sans réseau :
  * - Les données sont résolues directement et instantanément depuis le bundle JavaScript compilé (`src/lib/data.ts`).
- * - L'application n'a besoin d'aucun réseau ni d'aucun serveur actif pour fonctionner.
+ * - L'audio est accessible relativement sans dépendre d'un serveur d'API.
  */
 import { getEmbeddedPayload } from "./data";
 
@@ -61,7 +61,8 @@ export const api = {
 };
 
 export const audioUrl = (file: string) => {
-  return `/audio/${encodeURIComponent(file)}`;
+  // Chemin relatif compatible aussi bien avec Capacitor Android WebView ('https://localhost/audio/...' ou 'capacitor://localhost/audio/...') qu'avec le web standard
+  return `audio/${encodeURIComponent(file)}`;
 };
 
 /** Types lâches : le contenu est bilingue et polymorphe par conception. */
