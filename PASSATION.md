@@ -235,3 +235,18 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
   2. Résolution du chemin audio en relatif direct (`audio/...`) compatible Capacitor WebView.
   3. Intégration de l'ensemble des 4 pistes audio produites (`yanisx-robert-pickton-ep1-nobodies.mp3` + les 3 pistes `.wav`) dans les assets de l'APK.
   4. L'APK final pèse 33,9 Mo et embarque tout son contenu sonore en local.
+
+## 13. Déploiement du Grand Format 60 minutes — L'affaire BTK (2026-09-28)
+
+- **Transformation de l'épisode BTK (Dennis Rader)** :
+  1. Durée portée de 17 minutes à **60 minutes exactes (3 600 secondes)**.
+  2. Chapitrage complet en 6 actes :
+     - `0s` : Prologue — L'illusion du monstre insaisissable.
+     - `600s` : Acte I — Wichita, 15 janvier 1974 (La rupture du foyer Otero).
+     - `1300s` : Acte II — L'empreinte de la terreur et le profil fantôme (Kevin Bright, Nancy Fox...).
+     - `2000s` : Acte III — Le masque social (Le président d'église, le scout et l'inspecteur).
+     - `2700s` : Acte IV — Le carrefour « ET SI ? » (La vanité contre le mensonge tactique de la disquette).
+     - `3200s` : Épilogue — 16 février 2005 (L'effondrement judiciaire d'un homme médiocre).
+  3. Ligne éditoriale appliquée : respect scrupuleux de la mémoire des dix victimes, refus du sensationnalisme et analyse forensique des métadonnées du document Word.
+  4. Données synchronisées dans la base SQLite, dans les JSON compilés et synchronisées dans le projet mobile Android.
+  5. Compilation automatique de l'APK via GitHub Actions et mise à jour de la release `app-preview`.
