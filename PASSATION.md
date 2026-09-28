@@ -213,3 +213,14 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
    - Côté backend : `is_premium` configuré pour renvoyer `True`.
    - Côté frontend : statut par défaut `tier: "PREMIUM"` dans `state/app.ts`.
    - Tous les dossiers, chapitres, archives et cours sont immédiatement accessibles sans barrière.
+
+## 11. Résolution de l'affichage natif Android APK (2026-09-28)
+
+- **Diagnostic écran bloqué sur l'animation de démarrage (`#boot`)** :
+  1. WebView Android avec `file:///` ou `capacitor://localhost` nécessite `HashRouter` plutôt que `BrowserRouter` (qui attendait des routes de serveur web réelles).
+  2. Les requêtes `fetch()` asynchrones vers `/data/...` en environnement webview local pouvaient être bloquées par les règles CORS ou de sécurité WebView locale.
+- **Correctif appliqué** :
+  1. Passage à `HashRouter` dans `src/main.tsx`.
+  2. Incorporation de toutes les données du catalogue (9 dossiers, mémoires, cours, épisodes) directement dans le bundle JavaScript (`src/lib/data.ts`).
+  3. Nettoyage explicite de l'élément d'amorce `#boot` au montage de React.
+- **Résultat** : L'APK fonctionne de manière 100 % autonome et synchrone sans latence réseau.
