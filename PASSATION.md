@@ -113,15 +113,23 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
 1. **Dossiers 09 – 11** s'ils sont toujours attendus : Ivan Milat 🇦🇺, Monstre de Florence 🇮🇹, Fantôme de
    Heilbronn 🇩🇪. Ils n'existent pas ; il faudra les écrire de zéro, avec recherche de sources pour
    chacun. Le dossier Pickton se réordonnera alors.
-2. **Socle de tests** — `tests/` ne contient qu'un `.gitkeep`. Aucun test n'existe. À traiter en
-   priorité si le cahier des charges exige une non-régression.
-3. **Studio « Ma Voix »** — `backend/app/models.py` définit bien `VoiceProfile`
-   (`REAL` | `SYNTHETIC`, consentement daté et signé), mais aucune route ne l'expose.
-4. **Narrations manquantes** — sur les 16 épisodes du catalogue, 3 fichiers audio seulement existent
-   dans `content/media/` (episodes 01, 03, 05 d'Estelle Mouzin). Les 2 épisodes de Pickton sont en
-   `script_only`, comme les 15 autres.
-5. **Base de tests frontend** — `frontend/src/lib/i18n.test.ts` existe ; `npm test` non exécuté dans
-   cette session.
+2. **Socle de tests** — `tests/` ne contient qu'un `.gitkeep`. **Zéro test backend** (vérifié :
+   `find backend -name 'test_*.py' -not -path '*/.venv/*'` → 0 résultat). Côté frontend, un seul
+   fichier existe : `frontend/src/lib/i18n.test.ts`. `npm test` n'a pas été exécuté dans cette session.
+3. **Studio « Ma Voix »** — **plus avancé que supposé.** Le modèle `VoiceProfile` existe, et deux
+   routes sont déjà exposées dans `backend/app/routes/auth.py` : `GET /api/auth/me/voices` et
+   `POST /api/auth/me/voices`. La création d'une voix synthétique est déjà refusée tant que le
+   consentement explicite, daté et signé n'est pas fourni (HTTP 400 sinon), et l'API renvoie déjà
+   les 5 étapes du workflow. `frontend/src/pages/Account.tsx` consomme déjà `/me/voices`.
+   **Ce qui manque** : le flux complet — import d'échantillon, texte de calibration, validation d'une
+   prise, passage `draft → validated → active`, et la synthèse effective.
+4. **Narrations** — **14 épisodes** au total sur les 9 dossiers (aucun dossier sans épisode) :
+   **3 `produced`** (les 3 fichiers `.wav` de `content/media/`, tous d'Estelle Mouzin et Guy Georges),
+   **11 `script_only`**, dont les 2 épisodes de Pickton. Restent donc **11 narrations à produire**.
+5. **Nettoyage du dépôt** — `yanisx-main.bundle` (22 Mo) est commité à la racine alors qu'il ne
+   contient que `bda59ff`, un `main` antérieur à la PR #1. C'est du poids mort qui gonfle le clone
+   et l'archive de release (43 Mo). À retirer du suivi Git.
+6. **Base de tests frontend** — un seul fichier de test ; `vitest` n'est pas passé.
 
 ---
 
