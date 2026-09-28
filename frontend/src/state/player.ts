@@ -13,6 +13,7 @@
 import { create } from "zustand";
 import { api, endpoints, audioUrl, type Any } from "../lib/api";
 import { useApp } from "./app";
+import { tts } from "../lib/tts";
 
 export type Segment = { id: string; t: number; speaker?: string; text: string; text_en?: string };
 
@@ -54,6 +55,8 @@ type PlayerState = {
 let audioEl: HTMLAudioElement | null = null;
 let timer: number | null = null;
 let lastSave = 0;
+let currentTtsSegmentId: string | null = null;
+
 
 /* ---------------------------------------------------------------
  * Restitution Bluetooth (voiture).
@@ -199,6 +202,12 @@ export const usePlayer = create<PlayerState>((set, get) => {
       else set({ position: p });
     } else {
       set({ position: Math.min(st.duration, st.position + 0.25 * st.speed) });
+      // Vocalisation automatique du segment courant (TTS)
+      const cur = get().currentSegment();
+      if (cur && cur.id !== currentTtsSegmentId && cur.text) {
+        currentTtsSegmentId = cur.id;
+        tts.speak(cur.text);
+      }
     }
 
     const pos = get().position;
@@ -207,6 +216,7 @@ export const usePlayer = create<PlayerState>((set, get) => {
     );
     if (q) {
       if (audioEl) audioEl.pause();
+      tts.pause();
       set({ playing: false, pending: q, explanation: null });
       publishState(false);
       save();
@@ -308,6 +318,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
       if (audioEl && get().usingAudio) {
         audioEl.playbackRate = get().speed;
         audioEl.play().catch(() => set({ usingAudio: false }));
+      } else {
+        tts.resume();
       }
       set({ playing: true });
       publishState(true);
@@ -316,6 +328,7 @@ export const usePlayer = create<PlayerState>((set, get) => {
     },
     pause: () => {
       if (audioEl) audioEl.pause();
+      tts.pause();
       set({ playing: false });
       publishState(false);
       releaseWakeLock();
@@ -334,6 +347,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
     },
     stop: () => {
       save();
+      tts.stop();
+      currentTtsSegmentId = null;
       stopTimer();
       if (audioEl) {
         audioEl.pause();
