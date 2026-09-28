@@ -1,6 +1,11 @@
 /**
- * Client API. Toujours en URL relative : le serveur de dev relaie /api vers le
- * backend, donc le navigateur n'appelle jamais localhost (§contraintes aperçu).
+ * Client API hybride YANIS//X.
+ * 
+ * En environnement embarqué / Android APK ou hors ligne :
+ * - Si le backend local / distant ne répond pas, il bascule automatiquement
+ *   et de manière transparente sur les données JSON statiques pré-embarquées (/data/...).
+ * - Les fichiers audio sont également résolus localement (/audio/...).
+ * - L'application fonctionne donc à 100% sans serveur actif.
  */
 
 export class ApiError extends Error {
@@ -21,24 +26,78 @@ export const setToken = (t: string | null) => {
 };
 export const getToken = () => token ?? localStorage.getItem("yanisx.token");
 
+/** Résolution du chemin statique de repli */
+function getStaticFallbackUrl(path: string): string {
+  // Retirer les query params pour chercher le fichier statique
+  const cleanPath = path.split("?")[0];
+
+  if (cleanPath === "/meta") return "/data/meta.json";
+  if (cleanPath === "/cases") return "/data/cases.json";
+  if (cleanPath === "/explore") return "/data/explore.json";
+  if (cleanPath === "/archives") return "/data/archives.json";
+  if (cleanPath === "/memory") return "/data/memory.json";
+  if (cleanPath === "/glossary") return "/data/glossary.json";
+  if (cleanPath === "/countries") return "/data/countries.json";
+  if (cleanPath === "/courses") return "/data/courses.json";
+  if (cleanPath === "/episodes") return "/data/episodes.json";
+  if (cleanPath === "/counterfactuals") return "/data/counterfactuals.json";
+
+  // /cases/{slug} ou /cases/{slug}/{sub}
+  const caseMatch = cleanPath.match(/^\/cases\/([^\/]+)(?:\/([^\/]+))?$/);
+  if (caseMatch) {
+    const slug = caseMatch[1];
+    const sub = caseMatch[2];
+    if (sub) {
+      return `/data/cases/${slug}/${sub}.json`;
+    }
+    return `/data/cases/${slug}.json`;
+  }
+
+  // /episodes/{id}
+  const epMatch = cleanPath.match(/^\/episodes\/(\d+)$/);
+  if (epMatch) {
+    return `/data/episodes/${epMatch[1]}.json`;
+  }
+
+  return `/data${cleanPath}.json`;
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json", ...(init.headers as object) };
   if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
   const tk = getToken();
   if (tk) headers.Authorization = `Bearer ${tk}`;
 
-  let res: Response;
+  let res: Response | null = null;
+  let useFallback = false;
+
+  // 1. Essai sur l'API backend
   try {
     res = await fetch(`/api${path}`, { ...init, headers });
+    if (!res.ok && res.status >= 500) {
+      useFallback = true;
+    }
   } catch {
-    throw new ApiError(0, null, "Connexion au serveur impossible / Cannot reach the server");
+    useFallback = true;
   }
+
+  // 2. Repli transparent sur les données embarquées (APK / Hors-ligne)
+  if (useFallback || !res) {
+    const fallbackUrl = getStaticFallbackUrl(path);
+    try {
+      res = await fetch(fallbackUrl);
+    } catch {
+      // Ignoré, l'erreur finale sera levée plus bas
+    }
+  }
+
+  if (!res || !res.ok) {
+    const detail = res ? `${res.status} ${res.statusText}` : "Connexion impossible";
+    throw new ApiError(res?.status || 0, null, `Erreur chargement: ${detail}`);
+  }
+
   const text = await res.text();
   const data = text ? JSON.parse(text) : null;
-  if (!res.ok) {
-    const detail = (data && (data.detail || data.message)) || res.statusText;
-    throw new ApiError(res.status, data, typeof detail === "string" ? detail : JSON.stringify(detail));
-  }
   return data as T;
 }
 
@@ -49,7 +108,10 @@ export const api = {
   patch: <T,>(p: string, body?: unknown) => request<T>(p, { method: "PATCH", body: body === undefined ? undefined : JSON.stringify(body) }),
 };
 
-export const audioUrl = (file: string) => `/api/audio/${encodeURIComponent(file)}`;
+export const audioUrl = (file: string) => {
+  // Prise en charge locale directe dans l'APK et repli
+  return `/audio/${encodeURIComponent(file)}`;
+};
 
 /** Types lâches : le contenu est bilingue et polymorphe par conception. */
 export type Bi = { fr?: string; en?: string } | string | null | undefined;
