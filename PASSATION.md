@@ -200,3 +200,16 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
 | 🟡 | `PROBABLE` | Convergent, sans source décisive. |
 | 🟠 | `DISPUTED` | Deux sources ou lectures s'opposent ; l'écart est affiché. |
 | ⚪ | `UNKNOWN` | Non documenté. L'absence est affichée, jamais comblée. |
+
+## 10. Application Android APK (Capacitor) & Déverrouillage Premium (2026-09-28)
+
+1. **Compilation Android native via GitHub Actions** :
+   - Mise en place de `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`.
+   - Projet Android généré dans `frontend/android`.
+   - Icônes de marque Y//X générées pour toutes les densités (`mipmap-mdpi` à `xxxhdpi`, normales et maskables).
+   - Workflow `.github/workflows/build-apk.yml` compilant automatiquement l'APK (`./gradlew assembleDebug`) et publiant le fichier `yanisx-debug.apk` directement sur la release GitHub `app-preview`.
+
+2. **Accès Premium déverrouillé pour testeur direct** :
+   - Côté backend : `is_premium` configuré pour renvoyer `True`.
+   - Côté frontend : statut par défaut `tier: "PREMIUM"` dans `state/app.ts`.
+   - Tous les dossiers, chapitres, archives et cours sont immédiatement accessibles sans barrière.
