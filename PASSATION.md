@@ -124,8 +124,26 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
    **Ce qui manque** : le flux complet — import d'échantillon, texte de calibration, validation d'une
    prise, passage `draft → validated → active`, et la synthèse effective.
 4. **Narrations** — **14 épisodes** au total sur les 9 dossiers (aucun dossier sans épisode) :
-   **3 `produced`** (les 3 fichiers `.wav` de `content/media/`, tous d'Estelle Mouzin et Guy Georges),
-   **11 `script_only`**, dont les 2 épisodes de Pickton. Restent donc **11 narrations à produire**.
+   **4 `produced`** (3 fichiers `.wav` d'Estelle Mouzin et Guy Georges, + l'épisode 1 de Pickton en
+   `.mp3`), **10 `script_only`**, dont l'épisode 2 de Pickton. Restent donc **10 narrations à produire**.
+
+   > **Voix provisoire — v0.9.1.** L'épisode 1 de Pickton (« Nobodies ») a été narré avec une voix
+   > **de synthèse provisoire** (`voice_profile: synthese-provisoire`), en attendant l'enregistrement
+   > du créateur. Ce n'est pas la voix YANIS//X : `yanis-real` n'aurait pas été honnête, et la
+   > description de l'épisode le dit à l'auditeur. Audio : 3 min 04 s, mono 44,1 kHz 64 kb/s,
+   > loudnorm −16 LUFS, servi en HTTP Range (206) donc seek et reprise fonctionnent.
+   >
+   > **Piège à connaître — le chapitrage éditorial ne vaut pas le temps de parole.** Les scripts
+   > sont calibrés pour ~16 min de narration humaine ; la synthèse parle ~5× plus vite. Les
+   > timestamps doivent être **recalculés sur la durée audio réellement mesurée**, pas hérités du
+   > script. Non fait, la question pédagogique tombe après la fin de l'audio et la pause
+   > interactive — cœur de l'application — est silencieusement cassée. À refaire pour chaque
+   > narration : mesurer les segments, proportionner les `t` et les `at`, vérifier que chaque
+   > `at_sec` de question est dans `[0, durée]`.
+   >
+   > **Une question ne va pas avec n'importe quel épisode.** La question sur l'ADN des 33 victimes
+   > portait sur l'épisode 1, où rien n'est dit de la ferme : déplacée sur l'épisode 2 à 330 s.
+   > Vérifier le sujet avant de rattacher une question.
 5. **Nettoyage du dépôt** — `yanisx-main.bundle` (22 Mo) est commité à la racine alors qu'il ne
    contient que `bda59ff`, un `main` antérieur à la PR #1. C'est du poids mort qui gonfle le clone
    et l'archive de release (43 Mo). À retirer du suivi Git.
