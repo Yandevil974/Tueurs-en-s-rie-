@@ -1,12 +1,11 @@
 /**
  * Client API hybride YANIS//X.
  * 
- * En environnement embarqué / Android APK ou hors ligne :
- * - Si le backend local / distant ne répond pas, il bascule automatiquement
- *   et de manière transparente sur les données JSON statiques pré-embarquées (/data/...).
- * - Les fichiers audio sont également résolus localement (/audio/...).
- * - L'application fonctionne donc à 100% sans serveur actif.
+ * En environnement mobile autonome (Android APK) ou sans réseau :
+ * - Les données sont résolues directement et instantanément depuis le bundle JavaScript compilé (`src/lib/data.ts`).
+ * - L'application n'a besoin d'aucun réseau ni d'aucun serveur actif pour fonctionner.
  */
+import { getEmbeddedPayload } from "./data";
 
 export class ApiError extends Error {
   status: number;
@@ -26,79 +25,32 @@ export const setToken = (t: string | null) => {
 };
 export const getToken = () => token ?? localStorage.getItem("yanisx.token");
 
-/** Résolution du chemin statique de repli */
-function getStaticFallbackUrl(path: string): string {
-  // Retirer les query params pour chercher le fichier statique
+async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const cleanPath = path.split("?")[0];
 
-  if (cleanPath === "/meta") return "/data/meta.json";
-  if (cleanPath === "/cases") return "/data/cases.json";
-  if (cleanPath === "/explore") return "/data/explore.json";
-  if (cleanPath === "/archives") return "/data/archives.json";
-  if (cleanPath === "/memory") return "/data/memory.json";
-  if (cleanPath === "/glossary") return "/data/glossary.json";
-  if (cleanPath === "/countries") return "/data/countries.json";
-  if (cleanPath === "/courses") return "/data/courses.json";
-  if (cleanPath === "/episodes") return "/data/episodes.json";
-  if (cleanPath === "/counterfactuals") return "/data/counterfactuals.json";
-
-  // /cases/{slug} ou /cases/{slug}/{sub}
-  const caseMatch = cleanPath.match(/^\/cases\/([^\/]+)(?:\/([^\/]+))?$/);
-  if (caseMatch) {
-    const slug = caseMatch[1];
-    const sub = caseMatch[2];
-    if (sub) {
-      return `/data/cases/${slug}/${sub}.json`;
-    }
-    return `/data/cases/${slug}.json`;
+  // 1. Si on a des données compilées en dur, on les sert directement
+  const localPayload = getEmbeddedPayload(cleanPath);
+  if (localPayload) {
+    return localPayload as T;
   }
 
-  // /episodes/{id}
-  const epMatch = cleanPath.match(/^\/episodes\/(\d+)$/);
-  if (epMatch) {
-    return `/data/episodes/${epMatch[1]}.json`;
-  }
-
-  return `/data${cleanPath}.json`;
-}
-
-async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  // 2. Sinon essai réseau
   const headers: Record<string, string> = { Accept: "application/json", ...(init.headers as object) };
   if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
   const tk = getToken();
   if (tk) headers.Authorization = `Bearer ${tk}`;
 
-  let res: Response | null = null;
-  let useFallback = false;
-
-  // 1. Essai sur l'API backend
   try {
-    res = await fetch(`/api${path}`, { ...init, headers });
-    if (!res.ok && res.status >= 500) {
-      useFallback = true;
+    const res = await fetch(`/api${path}`, { ...init, headers });
+    if (res.ok) {
+      const text = await res.text();
+      return (text ? JSON.parse(text) : null) as T;
     }
   } catch {
-    useFallback = true;
+    // Échec réseau ignoré
   }
 
-  // 2. Repli transparent sur les données embarquées (APK / Hors-ligne)
-  if (useFallback || !res) {
-    const fallbackUrl = getStaticFallbackUrl(path);
-    try {
-      res = await fetch(fallbackUrl);
-    } catch {
-      // Ignoré, l'erreur finale sera levée plus bas
-    }
-  }
-
-  if (!res || !res.ok) {
-    const detail = res ? `${res.status} ${res.statusText}` : "Connexion impossible";
-    throw new ApiError(res?.status || 0, null, `Erreur chargement: ${detail}`);
-  }
-
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
-  return data as T;
+  throw new ApiError(404, null, `Ressource indisponible : ${path}`);
 }
 
 export const api = {
@@ -109,7 +61,6 @@ export const api = {
 };
 
 export const audioUrl = (file: string) => {
-  // Prise en charge locale directe dans l'APK et repli
   return `/audio/${encodeURIComponent(file)}`;
 };
 
