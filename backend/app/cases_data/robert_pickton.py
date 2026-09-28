@@ -1594,18 +1594,22 @@ EPISODES = [
                       "Nobodies: a neighbourhood, a list, twenty-five years"),
         "description": txt("De septembre 1978 à 2002. Comment des femmes ont disparu d'un quartier de Vancouver, "
                            "et comment une liste de leurs noms est devenue la seule forme de preuve qui leur "
-                           "reste.",
+                           "reste. Narration produite par une voix de synthèse provisoire, en attendant "
+                           "l'enregistrement du créateur.",
                            "From September 1978 to 2002. How women disappeared from a Vancouver neighbourhood, and "
-                           "how a list of their names became the only form of evidence left to them."),
+                           "how a list of their names became the only form of evidence left to them. Narration "
+                           "produced by a provisional synthetic voice, pending the creator's own recording."),
         "modes": ["documentary", "victims", "chronology", "investigation", "express", "psychology", "expert"],
-        "audio_status": "script_only", "voice_profile": "yanis-real",
+        "audio_status": "produced", "voice_profile": "synthese-provisoire",
+        "audio": "yanisx-robert-pickton-ep1-nobodies.mp3",
+        "duration_sec": 184,
         "chapters": [
             {"at": 0, "title": txt("Ouverture", "Opening")},
-            {"at": 70, "title": txt("Le code postal le plus pauvre du pays", "The poorest postal code in the country")},
-            {"at": 210, "title": txt("Le premier nom", "The first name")},
-            {"at": 360, "title": txt("Un avis de danger, 29 mars 1997", "A danger advisory, 29 March 1997")},
-            {"at": 520, "title": txt("Et maintenant, une question", "And now, a question")},
-            {"at": 560, "title": txt("L'année sans stratégie", "The year with no strategy")},
+            {"at": 19, "title": txt("Le code postal le plus pauvre du pays", "The poorest postal code in the country")},
+            {"at": 40, "title": txt("Le premier nom", "The first name")},
+            {"at": 62, "title": txt("Un avis de danger, 29 mars 1997", "A danger advisory, 29 March 1997")},
+            {"at": 113, "title": txt("Et maintenant, une question", "And now, a question")},
+            {"at": 117, "title": txt("Ce que dit la Commission", "What the Commission says")},
         ],
         "transcript": {"segments": [
             {"id": "n1", "t": 0, "speaker": "yanis",
@@ -1617,7 +1621,7 @@ EPISODES = [
                         "about an institution. The word the 2012 Commission of Inquiry chose for this file is a "
                         "single word. It is also the title of the report's central volume. Nobodies. People with no "
                         "name."},
-            {"id": "n2", "t": 70, "speaker": "yanis",
+            {"id": "n2", "t": 19, "speaker": "yanis",
              "text": "Vancouver, dans le Downtown Eastside. Le rapport d'enquête le décrit en des termes qu'il "
                      "faut citer : logement grossièrement inadapté, insécurité alimentaire, inégalités "
                      "sanitaires, pauvreté extrême. Ce n'est pas un décor. C'est une chaîne de conditions qui "
@@ -1626,7 +1630,7 @@ EPISODES = [
                         "quoted: grossly inadequate housing, food insecurity, health inequalities, extreme "
                         "poverty. This is not scenery. It is a chain of conditions that then determines who will be "
                         "searched for with the same urgency, and who will not."},
-            {"id": "n3", "t": 210, "speaker": "yanis",
+            {"id": "n3", "t": 40, "speaker": "yanis",
              "text": "Le douze septembre 1978, Lillian Jean O'Dare est vue pour la dernière fois. Elle est la "
                      "première femme de cette liste. La liste s'allongera pendant vingt-cinq ans. En 2004, la "
                      "dernière affiche de la police de Vancouver énumère soixante-neuf noms. Chacun de ces noms "
@@ -1635,9 +1639,9 @@ EPISODES = [
                         "list. The list will grow for twenty-five years. In 2004, the last Vancouver Police poster "
                         "lists sixty-nine names. Each of those names was a person who had a family, a place to "
                         "sleep, sometimes a job."},
-            {"id": "n4", "t": 360, "speaker": "yanis",
+            {"id": "n4", "t": 62, "speaker": "yanis",
              "text": "Le 29 mars 1997, la GRC envoie un message d'alerte à tous les détachements du Bas-Fraser. "
-                     "Un homme est696 illiterate75172637862751959516684835427417 dans le Lower Mainland avait "
+                     "Un homme du Lower Mainland avait "
                      "agressé une femme. Le message dit : il doit être considéré comme un danger pour les "
                      "travailleuses du sexe. C'est un moment rare. Le risque a été nommé, noir sur blanc, par une "
                      "institution, à une population entière.",
@@ -1645,7 +1649,7 @@ EPISODES = [
                         "man in the Lower Mainland had assaulted a woman. The message says: he should be considered "
                         "a danger to sex trade workers. This is a rare moment. The risk was named, in writing, by an "
                         "institution, to an entire population."},
-            {"id": "n5", "t": 480, "speaker": "yanis",
+            {"id": "n5", "t": 85, "speaker": "yanis",
              "text": "Un mois plus tard, il est arrêté. Quatre chefs d'accusation. Un avis de libération. Un "
                      "procès est fixé pour février 1998. Le 26 janvier, le parquet décide de surseoir. Le motif "
                      "déclaré : la témoin était trop atteinte par sa dépendance pour constituer un témoin "
@@ -1657,10 +1661,10 @@ EPISODES = [
                         "witness was too impaired by her dependency to be a reliable witness. It was a conclusion "
                         "drawn from a single meeting held less than two weeks before trial. That woman would testify "
                         "in 2003. Her name, meanwhile, remains under a publication ban twenty-five years later."},
-            {"id": "n6", "t": 520, "speaker": "yanis",
+            {"id": "n6", "t": 113, "speaker": "yanis",
              "text": "Et maintenant, une question. Pas un jugement. Une réflexion.",
              "text_en": "And now, a question. Not a judgement. A reflection."},
-            {"id": "n7", "t": 560, "speaker": "yanis",
+            {"id": "n7", "t": 117, "speaker": "yanis",
              "text": "La Commission d'enquête a elle-même refusé de commenter le bien-fondé de cette décision, "
                      "parce que le principe d'indépendance du parquet l'y oblige. Elle a dit autre chose, dans "
                      "d'autres mots : qu'en lumière de ce qui a été appris ensuite, la décision est inexplicable. "
@@ -1671,7 +1675,7 @@ EPISODES = [
                         "words: that in light of what was learned afterwards, the decision is inexplicable. One "
                         "word. Inexplicable. Afterwards. A decision is always judged twice: once at the moment it is "
                         "taken, and once in the light of what is known afterwards."},
-            {"id": "n8", "t": 780, "speaker": "yanis",
+            {"id": "n8", "t": 142, "speaker": "yanis",
              "text": "En 1998, un homme lié à l'entreprise de démolition de Robert Pickton enregistre une "
                      "conversation. Il y relie les femmes qui disparaissent, et les sacs à main et les pièces "
                      "d'identité retrouvés dans la roulotte de Pickton. Il donne cette bande à la police. On lui dit "
@@ -1681,7 +1685,7 @@ EPISODES = [
                         "he links the women who are disappearing to the purses and IDs found in Pickton's trailer. "
                         "He gives the tape to police. He is thanked. Then nothing. The official investigation will "
                         "not begin until February 2002, for another reason: they were looking for firearms."},
-            {"id": "n9", "t": 980, "speaker": "yanis",
+            {"id": "n9", "t": 165, "speaker": "yanis",
              "text": "Écouter cette histoire, c'est entendre le moment précis où une institution qui sait quelque "
                      "chose choisit de ne pas en faire une enquête. Puis le moment où elle le fait — pour une "
                      "autre raison, dans un autre dossier, sous un autre motif. Ce sont ces deux dates, et non la "
@@ -1793,7 +1797,7 @@ EPISODES = [
 ]
 
 QUESTIONS = [
-    question("1", 520, "system",
+    question("1", 113, "system",
              "Le 29 mars 1997, un avis de police désigne nommément un homme comme un danger pour les "
              "travailleuses du sexe. Qu'est-ce qui manque, dans les mois qui suivent, pour que cet avis devienne "
              "une stratégie ?",
@@ -1818,7 +1822,7 @@ QUESTIONS = [
                      "answer_note": "The expected answer is B. The advisory is not an information failure: it is the absence of any decision following from it."}},
              "forsaken-es"),
 
-    question("1", 780, "evidence",
+    question("2", 330, "evidence",
              "Des restes ou de l'ADN de 33 femmes sont retrouvés sur la propriété. Vingt-six femmes sont mises en "
              "accusation. Pourquoi l'ADN n'a-t-il pas suffi ?",
              "Remains or DNA from 33 women are found on the property. Twenty-six women are charged. Why was the DNA "
@@ -1898,7 +1902,7 @@ CASE = {
         "travailleuses du sexe. Il est arrêté le 1er avril, libéré le 8, et le 26 janvier 1998 le parquet suspend "
         "la procédure, estimant la témoin trop atteinte par sa dépendance. Des vêtements saisis ce jour-là ne sont "
         "analysés qu'en 2004 : ils portent l'ADN de deux femmes disparues. En 1998, un homme lié à l'entreprise de "
-        "démolition de Pickton enregistre ses_PS observations et les donne à la police. Le 5 février 2002, un mandat "
+        "démolition de Pickton enregistre ses observations et les donne à la police. Le 5 février 2002, un mandat "
         "portant sur des armes à feu illégales ouvre la plus vaste scène de crime de l'histoire canadienne : 383 000 "
         "verges cubes tamisées, plus de 600 000 objets saisis, et les restes ou l'ADN de 33 femmes. Robert Pickton "
         "est arrêté le 22 février 2002, condamné le 9 décembre 2007 à six peines de réclusion à vie sans libération "
