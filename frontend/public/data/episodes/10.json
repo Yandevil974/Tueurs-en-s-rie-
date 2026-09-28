@@ -1,1 +1,310 @@
-{"id":10,"case_id":"btk-rader","number":1,"title":{"fr":"Le fichier supprimé","en":"The deleted file"},"description":{"fr":"Kansas, 1974-2005. Trente ans de lettres, treize ans de silence, et deux mots retrouvés dans les métadonnées d'un document effacé.","en":"Kansas, 1974-2005. Thirty years of letters, thirteen years of silence, and two words found in the metadata of an erased document."},"modes":["documentary","investigation","chronology","express","expert","psychology","victims"],"duration_sec":1070,"audio":"","audio_status":"script_only","voice_profile":"yanis-real","chapters":[{"at":0,"title":{"fr":"Ouverture","en":"Opening"}},{"at":60,"title":{"fr":"15 janvier 1974","en":"15 January 1974"}},{"at":220,"title":{"fr":"Les lettres","en":"The letters"}},{"at":380,"title":{"fr":"Treize ans de silence","en":"Thirteen years of silence"}},{"at":520,"title":{"fr":"La question posée à la police","en":"The question put to the police"}},{"at":640,"title":{"fr":"Et maintenant, une question","en":"And now, a question"}}],"published_at":"2026-09-24","transcript":{"segments":[{"id":"b1","t":0,"speaker":"yanis","text":"Vous êtes sur YANIS//X, à travers mon regard. Aujourd'hui, une affaire américaine qui s'est terminée par un détail technique : un fichier que l'on croyait effacé.","text_en":"You are on YANIS//X, through my eyes. Today, an American case that ended with a technical detail: a file believed to be erased."},{"id":"b2","t":60,"speaker":"yanis","text":"15 janvier 1974, Wichita, Kansas. Quatre membres de la famille Otero sont tués à leur domicile. Le lendemain matin, leur fils Charlie, quinze ans, rentre et découvre les corps. C'est le premier fait d'une série qui comptera dix victimes, jusqu'au 19 janvier 1991.","text_en":"15 January 1974, Wichita, Kansas. Four members of the Otero family are killed at their home. The next morning, their son Charlie, fifteen, comes home and finds the bodies. It is the first offence of a series that would count ten victims, until 19 January 1991."},{"id":"b3","t":220,"speaker":"yanis","text":"En octobre 1974, une lettre revendiquant ces meurtres est déposée dans un livre d'une bibliothèque publique. Un survivant, Kevin Bright, décrit son agresseur : taille moyenne, moustache fournie, un regard qu'il qualifie de psychotique. Le signalement ne donnera rien.","text_en":"In October 1974, a letter claiming these murders is placed in a public library book. A survivor, Kevin Bright, describes his attacker: average height, bushy moustache, a gaze he calls psychotic. The description yields nothing."},{"id":"b4","t":380,"speaker":"yanis","text":"Puis treize ans de silence. Pendant ce temps, l'homme est responsable d'une troupe scoute, président du conseil de sa paroisse, employé municipal. Rien, dans sa vie sociale visible, ne le désigne.","text_en":"Then thirteen years of silence. During that time, the man leads a scout troop, presides over his church council, works for the city. Nothing in his visible social life points to him."},{"id":"b5","t":520,"speaker":"yanis","text":"En 2004, la couverture du trentième anniversaire des meurtres Otero est suivie d'une reprise des envois. En janvier 2005, il pose une question à la police : une disquette peut-elle être tracée ? Les enquêteurs font répondre par voie de presse que non. Cette réponse était fausse. Il y a cru.","text_en":"In 2004, coverage of the thirtieth anniversary of the Otero murders is followed by a resumption of mailings. In January 2005, he puts a question to the police: can a floppy disk be traced? Investigators have it answered through the media that it cannot. That answer was false. He believed it."},{"id":"b6","t":640,"speaker":"yanis","text":"Et maintenant, une question. Pas un jugement. Une réflexion.","text_en":"And now, a question. Not a judgement. A reflection."},{"id":"b7","t":680,"speaker":"yanis","text":"Le 16 février 2005, dans une disquette reçue par courrier, un document Word supprimé est encore présent. Ses métadonnées contiennent deux indications : « Christ Lutheran Church », et un dernier modificateur nommé « Dennis ». Une recherche en ligne montre qu'un Dennis Rader est président du conseil de cette paroisse. Un échantillon obtenu à partir d'un dossier médical concernant sa fille confirme un lien familial avec l'ADN des scènes. Le 25 février, il est arrêté au volant près de chez lui.","text_en":"On 16 February 2005, in a floppy disk received by mail, a deleted Word document is still present. Its metadata contain two indications: 'Christ Lutheran Church', and a last modifier named 'Dennis'. An online search shows a Dennis Rader is president of that congregation's council. A sample obtained from medical records concerning his daughter confirms a family link with the scene DNA. On 25 February, he is arrested while driving near his home."},{"id":"b8","t":860,"speaker":"yanis","text":"Le 27 juin 2005, il plaide coupable de dix meurtres. Le 18 août, il est condamné à dix peines de réclusion à perpétuité consécutives, avec un minimum de cent soixante-quinze ans. La peine de mort n'était pas applicable : le Kansas ne l'avait rétablie qu'en 1994, après les faits.","text_en":"On 27 June 2005, he pleads guilty to ten murders. On 18 August, he is sentenced to ten consecutive life terms, with a minimum of one hundred and seventy-five years. The death penalty was not applicable: Kansas had reinstated it only in 1994, after the facts."},{"id":"b9","t":980,"speaker":"yanis","text":"Dix personnes ont été tuées. Quatre d'entre elles portaient le même nom : Otero. Deux étaient des enfants de neuf et onze ans. Écouter les histoires. Comprendre les affaires. Ne jamais oublier les victimes.","text_en":"Ten people were killed. Four of them bore the same name: Otero. Two were children of nine and eleven. Listen to the stories. Understand the cases. Never forget the victims."}]},"pause_points":[{"id":15,"case_id":"btk-rader","episode_id":10,"at_sec":300,"kind":"bias","kind_label":{"fr":"Biais","en":"Bias"},"prompt":{"fr":"Un survivant décrit l'agresseur en 1974 : taille moyenne, moustache fournie. Trente et un ans plus tard, l'homme arrêté correspond à ce signalement. Que révèle cet écart ?","en":"A survivor describes the attacker in 1974: average height, bushy moustache. Thirty-one years later, the arrested man matches that description. What does that gap reveal?"},"choices":[{"id":"a","label":{"fr":"Que les témoignages sont inutiles","en":"That testimonies are useless"}},{"id":"b","label":{"fr":"Qu'un témoignage exact peut rester inexploité faute de support de comparaison","en":"That an accurate testimony can remain unexploited for lack of a comparison medium"}},{"id":"c","label":{"fr":"Que l'auteur n'a pas changé d'apparence","en":"That the author did not change appearance"}},{"id":"d","label":{"fr":"Que la police a négligé le survivant","en":"That the police neglected the survivor"}}],"source":{"id":29,"scope":"case","title":{"fr":"Dennis Rader — Who Is the BTK Killer?","en":"Dennis Rader — Who Is the BTK Killer?"},"author":"Redaction","publisher":"Biography.com","type":"press","url":"https://www.biography.com/crime/dennis-rader","date":"2025-01-21","reliability":"CONFIRMED","reliability_label":{"fr":"Confirmé","en":"Confirmed"},"verified_at":"2026-09-24","note":{"fr":"Éléments biographiques, découverte des corps, réémergence de 2004, aveux et condamnation.","en":"Biographical elements, discovery of the bodies, 2004 re-emergence, guilty plea and sentence."},"case_id":6}},{"id":14,"case_id":"btk-rader","episode_id":10,"at_sec":640,"kind":"evidence","kind_label":{"fr":"Indices","en":"Evidence"},"prompt":{"fr":"Une disquette contient un document supprimé dont les métadonnées donnent un prénom et une institution. Que peut-on en déduire à ce stade ?","en":"A floppy disk contains a deleted document whose metadata give a first name and an institution. What can be deduced at this stage?"},"choices":[{"id":"a","label":{"fr":"L'identité de l'auteur des faits","en":"The identity of the author of the offences"}},{"id":"b","label":{"fr":"Une piste nominative à vérifier par un élément indépendant","en":"A named lead to be verified by an independent element"}},{"id":"c","label":{"fr":"Une preuve suffisante pour condamner","en":"Evidence sufficient to convict"}},{"id":"d","label":{"fr":"Rien : les métadonnées sont modifiables","en":"Nothing: metadata can be modified"}}],"source":{"id":28,"scope":"case","title":{"fr":"Dennis Rader","en":"Dennis Rader"},"author":"Contributors","publisher":"Wikipedia (English)","type":"public_archive","url":"https://en.wikipedia.org/wiki/Dennis_Rader","date":"2026","reliability":"PROBABLE","reliability_label":{"fr":"Probable","en":"Probable"},"verified_at":"2026-09-24","note":{"fr":"Encyclopédie collaborative : données recoupées avec la presse ; niveau PROBABLE par prudence.","en":"Collaborative encyclopaedia: data cross-checked with the press; PROBABLE level as a precaution."},"case_id":6}}],"signature_line":{"fr":"Et maintenant, une question. Pas un jugement. Une réflexion.","en":"And now, a question. Not a judgement. A reflection."}}
+{
+  "id": 10,
+  "case_id": "btk-rader",
+  "number": 1,
+  "title": {
+    "fr": "BTK : Trente ans d'ombre, le piège numérique et les dix disparus",
+    "en": "BTK: Thirty years of shadow, the digital trap and the ten victims"
+  },
+  "description": {
+    "fr": "Grand format d'investigation 60 minutes. Kansas, 1974-2005. De la rupture du foyer Otero jusqu'au mensonge tactique de la disquette : déconstruction du mythe du prédateur, analyse des angles morts institutionnels et hommage aux dix vies volées.",
+    "en": "60-minute in-depth investigative special. Kansas, 1974-2005. From the shattered Otero home to the tactical floppy disk deception: deconstructing the predator myth, analyzing institutional blind spots, and honoring ten stolen lives."
+  },
+  "modes": [
+    "documentary",
+    "investigation",
+    "chronology",
+    "expert",
+    "psychology",
+    "victims",
+    "whatif"
+  ],
+  "duration_sec": 3600,
+  "audio": "",
+  "audio_status": "script_only",
+  "voice_profile": "yanis-real",
+  "chapters": [
+    {
+      "at": 0,
+      "title": {
+        "fr": "Prologue : L'illusion du monstre insaisissable",
+        "en": "Prologue: The illusion of the elusive monster"
+      }
+    },
+    {
+      "at": 600,
+      "title": {
+        "fr": "Acte I : Wichita, 15 janvier 1974 — La rupture d'un foyer",
+        "en": "Act I: Wichita, 15 January 1974 — The shattered home"
+      }
+    },
+    {
+      "at": 1300,
+      "title": {
+        "fr": "Acte II : L'empreinte de la terreur et le profil fantôme",
+        "en": "Act II: The imprint of terror and the phantom profile"
+      }
+    },
+    {
+      "at": 2000,
+      "title": {
+        "fr": "Acte III : Le masque social — Le président, le scout et le censeur",
+        "en": "Act III: The social mask — President, scout and inspector"
+      }
+    },
+    {
+      "at": 2700,
+      "title": {
+        "fr": "Acte IV : Le carrefour « ET SI ? » — La vanité contre le piège",
+        "en": "Act IV: The 'WHAT IF?' crossroad — Vanity vs the trap"
+      }
+    },
+    {
+      "at": 3200,
+      "title": {
+        "fr": "Épilogue : 16 février 2005 — L'effondrement d'un homme médiocre",
+        "en": "Epilogue: 16 February 2005 — The collapse of a mediocre man"
+      }
+    }
+  ],
+  "published_at": "2026-09-24",
+  "transcript": {
+    "segments": [
+      {
+        "id": "btk_p1",
+        "t": 0,
+        "speaker": "yanis",
+        "text": "Vous écoutez YANIS//X, à travers mon regard. Ici, nous refusons le voyeurisme morbide, la fascination malsaine pour les prédateurs et la dramatisation théâtrale qui transforme la tragédie en spectacle. Notre boussole est intangible : la dignité des victimes, la rigueur documentaire sans compromis, et l'analyse lucide des failles institutionnelles. Aujourd'hui, nous plongeons au cœur de l'une des affaires les plus emblématiques de l'histoire criminelle américaine, souvent présentée à tort comme l'œuvre d'un génie du mal : l'affaire Dennis Rader, celui qui s'était lui-même baptisé BTK.",
+        "text_en": "You are listening to YANIS//X, through my eyes. Here, we refuse morbid voyeurism, unwholesome fascination with predators, and theatrical sensationalism that turns tragedy into entertainment. Our compass is unwavering: victim dignity, uncompromising documentary rigor, and lucid analysis of institutional blind spots. Today, we delve into one of the most iconic cases in American criminal history, often falsely portrayed as the work of an evil mastermind: the case of Dennis Rader, who christened himself BTK."
+      },
+      {
+        "id": "btk_p2",
+        "t": 300,
+        "speaker": "yanis",
+        "text": "Pendant plus de trente ans, la ville de Wichita dans le Kansas a vécu sous la hantise d'une ombre. Un homme qui s'introduisait dans le secret des foyers, ligotait, torturait et supprimait des vies innocentes, avant d'adresser à la presse et à la police des poèmes macabres et des lettres de défi. Les médias en ont fait un spectre surhumain, un joueur d'échecs insaisissable défiant le FBI. Mais lorsque le masque est tombé en février 2005, ce n'est pas un génie du crime qui est apparu dans le box des accusés. C'était un fonctionnaire municipal mesquin, un contrôleur sanitaire zélé obsédé par la hauteur des pelouses du voisinage, un homme d'une affligeante banalité dont la vanité technologique a fini par provoquer la chute.",
+        "text_en": "For more than thirty years, the city of Wichita, Kansas, lived under the shadow of dread. A man who slipped into the privacy of homes, bound, tortured, and took innocent lives, before mailing macabre poems and mocking letters to the press and police. The media made him into a superhuman ghost, an elusive chess master outsmarting the FBI. But when the mask fell in February 2005, it was no criminal genius standing in the dock. It was a petty municipal inspector, an overzealous animal control officer obsessed with the height of his neighbors' grass, an agonizingly ordinary man whose technological vanity finally triggered his downfall."
+      },
+      {
+        "id": "btk_p3",
+        "t": 600,
+        "speaker": "yanis",
+        "text": "15 janvier 1974. Matin d'hiver ordinaire au 803 North Edgemoor Street. La maison de la famille Otero respire la vie tranquille de la classe moyenne de Wichita. Joseph Otero, trente-huit ans, ancien militaire mécanicien, son épouse Josephine, trente-quatre ans, et leurs enfants s'apprêtent pour la journée d'école et de travail. Rien ne laisse présager qu'un prédateur surveille les allées et venues depuis plusieurs jours. Dennis Rader coupe la ligne téléphonique, s'infiltre par effraction armé d'un pistolet, et soumet la famille sous la menace. En quelques heures, quatre vies sont fauchées : Joseph, Josephine, et deux de leurs jeunes enfants, Josephine âgée de onze ans et Joseph Junior, neuf ans.",
+        "text_en": "15 January 1974. An ordinary winter morning at 803 North Edgemoor Street. The home of the Otero family breathes the quiet life of Wichita's working class. Joseph Otero, 38, former military mechanic, his wife Josephine, 34, and their children prepare for the day. Nothing foretells that a predator has been watching their routines for days. Dennis Rader cuts the telephone wire, breaks in with a handgun, and subdues the household. In a few hours, four lives are stolen: Joseph, Josephine, and two of their young children, 11-year-old Josephine and 9-year-old Joseph Junior."
+      },
+      {
+        "id": "btk_p4",
+        "t": 950,
+        "speaker": "yanis",
+        "text": "Le drame humain prend toute son ampleur en fin de matinée. Charlie Otero, le fils aîné âgé de quinze ans, rentre de l'école avec ses deux frères et sœurs rescapés. C'est lui qui franchit le seuil, découvre le silence anormal, puis l'indicible. Toute sa vie, Charlie portera le fardeau de ce traumatisme indélébile. Dans les jours qui suivent, les enquêteurs piétinent, égarés par des pistes sans issue, soupçonnant un temps des règlements de comptes liés aux origines hispaniques de Joseph ou à son passé militaire. La police ne comprend pas encore qu'elle a affaire à un tueur en série mû par des fantasmes de domination absolue, qui choisit ses victimes par opportunisme géographique.",
+        "text_en": "The human tragedy reaches its zenith late that morning. Charlie Otero, the 15-year-old eldest son, returns from school with his two surviving siblings. It is he who crosses the threshold, notices the eerie silence, and discovers the unspeakable. For the rest of his life, Charlie would bear the weight of that indelible trauma. In the days that followed, detectives faltered, led astray by dead-end leads, initially suspecting disputes tied to Joseph's Hispanic background or military service. Police did not yet grasp they were facing a serial killer driven by fantasies of absolute domination, picking targets out of sheer geographic opportunity."
+      },
+      {
+        "id": "btk_p5",
+        "t": 1300,
+        "speaker": "yanis",
+        "text": "Frustré par le silence des enquêteurs et l'absence d'écho médiatique glorifiant son crime, l'assassin décide de prendre l'initiative. En octobre 1974, il dépose une lettre dactylographiée à l'intérieur d'un manuel d'ingénierie à la bibliothèque publique de Wichita, puis appelle un journaliste local. Dans ce texte, il revendique le quadruple meurtre des Otero avec des détails que seul le tueur pouvait connaître, et invente son propre acronyme : Bind, Torture, Kill. Attacher, torturer, tuer. Il avertit la population qu'il frappera à nouveau.",
+        "text_en": "Frustrated by the investigators' silence and the lack of media coverage glorifying his crime, the killer decides to seize the initiative. In October 1974, he hides a typed letter inside an engineering textbook at the Wichita Public Library, then calls a local reporter. In the letter, he claims the quadruple Otero homicide with details only the killer could possess, coining his own acronym: Bind, Torture, Kill. He warns the public that he will strike again."
+      },
+      {
+        "id": "btk_p6",
+        "t": 1650,
+        "speaker": "yanis",
+        "text": "Les années suivantes voient la terreur s'installer par vagues. Le 4 avril 1974, Kathryn Bright, vingt et un ans, est assassinée à son domicile. Mais son frère, Kevin Bright, dix-neuf ans, bien que touché par balle, réussit à s'enfuir et survit miraculeusement. Kevin fournit aux policiers la première description visuelle concrète du tueur : un homme d'environ un mètre quatre-vingts, corpulence moyenne, moustache bien fournie, regard fixe et pénétrant. Pourtant, malgré ce portrait-robot fidèle, Rader passe totalement inaperçu. Suivront les meurtres de Shirley Vian en mars 1977, de Nancy Fox en décembre 1977, puis de Marine Hedge et Vicki Wegerle dans les années quatre-vingt. Dix victimes au total, dont la mémoire a trop longtemps été éclipsée par le mythe du monstre.",
+        "text_en": "In the following years, terror swept the city in waves. On April 4, 1974, 21-year-old Kathryn Bright was murdered in her home. But her brother, 19-year-old Kevin Bright, though shot, miraculously broke free and survived. Kevin gave detectives the first tangible description of the predator: an average-height male, stocky build, thick bushy mustache, and piercing eyes. Yet despite this accurate sketch, Rader remained invisible. There followed the murders of Shirley Vian in March 1977, Nancy Fox in December 1977, and Marine Hedge and Vicki Wegerle in the 1980s. Ten victims in all, whose memories were eclipsed for decades by the sensational myth."
+      },
+      {
+        "id": "btk_p7",
+        "t": 2000,
+        "speaker": "yanis",
+        "text": "Comment cet individu a-t-il pu échapper à toute détection pendant plus de trois décennies ? La réponse réside dans son camouflage social parfait. Dennis Rader ne vivait pas en ermite marginalisé. Marié, père de deux enfants, diplômé en administration de la justice criminelle, il était employé municipal assermenté dans la banlieue de Park City. Il patrouillait en uniforme pour verbaliser les chiens errants et traquer les infractions d'urbanisme mineures avec un zèle tyrannique. Mieux encore : il était président élu du conseil de son église luthérienne, la Christ Lutheran Church, et chef de troupe chez les Boy Scouts. La police cherchait un marginal psychopathe incapable de s'intégrer ; le tueur était un pilier de la communauté qui côtoyait quotidiennement les forces de l'ordre sans jamais éveiller le moindre soupçon.",
+        "text_en": "How could this individual evade detection for over three decades? The answer lies in his flawless social camouflage. Dennis Rader did not live as an outcast hermit. Married, father of two, holder of a degree in criminal justice administration, he served as a municipal compliance officer in suburban Park City. He patrolled in uniform, ticketing stray dogs and citing minor zoning violations with tyrannical relish. Even more: he served as elected president of the church council at Christ Lutheran Church and led a Boy Scout troop. Police were searching for a dysfunctional psychotic loner; the killer was a community pillar brushing shoulders with law enforcement daily without raising an eyelid."
+      },
+      {
+        "id": "btk_p8",
+        "t": 2350,
+        "speaker": "yanis",
+        "text": "Après le meurtre de Dolores Davis en janvier 1991, Rader cesse de tuer et plonge dans treize années d'un silence absolu. L'affaire s'enlise dans les archives des cold cases de Wichita. Rader vieillit, son sentiment de toute-puissance s'émousse face à l'oubli. Mais en janvier 2004, le journal local, The Wichita Eagle, publie un article rétrospectif à l'occasion du trentième anniversaire du massacre des Otero. Le journaliste s'interroge : BTK est-il mort ? Est-il incarcéré sous une autre identité ? Cet article blesse mortellement l'orgueil démesuré du prédateur. Pour Rader, être oublié est pire que d'être pourchassé. En mars 2004, il brise son silence et reprend ses envois postaux, ignorant qu'il vient de signer sa propre perte.",
+        "text_en": "Following the murder of Dolores Davis in January 1991, Rader ceased killing and plunged into thirteen years of absolute silence. The case stalled among Wichita's cold files. Rader aged, his illusion of omnipotence threatened by public oblivion. But in January 2004, the local newspaper, The Wichita Eagle, published a reflective feature on the 30th anniversary of the Otero murders. The journalist mused: Was BTK dead? Was he locked away under another name? That article delivered a fatal blow to the predator's swollen ego. To Rader, being forgotten was worse than being hunted. In March 2004, he broke his silence and resumed mailings, oblivious that he was sealing his own doom."
+      },
+      {
+        "id": "btk_p9",
+        "t": 2700,
+        "speaker": "yanis",
+        "text": "Et maintenant, nous arrivons au carrefour de notre réflexion : le grand moment ET SI. En janvier 2005, Dennis Rader souhaite transmettre un long manifeste numérique mais craint la technologie moderne dont il ne maîtrise pas les rouages secrets. Dans une lettre codée, il pose une question explicite aux enquêteurs : « Est-ce qu'une disquette informatique 3,5 pouces peut être tracée jusqu'à un ordinateur personnel ? Dites-le-moi en toute franchise dans une petite annonce. »",
+        "text_en": "And now, we reach the crossroads of our investigation: the pivotal WHAT IF moment. In January 2005, Dennis Rader wished to transmit a long digital manifesto but feared modern computer forensics whose inner workings he failed to grasp. In a coded note, he asked detectives point-blank: 'Can a 3.5-inch floppy disk be traced back to a personal computer? Tell me truthfully in a classified ad.'"
+      },
+      {
+        "id": "btk_p10",
+        "t": 2900,
+        "speaker": "yanis",
+        "text": "Les enquêteurs de Wichita, dirigés par le lieutenant Ken Landwehr, font face à un dilemme éthique et tactique crucial. Doivent-ils refuser de répondre ? Doivent-ils avertir que tout support est analysable ? Non. La police choisit la ruse et publie une petite annonce dans le journal disant : « Rex, tout va bien, les disquettes ne peuvent pas être tracées. » Dennis Rader, croyant naïvement qu'un pacte tacite de confiance le lie aux policiers, fait confiance à cette réponse. Et si les enquêteurs avaient répondu la vérité ? Et si Rader était resté fidèle au papier et aux paquets physiques ? L'affaire ne se serait jamais dénouée sur cette erreur grossière. Rader serait probablement mort en homme libre, emportant ses crimes dans la tombe.",
+        "text_en": "Wichita investigators, spearheaded by Lieutenant Ken Landwehr, faced a decisive tactical and ethical dilemma. Should they refuse to answer? Should they warn that all digital media can be forensically audited? No. Police chose deception and ran a classified ad: 'Rex, all is fine, floppy disks cannot be traced.' Dennis Rader, naively believing an unspoken code of mutual respect bonded him to detectives, took the bait. What if the police had told the truth? What if Rader had stuck to printed paper and drop-offs? The case would never have resolved on this clumsy blunder. Rader would likely have died a free man, carrying his secrets to the grave."
+      },
+      {
+        "id": "btk_p11",
+        "t": 3200,
+        "speaker": "yanis",
+        "text": "Le 16 février 2005, une enveloppe arrive dans les locaux de la chaîne de télévision locale KSAS-TV. À l'intérieur : une disquette 3,5 pouces de marque Memorex, de couleur violette. Les experts en criminalistique informatique de la police de Wichita insèrent la disquette dans une station sécurisée. Bien que le fichier visible ait été effacé par Rader, les outils forensiques restaurent immédiatement un document Word intitulé « Test-01.doc ». Dans les métadonnées cachées du logiciel, deux lignes surgissent avec une clarté foudroyante : Entreprise : Christ Lutheran Church. Dernier utilisateur ayant modifié le document : Dennis.",
+        "text_en": "On 16 February 2005, a padded envelope arrived at local TV station KSAS-TV. Inside: a purple 3.5-inch Memorex floppy disk. Wichita Police digital forensic specialists mounted the disk in a sanitized sandbox. Although the visible file had been deleted by Rader, forensic utilities instantly recovered a Word document named 'Test-01.doc'. In the software's hidden metadata, two lines emerged with blinding clarity: Company: Christ Lutheran Church. Last modified by: Dennis."
+      },
+      {
+        "id": "btk_p12",
+        "t": 3450,
+        "speaker": "yanis",
+        "text": "Une simple recherche sur Internet révèle aussitôt l'organigramme de cette congrégation : Dennis Rader est le président du conseil paroissial. Les policiers obtiennent en urgence un mandat pour récupérer un frottis cervical médical effectué quelques mois plus tôt par sa fille à l'infirmerie de l'Université du Kansas. Les analyses ADN établissent une filiation biologique directe à 99,99 % avec le sperme prélevé sur les scènes de crime des années soixante-dix. Le 25 février 2005, Dennis Rader est intercepté sans violence au volant de sa voiture à Park City.",
+        "text_en": "A brief online search instantly revealed the congregation's directory: Dennis Rader was the president of the church council. Detectives urgently secured a court order to obtain a Pap smear specimen taken months earlier from his daughter at the University of Kansas clinic. DNA testing established a 99.99% direct familial link to semen preserved from crime scenes in the 1970s. On 25 February 2005, Dennis Rader was peacefully intercepted at the wheel of his car in Park City."
+      },
+      {
+        "id": "btk_p13",
+        "t": 3550,
+        "speaker": "yanis",
+        "text": "Le 27 juin 2005, Rader plaide coupable des dix assassinats. Lors de ses aveux froids et détaillés, le mythe s'effondre définitivement. Il n'y avait aucun génie, aucune grandeur tragique : seulement la lâcheté d'un prédateur opportuniste profitant de la confiance et de la vulnérabilité de ses concitoyens. Condamné à dix peines de prison à vie consécutives sans libération conditionnelle possible avant cent soixante-quinze ans, il croupit désormais dans l'isolement carcéral. Mais pour nous, sur YANIS//X, ce ne sont pas les divagations du criminel qui méritent la postérité. Ce sont les noms et les visages de Joseph, Josephine, Joseph Junior, Josephine Otero, Kathryn Bright, Shirley Vian, Nancy Fox, Marine Hedge, Vicki Wegerle et Dolores Davis. Écouter les faits. Déconstruire les mythes. Ne jamais oublier les victimes.",
+        "text_en": "On 27 June 2005, Rader pleaded guilty to all ten homicides. During his cold, robotic confession, the myth vanished forever. There was no genius, no tragic grandeur: only the cowardice of an opportunist exploiting trust and vulnerability. Sentenced to ten consecutive life terms without parole eligibility for 175 years, he remains in maximum security isolation. But for us, on YANIS//X, it is not the murderer's ego that deserves posterity. It is the names and lives of Joseph, Josephine, Joseph Junior, Josephine Otero, Kathryn Bright, Shirley Vian, Nancy Fox, Marine Hedge, Vicki Wegerle, and Dolores Davis. Listen to the facts. Deconstruct the myths. Never forget the victims."
+      }
+    ]
+  },
+  "pause_points": [
+    {
+      "id": 15,
+      "case_id": "btk-rader",
+      "episode_id": 10,
+      "at_sec": 300,
+      "kind": "bias",
+      "kind_label": {
+        "fr": "Biais",
+        "en": "Bias"
+      },
+      "prompt": {
+        "fr": "Un survivant décrit l'agresseur en 1974 : taille moyenne, moustache fournie. Trente et un ans plus tard, l'homme arrêté correspond à ce signalement. Que révèle cet écart ?",
+        "en": "A survivor describes the attacker in 1974: average height, bushy moustache. Thirty-one years later, the arrested man matches that description. What does that gap reveal?"
+      },
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "fr": "Que les témoignages sont inutiles",
+            "en": "That testimonies are useless"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "fr": "Qu'un témoignage exact peut rester inexploité faute de support de comparaison",
+            "en": "That an accurate testimony can remain unexploited for lack of a comparison medium"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "fr": "Que l'auteur n'a pas changé d'apparence",
+            "en": "That the author did not change appearance"
+          }
+        },
+        {
+          "id": "d",
+          "label": {
+            "fr": "Que la police a négligé le survivant",
+            "en": "That the police neglected the survivor"
+          }
+        }
+      ],
+      "source": {
+        "id": 29,
+        "scope": "case",
+        "title": {
+          "fr": "Dennis Rader — Who Is the BTK Killer?",
+          "en": "Dennis Rader — Who Is the BTK Killer?"
+        },
+        "author": "Redaction",
+        "publisher": "Biography.com",
+        "type": "press",
+        "url": "https://www.biography.com/crime/dennis-rader",
+        "date": "2025-01-21",
+        "reliability": "CONFIRMED",
+        "reliability_label": {
+          "fr": "Confirmé",
+          "en": "Confirmed"
+        },
+        "verified_at": "2026-09-24",
+        "note": {
+          "fr": "Éléments biographiques, découverte des corps, réémergence de 2004, aveux et condamnation.",
+          "en": "Biographical elements, discovery of the bodies, 2004 re-emergence, guilty plea and sentence."
+        },
+        "case_id": 6
+      }
+    },
+    {
+      "id": 14,
+      "case_id": "btk-rader",
+      "episode_id": 10,
+      "at_sec": 640,
+      "kind": "evidence",
+      "kind_label": {
+        "fr": "Indices",
+        "en": "Evidence"
+      },
+      "prompt": {
+        "fr": "Une disquette contient un document supprimé dont les métadonnées donnent un prénom et une institution. Que peut-on en déduire à ce stade ?",
+        "en": "A floppy disk contains a deleted document whose metadata give a first name and an institution. What can be deduced at this stage?"
+      },
+      "choices": [
+        {
+          "id": "a",
+          "label": {
+            "fr": "L'identité de l'auteur des faits",
+            "en": "The identity of the author of the offences"
+          }
+        },
+        {
+          "id": "b",
+          "label": {
+            "fr": "Une piste nominative à vérifier par un élément indépendant",
+            "en": "A named lead to be verified by an independent element"
+          }
+        },
+        {
+          "id": "c",
+          "label": {
+            "fr": "Une preuve suffisante pour condamner",
+            "en": "Evidence sufficient to convict"
+          }
+        },
+        {
+          "id": "d",
+          "label": {
+            "fr": "Rien : les métadonnées sont modifiables",
+            "en": "Nothing: metadata can be modified"
+          }
+        }
+      ],
+      "source": {
+        "id": 28,
+        "scope": "case",
+        "title": {
+          "fr": "Dennis Rader",
+          "en": "Dennis Rader"
+        },
+        "author": "Contributors",
+        "publisher": "Wikipedia (English)",
+        "type": "public_archive",
+        "url": "https://en.wikipedia.org/wiki/Dennis_Rader",
+        "date": "2026",
+        "reliability": "PROBABLE",
+        "reliability_label": {
+          "fr": "Probable",
+          "en": "Probable"
+        },
+        "verified_at": "2026-09-24",
+        "note": {
+          "fr": "Encyclopédie collaborative : données recoupées avec la presse ; niveau PROBABLE par prudence.",
+          "en": "Collaborative encyclopaedia: data cross-checked with the press; PROBABLE level as a precaution."
+        },
+        "case_id": 6
+      }
+    }
+  ],
+  "signature_line": {
+    "fr": "Et maintenant, une question. Pas un jugement. Une réflexion.",
+    "en": "And now, a question. Not a judgement. A reflection."
+  }
+}
