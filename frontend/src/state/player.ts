@@ -272,7 +272,7 @@ export const usePlayer = create<PlayerState>((set, get) => {
         if (ep.audio_status === "produced" && ep.audio) {
           usingAudio = true;
           const el = getOrCreateAudio();
-          el.src = audioUrl(ep.audio);
+          el.src = new URL(audioUrl(ep.audio), window.location.href).href;
           el.preload = "auto";
           el.onended = () => {
             set({ playing: false });

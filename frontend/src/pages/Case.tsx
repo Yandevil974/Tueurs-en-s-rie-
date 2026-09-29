@@ -5,6 +5,7 @@ import { useApi, fmtDate } from "../lib/hooks";
 import { pick, tr } from "../lib/i18n";
 import { useApp } from "../state/app";
 import CaseCard from "../components/CaseCard";
+import { usePlayer } from "../state/player";
 import {
   BackLink,
   Bi_,
@@ -100,6 +101,8 @@ export default function CasePage() {
   const gate = useSensitiveGate(data?.case, slug);
   const toggleFavourite = useApp((s) => s.toggleFavourite);
   const favourites = useApp((s) => s.favourites);
+  const loadEpisode = usePlayer((s) => s.load);
+  const playEpisode = usePlayer((s) => s.play);
   const c = data?.case;
   const recs: Any[] = recommendations.data?.recommendations || [];
 
@@ -123,7 +126,20 @@ export default function CasePage() {
       </div>
 
       <div className="row" style={{ margin: "10px 0 0", justifyContent: "space-between" }}>
-        <button className="btn sm primary" onClick={() => nav(`/podcasts?case=${encodeURIComponent(c.slug)}`)}>▶ {tr(lang, "case.listen")}</button>
+        <button
+          className="btn sm primary"
+          onClick={async () => {
+            const episodes = (data as any)?.episodes || [];
+            if (episodes.length > 0) {
+              await loadEpisode(episodes[0].id);
+              playEpisode();
+            } else {
+              nav(`/podcasts?case=${encodeURIComponent(c.slug)}`);
+            }
+          }}
+        >
+          ▶ {tr(lang, "case.listen")}
+        </button>
         <button className={`btn sm ${favourites.includes(c.slug) ? "primary" : "ghost"}`} onClick={() => toggleFavourite(c.slug)} aria-pressed={favourites.includes(c.slug)}>
           {favourites.includes(c.slug) ? "★" : "☆"} {lang === "fr" ? "Favori" : "Favourite"}
         </button>

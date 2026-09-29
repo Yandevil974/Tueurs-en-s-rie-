@@ -61,7 +61,11 @@ export const api = {
 };
 
 export const audioUrl = (file: string) => {
-  return `/audio/${encodeURIComponent(file)}`;
+  const enc = encodeURIComponent(file);
+  if (typeof window !== "undefined" && (window.location.protocol === "capacitor:" || window.location.protocol === "http:")) {
+    return `./audio/${enc}`;
+  }
+  return `/audio/${enc}`;
 };
 
 /** Types lâches : le contenu est bilingue et polymorphe par conception. */
