@@ -40,6 +40,14 @@ export const UI: Dict = {
   },
 
   "common.loading": { fr: "Chargement…", en: "Loading…" },
+
+  "install.title": { fr: "Installer l'application", en: "Install the app" },
+  "install.hint": { fr: "Une icône sur votre écran d'accueil, plein écran, et qui démarre sans réseau.", en: "An icon on your home screen, full screen, and it starts without a network." },
+  "install.cta": { fr: "Installer", en: "Install" },
+  "install.done": { fr: "Installée", en: "Installed" },
+  "install.ios": { fr: "Sur iPhone : touchez Partager, puis « Sur l'écran d'accueil ».", en: "On iPhone: tap Share, then \u201cAdd to Home Screen\u201d." },
+  "install.update": { fr: "Nouvelle version disponible", en: "New version available" },
+  "install.apply": { fr: "Actualiser", en: "Reload" },
   "common.error": { fr: "Une erreur est survenue", en: "Something went wrong" },
   "common.retry": { fr: "Réessayer", en: "Retry" },
   "common.back": { fr: "Retour", en: "Back" },

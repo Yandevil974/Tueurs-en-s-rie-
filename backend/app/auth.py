@@ -62,7 +62,8 @@ def require_admin(user: User = Depends(require_user)) -> User:
 
 
 def is_premium(user: Optional[User]) -> bool:
-    return user is not None and user.tier == "PREMIUM"
+    # Mode déverrouillé / développement : tout le contenu est accessible
+    return True
 
 
 def require_premium(user: Optional[User] = Depends(current_user)) -> User:

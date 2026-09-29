@@ -1,0 +1,83 @@
+name: Build Android APK (YANIS//X)
+
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Prepare Audio Assets & Build Web Application
+        run: |
+          # Copie des fichiers audio maîtres dans public/audio pour le packaging
+          mkdir -p frontend/public/audio
+          cp -v content/media/*.wav content/media/*.mp3 frontend/public/audio/ 2>/dev/null || true
+          cd frontend
+          npm ci
+          npm run build
+          npx cap sync android
+          # Vérifier et s'assurer que les fichiers audio sont bien dans les assets de l'APK
+          mkdir -p android/app/src/main/assets/public/audio
+          cp -v public/audio/* android/app/src/main/assets/public/audio/
+          ls -la android/app/src/main/assets/public/audio
+
+      - name: Build APK with Gradle
+        run: |
+          cd frontend/android
+          chmod +x gradlew
+          ./gradlew assembleDebug --stacktrace
+          # Rename APK for clarity
+          cp app/build/outputs/apk/debug/app-debug.apk ../../yanisx-debug.apk
+
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yanisx-app-debug
+          path: yanisx-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach APK to Release or Update Nightly Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/arena/01a0e7ec-tueurs-en-s-rie'
+        with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'app-preview' }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Application Android YANIS//X (APK)' }}
+          body: |
+            ## Application Android YANIS//X (APK direct)
+            
+            Fichier APK prêt à installer sur Android (Samsung Z Fold 5, One UI) :
+            - **Nom :** YANIS//X
+            - **Package :** `app.yanisx.android`
+            - **Usage en voiture :** Prise en charge Bluetooth intégrée et Media Session.
+            - **Accès complet :** Mode Premium déverrouillé directement pour vos tests.
+            - **Audio embarqué :** Toutes les pistes audio sont packagées en dur dans l'APK.
+          files: yanisx-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
