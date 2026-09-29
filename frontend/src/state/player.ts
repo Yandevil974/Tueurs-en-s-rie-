@@ -1,3 +1,16 @@
+declare global {
+  interface Window {
+    AndroidNativeAudio?: {
+      playAudio: (assetName: string) => void;
+      pauseAudio: () => void;
+      resumeAudio: () => void;
+      stopAudio: () => void;
+      seekTo: (sec: number) => void;
+      getCurrentPosition: () => number;
+      isPlaying: () => boolean;
+    };
+  }
+}
 /**
  * 🎧 Le moteur du podcast interactif (§3, §8, §26).
  *
@@ -311,7 +324,10 @@ export const usePlayer = create<PlayerState>((set, get) => {
       const { pending, duration, position } = get();
       if (pending) return;
       if (duration > 0 && position >= duration - 0.5) set({ position: 0 });
-      if (audioEl && get().usingAudio) {
+      const currentEp = get().episode;
+      if (window.AndroidNativeAudio && currentEp && currentEp.audio) {
+        window.AndroidNativeAudio.playAudio(currentEp.audio);
+      } else if (audioEl && get().usingAudio) {
         audioEl.playbackRate = get().speed;
         audioEl.play().catch((err) => {
           console.warn("Échec audioEl.play():", err);
@@ -335,6 +351,9 @@ export const usePlayer = create<PlayerState>((set, get) => {
       startTimer();
     },
     pause: () => {
+      if (window.AndroidNativeAudio) {
+        window.AndroidNativeAudio.pauseAudio();
+      }
       if (audioEl) audioEl.pause();
       tts.pause();
       set({ playing: false });
@@ -345,6 +364,9 @@ export const usePlayer = create<PlayerState>((set, get) => {
     toggle: () => (get().playing ? get().pause() : get().play()),
     seek: (sec) => {
       const clamped = Math.max(0, Math.min(get().duration || sec, sec));
+      if (window.AndroidNativeAudio) {
+        window.AndroidNativeAudio.seekTo(Math.round(clamped));
+      }
       if (audioEl && get().usingAudio) audioEl.currentTime = clamped;
       set({ position: clamped });
     },
@@ -356,6 +378,9 @@ export const usePlayer = create<PlayerState>((set, get) => {
     stop: () => {
       save();
       stopTimer();
+      if (window.AndroidNativeAudio) {
+        window.AndroidNativeAudio.stopAudio();
+      }
       if (audioEl) {
         audioEl.pause();
         audioEl = null;
