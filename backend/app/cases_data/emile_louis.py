@@ -347,24 +347,24 @@ INVESTIGATION = {
                      "ouverte.",
                      "Seven young women in state care disappear between 1977 and 1979. No centre reports these "
                      "disappearances: they are recorded as running away. No overall judicial investigation is opened."),
-         "reliability": "CONFIRMED", "source": "vINGTminutes-traces", "premium": False},
+         "reliability": "CONFIRMED", "source": "vINGTminutes-traces"},
         {"n": 2, "date": "1979-12", "title": txt("Un chauffeur de car", "A bus driver"),
          "body": txt("Émile Louis conduit le car qui transporte ces jeunes femmes entre leur établissement et leur "
                      "lieu de résidence. Il est entendu en décembre 1979 au sujet de Martine Renault.",
                      "Émile Louis drives the bus transporting these young women between their institution and their "
                      "residence. He is heard in December 1979 about Martine Renault."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": False},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 3, "date": "1981-07-05", "title": txt("Un corps dans une étable", "A body in a barn"),
          "body": txt("Le corps de Sylviane Lesage, 23 ans, est découvert à Rouvray. Émile Louis est inculpé de "
                      "meurtre et écroué.",
                      "The body of Sylviane Lesage, 23, is discovered in Rouvray. Émile Louis is charged with murder "
                      "and detained."),
-         "reliability": "CONFIRMED", "source": "lyonne-dates", "premium": False},
+         "reliability": "CONFIRMED", "source": "lyonne-dates"},
         {"n": 4, "date": "1983-01", "title": txt("Une condamnation pour d'autres faits", "A conviction for other facts"),
          "body": txt("Il est condamné pour attentats à la pudeur sur des mineures de la DDASS : cinq ans, réduits à "
                      "quatre en appel.",
                      "He is convicted of indecent assaults on minors in state care: five years, reduced to four on appeal."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": False},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 5, "date": "1984-02", "title": txt("Le rapport qui désigne, et qui dort", "The report that names, and sleeps"),
          "body": txt("Non-lieu dans l'affaire Lesage, faute de preuves. La même année, le gendarme Christian Jambert "
                      "remet un rapport désignant Émile Louis comme principal suspect dans la disparition de six jeunes "
@@ -372,38 +372,38 @@ INVESTIGATION = {
                      "Dismissal in the Lesage case for lack of evidence. The same year, gendarme Christian Jambert "
                      "submits a report naming Émile Louis as the main suspect in the disappearance of six young women. "
                      "The report is not followed up."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": True},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 6, "date": "1996", "title": txt("Une association rouvre le dossier", "An association reopens the file"),
          "body": txt("L'association de défense des handicapés de l'Yonne dépose plainte. Le parquet refuse de donner "
                      "suite : les faits sont prescrits. L'affaire est alors portée devant les médias.",
                      "The Yonne disability defence association files a complaint. The prosecution refuses to proceed: "
                      "the facts are time-barred. The case is then taken to the media."),
-         "reliability": "CONFIRMED", "source": "monde-yonne", "premium": False},
+         "reliability": "CONFIRMED", "source": "monde-yonne"},
         {"n": 7, "date": "2000-12-12", "title": txt("Des aveux fondés sur une croyance", "Confessions based on a belief"),
          "body": txt("Émile Louis est interpellé. Croyant les faits prescrits, il reconnaît sept meurtres. Il se "
                      "rétracte en janvier 2001, invoquant la pression des gendarmes.",
                      "Émile Louis is arrested. Believing the facts time-barred, he admits seven murders. He retracts "
                      "in January 2001, invoking pressure from the gendarmes."),
-         "reliability": "CONFIRMED", "source": "vINGTminutes-traces", "premium": True},
+         "reliability": "CONFIRMED", "source": "vINGTminutes-traces"},
         {"n": 8, "date": "2000-12", "title": txt("Deux corps, cinq absences", "Two bodies, five absences"),
          "body": txt("Sur ses indications, les corps de Madeleine Dejust et de Jacqueline Weis sont exhumés. Les cinq "
                      "autres ne seront jamais retrouvés.",
                      "On his indications, the bodies of Madeleine Dejust and Jacqueline Weis are exhumed. The five "
                      "others will never be found."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": False},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 9, "date": "2002-02-20", "title": txt("La prescription écartée", "Prescription ruled out"),
          "body": txt("La Cour de cassation retient que la séquestration est un crime continu tant que le corps n'est "
                      "pas retrouvé. Le dossier peut être jugé, vingt-cinq ans après les faits.",
                      "The Court of Cassation holds that confinement is a continuing offence as long as the body is not "
                      "found. The file can be tried, twenty-five years after the facts."),
-         "reliability": "CONFIRMED", "source": "monde-yonne", "premium": True},
+         "reliability": "CONFIRMED", "source": "monde-yonne"},
         {"n": 10, "date": "2004-11-25", "title": txt("Le verdict", "The verdict"),
          "body": txt("La cour d'assises de l'Yonne condamne Émile Louis à la réclusion criminelle à perpétuité avec "
                      "18 ans de sûreté. Peine confirmée en appel le 27 juin 2006, pourvoi rejeté en septembre 2007.",
                      "The Yonne assize court sentences Émile Louis to life imprisonment with an 18-year minimum term. "
                      "Sentence confirmed on appeal on 27 June 2006, appeal to the Court of Cassation rejected in "
                      "September 2007."),
-         "reliability": "CONFIRMED", "source": "monde-yonne", "premium": False},
+         "reliability": "CONFIRMED", "source": "monde-yonne"},
     ],
     "reality": txt(
         "Voici comment l'enquête s'est réellement déroulée : vingt ans d'oubli institutionnel, un rapport de "
@@ -930,8 +930,7 @@ CASE = {
     "status": "PARTIALLY_RESOLVED",
     "status_note": txt("Condamnation définitive prononcée en 2006 ; cinq corps n'ont jamais été retrouvés.",
                        "Final conviction pronounced in 2006; five bodies were never recovered."),
-    "type": "serial", "tags": ["serial_killer", "institutional_failures", "cold_case", "france", "vulnerable_victims", "prescription"],
-    "tier": "PREMIUM", "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
+    "type": "serial", "tags": ["serial_killer", "institutional_failures", "cold_case", "france", "vulnerable_victims", "prescription"], "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
     "triggers": txt("Meurtres de jeunes femmes en situation de handicap ; défaillances institutionnelles ; mort contestée d'un gendarme.",
                     "Murders of young women with disabilities; institutional failures; disputed death of a gendarme."),
     "lat": 47.798, "lon": 3.567, "cover": "cover-yonne",

@@ -88,7 +88,6 @@ CASE = {
     ),
     "type": "disappearance",
     "tags": ["child_victim", "cold_case", "dna", "france", "judicial_failures", "serial_link"],
-    "tier": "FREE",
     "editorial": "yanis",
     "published_at": "2026-09-24",
     "sensitive": True,
@@ -479,7 +478,7 @@ INVESTIGATION = {
                 "immediate. What investigators knew at that moment: a short, routine journey, a narrow window of "
                 "disappearance, a small commune, winter weather.",
             ),
-            "reliability": "CONFIRMED", "source": "franceinfo-chronologie", "premium": False,
+            "reliability": "CONFIRMED", "source": "franceinfo-chronologie",
         },
         {
             "n": 2, "date": "2003-01",
@@ -492,7 +491,7 @@ INVESTIGATION = {
                 "was opened in Meaux. This mass work produced a considerable volume of statements without leading to an "
                 "identification.",
             ),
-            "reliability": "CONFIRMED", "source": "franceinfo-chronologie", "premium": False,
+            "reliability": "CONFIRMED", "source": "franceinfo-chronologie",
         },
         {
             "n": 3, "date": "2003",
@@ -504,7 +503,7 @@ INVESTIGATION = {
                 "The Michel Fourniret lead was considered as early as 2003. Searches uncovered a video report on the "
                 "disappearance and photographs of the child on his computer. He denied it and claimed an interest in the case.",
             ),
-            "reliability": "PROBABLE", "source": "marieclaire-temps-forts", "premium": True,
+            "reliability": "PROBABLE", "source": "marieclaire-temps-forts",
         },
         {
             "n": 4, "date": "2003",
@@ -517,7 +516,7 @@ INVESTIGATION = {
                 "from Guermantes. Phone records attest it. Investigators deemed the alibi solid; the lead was set "
                 "aside, and Guermantes did not correspond to the usual area of his crimes.",
             ),
-            "reliability": "CONFIRMED", "source": "monde-5dates", "premium": False,
+            "reliability": "CONFIRMED", "source": "monde-5dates",
         },
         {
             "n": 5, "date": "2004-2018",
@@ -529,7 +528,7 @@ INVESTIGATION = {
                 "The file was investigated in Meaux and then saw a succession of magistrates. The 2025 ruling would "
                 "find: ten successive magistrates, no synthesis report, a file never paginated, meaning no page was numbered.",
             ),
-            "reliability": "CONFIRMED", "source": "rtl-faute-lourde", "premium": True,
+            "reliability": "CONFIRMED", "source": "rtl-faute-lourde",
         },
         {
             "n": 6, "date": "2019",
@@ -541,7 +540,7 @@ INVESTIGATION = {
                 "In 2019, the file was transferred to Paris, with the stated aim of facilitating the discovery of truth "
                 "before Michel Fourniret's age and memory prevented it for good. Judge Sabine Kheris took over.",
             ),
-            "reliability": "CONFIRMED", "source": "monde-5dates", "premium": False,
+            "reliability": "CONFIRMED", "source": "monde-5dates",
         },
         {
             "n": 7, "date": "2020-01",
@@ -552,7 +551,7 @@ INVESTIGATION = {
                 "Monique Olivier accused her ex-husband of abducting, raping and strangling Estelle Mouzin. She was "
                 "indicted for complicity in abduction and confinement followed by death.",
             ),
-            "reliability": "CONFIRMED", "source": "monde-5dates", "premium": True,
+            "reliability": "CONFIRMED", "source": "monde-5dates",
         },
         {
             "n": 8, "date": "2020-03",
@@ -565,7 +564,7 @@ INVESTIGATION = {
                 "gave neither the conditions of the abduction, nor of the death, nor the location of the body. His "
                 "convoluted statements and memory problems constantly complicated investigators' work.",
             ),
-            "reliability": "CONFIRMED", "source": "monde-5dates", "premium": False,
+            "reliability": "CONFIRMED", "source": "monde-5dates",
         },
         {
             "n": 9, "date": "2020-08-21",
@@ -576,7 +575,7 @@ INVESTIGATION = {
                 "A new expert examination revealed a partial DNA trace of Estelle Mouzin on a mattress seized in 2003. "
                 "The item had been in judicial custody for seventeen years: the science had changed, the seal had stayed.",
             ),
-            "reliability": "CONFIRMED", "source": "franceinfo-chronologie", "premium": True,
+            "reliability": "CONFIRMED", "source": "franceinfo-chronologie",
         },
         {
             "n": 10, "date": "2020-10-15",
@@ -587,7 +586,7 @@ INVESTIGATION = {
                 "A six-hour reconstruction was held in Guermantes. Searches followed in the Ardennes, on designated "
                 "sites including Issancourt-et-Rumel. They did not recover the body.",
             ),
-            "reliability": "CONFIRMED", "source": "ouestfrance-reconstitution", "premium": False,
+            "reliability": "CONFIRMED", "source": "ouestfrance-reconstitution",
         },
         {
             "n": 11, "date": "2023-12-19",
@@ -598,7 +597,7 @@ INVESTIGATION = {
                 "Michel Fourniret having died in 2021, public prosecution was extinguished with respect to him. Monique "
                 "Olivier appeared alone. She was sentenced to life imprisonment with a 20-year minimum term.",
             ),
-            "reliability": "CONFIRMED", "source": "franceinfo-olivier-2023", "premium": True,
+            "reliability": "CONFIRMED", "source": "franceinfo-olivier-2023",
         },
         {
             "n": 12, "date": "2025-09-03",
@@ -611,7 +610,7 @@ INVESTIGATION = {
                 "Mouzin. The ruling recognised the failures while noting the exceptional scale of certain "
                 "investigative acts.",
             ),
-            "reliability": "CONFIRMED", "source": "rtl-faute-lourde", "premium": False,
+            "reliability": "CONFIRMED", "source": "rtl-faute-lourde",
         },
     ],
     "reality": txt(
@@ -1038,7 +1037,7 @@ UNKNOWNS = [
 
 # --------------------------------------------------------- DOSSIER (§9) ----
 SECTIONS = [
-    {"key": "introduction", "title": txt("Introduction", "Introduction"), "tier": "FREE",
+    {"key": "introduction", "title": txt("Introduction", "Introduction"),
      "blocks": [block("paragraph", "Un trajet de quelques centaines de mètres", "A journey of a few hundred metres",
                       "Le 9 janvier 2003, à Guermantes, une enfant de 9 ans ne rentre pas de l'école. Ce qui suit est "
                       "l'histoire d'une enquête de dix-sept ans, d'une trace conservée dans un scellé, d'aveux tardifs "
@@ -1047,7 +1046,7 @@ SECTIONS = [
                       "is the story of a seventeen-year investigation, a trace kept in an exhibit, late confessions and "
                       "a court decision recognising gross negligence by the State.",
                       "CONFIRMED", "franceinfo-chronologie")]},
-    {"key": "context", "title": txt("Contexte", "Context"), "tier": "FREE",
+    {"key": "context", "title": txt("Contexte", "Context"),
      "blocks": [block("paragraph", "Une commune de 1 400 habitants", "A commune of 1,400 inhabitants",
                       "Guermantes est une petite commune de Seine-et-Marne. La disparition d'un enfant y déclenche un "
                       "dispositif de masse : tous les habitants entendus, tous les logements perquisitionnés, les bois "
@@ -1056,7 +1055,7 @@ SECTIONS = [
                       "operation: all inhabitants heard, all homes searched, woods combed. The volume of acts was "
                       "considerable; the identification did not come.",
                       "CONFIRMED", "franceinfo-chronologie")]},
-    {"key": "offender", "title": txt("Auteur", "Author"), "tier": "PREMIUM",
+    {"key": "offender", "title": txt("Auteur", "Author"),
      "blocks": [block("paragraph", "Michel Fourniret (1942-2021)", "Michel Fourniret (1942-2021)",
                       "Tueur en série déjà condamné à la perpétuité en 2008 pour les meurtres de sept jeunes femmes ou "
                       "adolescentes commis entre 1987 et 2001, puis à 20 ans de réclusion en 2018. Il a reconnu en "
@@ -1067,11 +1066,11 @@ SECTIONS = [
                       "acknowledged his responsibility for Estelle Mouzin's death. He died in custody on 10 May 2021 "
                       "and was not tried for these facts.",
                       "CONFIRMED", "franceinfo-olivier-2023")]},
-    {"key": "victims", "title": txt("Victime", "Victim"), "tier": "FREE", "blocks": []},
-    {"key": "timeline", "title": txt("Chronologie", "Chronology"), "tier": "FREE", "blocks": []},
-    {"key": "investigation", "title": txt("Enquête", "Investigation"), "tier": "FREE", "blocks": []},
-    {"key": "clues", "title": txt("Indices et preuves", "Clues and evidence"), "tier": "PREMIUM", "blocks": []},
-    {"key": "behaviour", "title": txt("Analyse comportementale", "Behavioural analysis"), "tier": "PREMIUM",
+    {"key": "victims", "title": txt("Victime", "Victim"), "blocks": []},
+    {"key": "timeline", "title": txt("Chronologie", "Chronology"), "blocks": []},
+    {"key": "investigation", "title": txt("Enquête", "Investigation"), "blocks": []},
+    {"key": "clues", "title": txt("Indices et preuves", "Clues and evidence"), "blocks": []},
+    {"key": "behaviour", "title": txt("Analyse comportementale", "Behavioural analysis"),
      "blocks": [block("behaviour", "Parler peu, parler tard", "Speaking little, speaking late",
                       "Le comportement documenté de l'auteur dans ce dossier est un comportement de contrôle de "
                       "l'information : dénégation initiale, aveu de responsabilité sans récit, refus de préciser les "
@@ -1082,9 +1081,9 @@ SECTIONS = [
                       "designation of places without results. This pattern forced the investigation to work on traces "
                       "and on a third party's speech rather than on a verifiable account.",
                       "CONFIRMED", "monde-5dates")]},
-    {"key": "psychology", "title": txt("Psychologie", "Psychology"), "tier": "PREMIUM", "blocks": []},
-    {"key": "victimology", "title": txt("Victimologie", "Victimology"), "tier": "FREE", "blocks": []},
-    {"key": "geography", "title": txt("Géographie", "Geography"), "tier": "FREE", "blocks": [
+    {"key": "psychology", "title": txt("Psychologie", "Psychology"), "blocks": []},
+    {"key": "victimology", "title": txt("Victimologie", "Victimology"), "blocks": []},
+    {"key": "geography", "title": txt("Géographie", "Geography"), "blocks": [
         block("paragraph", "Trois lieux, deux pays", "Three places, two countries",
               "Guermantes (lieu de la disparition), Ville-sur-Lumes (lieu désigné de la séquestration), "
               "Sart-Custinne en Belgique (lieu de l'appel d'alibi). La distance entre les deux premiers est d'environ "
@@ -1093,16 +1092,16 @@ SECTIONS = [
               "in Belgium (place of the alibi call). The distance between the first two is about 250 kilometres — it "
               "was this distance that weighed in setting the lead aside in 2003.",
               "CONFIRMED", "monde-5dates")]},
-    {"key": "arrest", "title": txt("Mise en cause", "Indictment"), "tier": "FREE", "blocks": [
+    {"key": "arrest", "title": txt("Mise en cause", "Indictment"), "blocks": [
         block("paragraph", "Une mise en examen tardive", "A late indictment",
               "Michel Fourniret a été mis en examen pour enlèvement et séquestration suivis de mort dans ce dossier ; "
               "Monique Olivier a été mise en examen pour complicité en 2020.",
               "Michel Fourniret was indicted for abduction and confinement followed by death in this file; Monique "
               "Olivier was indicted for complicity in 2020.",
               "CONFIRMED", "ouestfrance-reconstitution")]},
-    {"key": "trial", "title": txt("Procès", "Trial"), "tier": "FREE", "blocks": []},
-    {"key": "justice", "title": txt("Justice", "Justice"), "tier": "FREE", "blocks": []},
-    {"key": "consequences", "title": txt("Conséquences", "Consequences"), "tier": "FREE",
+    {"key": "trial", "title": txt("Procès", "Trial"), "blocks": []},
+    {"key": "justice", "title": txt("Justice", "Justice"), "blocks": []},
+    {"key": "consequences", "title": txt("Conséquences", "Consequences"),
      "blocks": [block("paragraph", "Après le verdict", "After the verdict",
                       "L'affaire a produit une décision civile inédite pour la famille : la reconnaissance de la faute "
                       "lourde de l'État, le 3 septembre 2025. Elle a aussi alimenté le débat public sur la "
@@ -1111,11 +1110,11 @@ SECTIONS = [
                       "negligence by the State, on 3 September 2025. It also fed public debate on the continuity of "
                       "investigations and on the handling of child disappearance files.",
                       "CONFIRMED", "rtl-faute-lourde")]},
-    {"key": "archives", "title": txt("Archives", "Archives"), "tier": "PREMIUM", "blocks": []},
-    {"key": "sources", "title": txt("Sources", "Sources"), "tier": "FREE", "blocks": []},
-    {"key": "memorial", "title": txt("Mémoire", "Memory"), "tier": "FREE", "blocks": []},
-    {"key": "unknowns", "title": txt("Zones d'ombre", "Unknown zones"), "tier": "FREE", "blocks": []},
-    {"key": "lessons", "title": txt("Ce que l'affaire nous apprend", "What the case teaches us"), "tier": "FREE", "blocks": []},
+    {"key": "archives", "title": txt("Archives", "Archives"), "blocks": []},
+    {"key": "sources", "title": txt("Sources", "Sources"), "blocks": []},
+    {"key": "memorial", "title": txt("Mémoire", "Memory"), "blocks": []},
+    {"key": "unknowns", "title": txt("Zones d'ombre", "Unknown zones"), "blocks": []},
+    {"key": "lessons", "title": txt("Ce que l'affaire nous apprend", "What the case teaches us"), "blocks": []},
 ]
 
 # -------------------------------------------------------------- PODCAST ----

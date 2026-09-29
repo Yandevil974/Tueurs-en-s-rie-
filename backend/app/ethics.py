@@ -166,7 +166,7 @@ NEVER = {
         "Ne jamais inventer une source, une citation, une date ou une identité.",
         "Ne jamais présenter une fiction comme un fait.",
         "Ne jamais poser un diagnostic psychiatrique.",
-        "Ne jamais rendre payante la mémoire essentielle des victimes.",
+        "Toujours traiter les victimes avec dignité et replacer leur mémoire au centre.",
         "Ne jamais transformer un crime en jeu ou en compétition.",
     ],
     "en": [
@@ -177,7 +177,7 @@ NEVER = {
         "Never invent a source, a quote, a date or an identity.",
         "Never present fiction as fact.",
         "Never make a psychiatric diagnosis.",
-        "Never paywall the essential memory of victims.",
+        "Always treat victims with dignity and keep their memory central.",
         "Never turn a crime into a game or a competition.",
     ],
 }

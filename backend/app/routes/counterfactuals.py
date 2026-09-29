@@ -9,9 +9,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from .. import ethics
-from ..auth import current_user, require_user
 from ..db import get_db
-from ..models import Case, Counterfactual, UserProgress
+from ..models import Case, Counterfactual
 from ._serialise import counterfactual_out, sources_map
 
 router = APIRouter(prefix="/counterfactuals", tags=["et-si"])
@@ -161,26 +160,3 @@ def get_counterfactual(cf_id: int, db: Session = Depends(get_db)):
     payload = compute(cf)
     payload["source"] = smap.get(cf.source_id) if cf.source_id else None
     return payload
-
-
-@router.post("/{cf_id}/reflect")
-def save_reflection(cf_id: int, payload: dict, user=Depends(require_user), db: Session = Depends(get_db)):
-    """§57 « À vous de réfléchir »: a private, saved reflection. No score."""
-    cf = db.get(Counterfactual, cf_id)
-    if cf is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Réflexion introuvable / Counterfactual not found")
-    text = str((payload or {}).get("text", "")).strip()[:4000]
-    if not text:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY,
-                            "Réflexion vide / Empty reflection")
-    ref = f"{cf.case.slug}:{cf.id}"
-    row = db.query(UserProgress).filter_by(user_id=user.id, kind="reflection", ref=ref).first()
-    if row is None:
-        row = UserProgress(user_id=user.id, kind="reflection", ref=ref, value={"text": text})
-        db.add(row)
-    else:
-        row.value = {"text": text}
-    db.commit()
-    return {"saved": True, "case_id": cf.case.slug, "counterfactual_id": cf.id, "text": text,
-            "private": {"fr": "Votre réflexion reste privée. Elle n'est ni publiée ni partagée.",
-                        "en": "Your reflection stays private. It is neither published nor shared."}}

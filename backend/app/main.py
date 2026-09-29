@@ -1,7 +1,7 @@
 """YANIS//X — API.
 
-Identity: "ARCHIVES CRIMINELLES PREMIUM". Every response carries the editorial
-rules that govern it: nothing invented, nothing glorified, victims centred.
+Personal documentary archive: no account or subscription tiers. Every response
+carries the editorial rules: nothing invented, nothing glorified, victims centred.
 """
 from __future__ import annotations
 
@@ -28,7 +28,7 @@ psychology, victimology, investigation, archives and memory.
 Règles éditoriales / editorial rules:
 - aucune donnée inventée — *no invented data*
 - chaque fait porte un niveau de fiabilité et sa source — *every fact carries a reliability level and its source*
-- les victimes sont au centre, jamais payantes — *victims come first, never paywalled*
+- les victimes sont au centre et traitées avec dignité — *victims come first and are treated with dignity*
 - aucun classement, aucune glorification, aucun jeu avec la violence — *no ranking, no glorification, no gamified violence*
 """
 
@@ -114,7 +114,6 @@ def index() -> dict:
             "answer": "/api/questions/{id}/answer",
             "counterfactuals": "/api/counterfactuals",
             "counterfactual": "/api/counterfactuals/{id}",
-            "reflect": "/api/counterfactuals/{id}/reflect",
             "world": "/api/explore",
             "continent": "/api/explore/continent/{continent}",
             "country": "/api/explore/country/{code}",
@@ -130,10 +129,5 @@ def index() -> dict:
             "glossary": "/api/glossary",
             "courses": "/api/courses",
             "countries": "/api/countries",
-            "auth": "/api/auth/register, /api/auth/login, /api/auth/me",
-            "progress": "/api/progress, /api/progress/resume, /api/progress/favourite/{slug}",
-            "voices": "/api/auth/me/voices",
-            "notifications": "/api/notifications, /api/notifications/{id}/read, /api/notifications/read-all",
-            "admin": "/api/admin/stats, /api/admin/revisions, /api/admin/reseed, /api/admin/notifications",
         },
     }

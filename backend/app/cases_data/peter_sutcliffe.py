@@ -243,13 +243,13 @@ INVESTIGATION = {
         {"n": 1, "date": "1975-10-30", "title": txt("Un premier meurtre dans le Yorkshire", "A first murder in Yorkshire"),
          "body": txt("Wilma McCann, 28 ans, est tuée le 30 octobre 1975. Rien ne relie encore ce fait à une série.",
                      "Wilma McCann, 28, is killed on 30 October 1975. Nothing yet links this offence to a series.",),
-         "reliability": "PROBABLE", "source": "serialkillercalendar", "premium": False},
+         "reliability": "PROBABLE", "source": "serialkillercalendar"},
         {"n": 2, "date": "1976-1977", "title": txt("La constitution d'une série", "The formation of a series"),
          "body": txt("Des meurtres successifs sont commis dans le Yorkshire et le nord-ouest. L'enquête devient l'une "
                      "des plus vastes et des plus coûteuses de l'histoire britannique.",
                      "Successive murders are committed in Yorkshire and the north-west. The investigation becomes one "
                      "of the largest and most expensive in British history.",),
-         "reliability": "CONFIRMED", "source": "ap-death", "premium": False},
+         "reliability": "CONFIRMED", "source": "ap-death"},
         {"n": 3, "date": "1978", "title": txt("Un canular qui oriente l'enquête", "A hoax that steers the investigation"),
          "body": txt("Des lettres puis une cassette revendiquant les faits parviennent à la police. Elles émanent "
                      "d'un autre homme. Des responsables s'y fient : les recherches sont orientées vers un accent du "
@@ -257,30 +257,30 @@ INVESTIGATION = {
                      "Letters then a tape claiming the offences reach the police. They come from another man. Senior "
                      "officers rely on them: searches are steered towards a Wearside accent, which the actual author "
                      "did not have.",),
-         "reliability": "CONFIRMED", "source": "ap-death", "premium": True},
+         "reliability": "CONFIRMED", "source": "ap-death"},
         {"n": 4, "date": "1978-1980", "title": txt("Neuf entretiens, aucune identification", "Nine interviews, no identification"),
          "body": txt("L'homme est entendu neuf fois pendant l'enquête. Le système de fiches, mal croisé, égare des "
                      "éléments ; des détails physiques ne sont pas rapprochés.",
                      "The man is interviewed nine times during the investigation. The card system, poorly "
                      "cross-referenced, misplaces elements; physical details are not linked.",),
-         "reliability": "CONFIRMED", "source": "ap-death", "premium": True},
+         "reliability": "CONFIRMED", "source": "ap-death"},
         {"n": 5, "date": "1981-01-02", "title": txt("Un contrôle routier", "A traffic stop"),
          "body": txt("À Sheffield, lors d'un contrôle sans lien avec l'affaire, il est trouvé en compagnie d'une "
                      "prostituée dans sa voiture. Il est arrêté. Au cours d'un entretien de vingt-quatre heures, il "
                      "reconnaît les faits.",
                      "In Sheffield, during a stop unrelated to the case, he is found with a prostitute in his car. He "
                      "is arrested. During a twenty-four hour interview, he admits the facts.",),
-         "reliability": "CONFIRMED", "source": "ap-death", "premium": False},
+         "reliability": "CONFIRMED", "source": "ap-death"},
         {"n": 6, "date": "1981-05-22", "title": txt("Le verdict", "The verdict"),
          "body": txt("Le jury écarte la responsabilité atténuée et le déclare coupable de treize meurtres et sept "
                      "tentatives. Vingt peines de réclusion à perpétuité concurrentes sont prononcées.",
                      "The jury rejects diminished responsibility and finds him guilty of thirteen murders and seven "
                      "attempts. Twenty concurrent life terms are pronounced.",),
-         "reliability": "CONFIRMED", "source": "ap-death", "premium": False},
+         "reliability": "CONFIRMED", "source": "ap-death"},
         {"n": 7, "date": "2010-08-04", "title": txt("Une peine incompressible confirmée", "A whole life tariff confirmed"),
          "body": txt("Une décision de la High Court confirme qu'il ne sera jamais libéré.",
                      "A High Court decision confirms he will never be released.",),
-         "reliability": "PROBABLE", "source": "serialkillercalendar", "premium": True},
+         "reliability": "PROBABLE", "source": "serialkillercalendar"},
     ],
     "reality": txt(
         "L'enquête a disposé des éléments avant de pouvoir les assembler : neuf entretiens, des détails physiques "
@@ -743,8 +743,7 @@ CASE = {
     "country": "GB", "region": "Yorkshire / Angleterre du Nord", "city": "Leeds",
     "year_start": 1975, "year_end": 2020, "period_label": txt("1975 – 2020", "1975 – 2020"),
     "status": "RESOLVED", "type": "serial",
-    "tags": ["serial_killer", "uk", "hoax", "information_management", "media_naming", "whole_life_tariff"],
-    "tier": "PREMIUM", "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
+    "tags": ["serial_killer", "uk", "hoax", "information_management", "media_naming", "whole_life_tariff"], "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
     "triggers": txt("Meurtres de treize femmes ; débats sur la catégorisation des victimes ; diagnostic "
                     "psychiatrique évoqué.",
                     "Murders of thirteen women; debates on the categorisation of victims; psychiatric diagnosis "

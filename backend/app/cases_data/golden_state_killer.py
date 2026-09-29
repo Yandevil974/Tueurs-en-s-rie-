@@ -242,30 +242,30 @@ INVESTIGATION = {
                      "exerce comme policier à Exeter puis à Auburn.",
                      "A first series of offences is committed in northern California, while the author works as a "
                      "police officer in Exeter then Auburn."),
-         "reliability": "CONFIRMED", "source": "guardian-plea", "premium": False},
+         "reliability": "CONFIRMED", "source": "guardian-plea"},
         {"n": 2, "date": "1979-1986", "title": txt("Des meurtres dans le sud", "Murders in the south"),
          "body": txt("Des meurtres sont commis dans le sud de la Californie, dont celui de Lyman et Charlene Smith à "
                      "Ventura en 1980. Le rapprochement entre les deux zones prendra des années.",
                      "Murders are committed in southern California, including that of Lyman and Charlene Smith in "
                      "Ventura in 1980. Linking the two areas would take years."),
-         "reliability": "CONFIRMED", "source": "guardian-plea", "premium": False},
+         "reliability": "CONFIRMED", "source": "guardian-plea"},
         {"n": 3, "date": "1986", "title": txt("Le dernier fait connu", "The last known offence"),
          "body": txt("La série s'arrête en 1986. Le dossier devient froid, et le reste pendant plus de trente ans.",
                      "The series stops in 1986. The file goes cold, and stays so for more than thirty years.",),
-         "reliability": "CONFIRMED", "source": "aetv-gsk", "premium": False},
+         "reliability": "CONFIRMED", "source": "aetv-gsk"},
         {"n": 4, "date": "1990-2017", "title": txt("Une vie ordinaire", "An ordinary life"),
          "body": txt("L'auteur travaille comme mécanicien poids lourds dans un centre de distribution à Roseville "
                      "jusqu'à sa retraite en 2017. Il vit à Citrus Heights.",
                      "The author works as a truck mechanic in a distribution centre in Roseville until retiring in "
                      "2017. He lives in Citrus Heights."),
-         "reliability": "CONFIRMED", "source": "rossmo-2023", "premium": True},
+         "reliability": "CONFIRMED", "source": "rossmo-2023"},
         {"n": 5, "date": "2018", "title": txt("Un profil déposé sur une base ouverte", "A profile uploaded to an open database"),
          "body": txt("Un profil ADN issu d'un kit de prélèvement du comté de Ventura est déposé sur GEDmatch. La "
                      "méthode consiste à identifier des apparentés, puis à construire un arbre généalogique croisé "
                      "avec l'âge et la géographie.",
                      "A DNA profile from a Ventura County rape kit is uploaded to GEDmatch. The method consists of "
                      "identifying relatives, then building a family tree crossed with age and geography."),
-         "reliability": "CONFIRMED", "source": "aetv-gsk", "premium": False},
+         "reliability": "CONFIRMED", "source": "aetv-gsk"},
         {"n": 6, "date": "2018-04", "title": txt("De mille noms à trois, puis à un", "From a thousand names to three, then to one"),
          "body": txt("L'arbre de plus de mille noms est réduit à trois individus, dont Joseph DeAngelo et son frère. "
                      "Deux prélèvements discrets — poignée de voiture et mouchoir dans une poubelle — confirment la "
@@ -273,19 +273,19 @@ INVESTIGATION = {
                      "The tree of more than a thousand names is reduced to three individuals, including Joseph "
                      "DeAngelo and his brother. Two covert samples — a car door handle and a tissue from a bin — "
                      "confirm the match."),
-         "reliability": "CONFIRMED", "source": "rossmo-2023", "premium": True},
+         "reliability": "CONFIRMED", "source": "rossmo-2023"},
         {"n": 7, "date": "2018-04-24", "title": txt("Arrestation", "Arrest"),
          "body": txt("Il est arrêté à son domicile de Citrus Heights, sans résistance, à 72 ans. C'est la première "
                      "arrestation publique obtenue par généalogie génétique.",
                      "He is arrested at his Citrus Heights home, without resistance, aged 72. It is the first public "
                      "arrest obtained through genetic genealogy."),
-         "reliability": "CONFIRMED", "source": "abc-timeline", "premium": False},
+         "reliability": "CONFIRMED", "source": "abc-timeline"},
         {"n": 8, "date": "2020-06-29", "title": txt("Un accord pour éviter la peine de mort", "A deal to avoid the death penalty"),
          "body": txt("Il plaide coupable. Le parquet, qui avait requis la peine capitale, accepte l'accord en citant "
                      "la complexité du dossier et l'âge avancé de nombreuses victimes et témoins.",
                      "He pleads guilty. The prosecution, which had sought the death penalty, accepts the deal citing "
                      "the complexity of the file and the advanced age of many victims and witnesses."),
-         "reliability": "CONFIRMED", "source": "guardian-plea", "premium": True},
+         "reliability": "CONFIRMED", "source": "guardian-plea"},
         {"n": 9, "date": "2020-08-21", "title": txt("Le maximum légal", "The legal maximum"),
          "body": txt("Après trois jours d'auditions de survivants et de familles, il est condamné à onze peines "
                      "consécutives de réclusion à perpétuité sans possibilité de libération conditionnelle, plus "
@@ -293,7 +293,7 @@ INVESTIGATION = {
                      "After three days of hearings of survivors and families, he is sentenced to eleven consecutive "
                      "life terms without possibility of parole, plus fifteen concurrent sentences. The judge states "
                      "he imposed the maximum allowed."),
-         "reliability": "CONFIRMED", "source": "bbc-sentence", "premium": False},
+         "reliability": "CONFIRMED", "source": "bbc-sentence"},
     ],
     "reality": txt(
         "L'affaire s'est résolue par une méthode nouvelle appliquée à des traces anciennes : la généalogie génétique. "
@@ -784,8 +784,7 @@ CASE = {
     "country": "US", "region": "Californie", "city": "Sacramento",
     "year_start": 1974, "year_end": 2020, "period_label": txt("1974 – 2020", "1974 – 2020"),
     "status": "RESOLVED", "type": "serial",
-    "tags": ["serial_killer", "cold_case", "genetic_genealogy", "dna", "usa", "police_offender", "statute_of_limitations"],
-    "tier": "PREMIUM", "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
+    "tags": ["serial_killer", "cold_case", "genetic_genealogy", "dna", "usa", "police_offender", "statute_of_limitations"], "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
     "triggers": txt("Agressions sexuelles, meurtres au domicile ; ampleur des faits évoquée sans détail graphique.",
                     "Sexual assaults, murders at home; scale of the offences mentioned without graphic detail."),
     "lat": 37.5, "lon": -121.0, "cover": "cover-gsk",

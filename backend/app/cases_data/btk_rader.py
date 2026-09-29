@@ -227,55 +227,55 @@ INVESTIGATION = {
                      "ans. L'enquête porte sur un quadruple homicide au domicile.",
                      "Four members of the Otero family are found dead the next morning by their 15-year-old son. The "
                      "investigation concerns a quadruple homicide at the home."),
-         "reliability": "CONFIRMED", "source": "biography-rader", "premium": False},
+         "reliability": "CONFIRMED", "source": "biography-rader"},
         {"n": 2, "date": "1974-10", "title": txt("Une revendication dans un livre", "A claim inside a book"),
          "body": txt("Une lettre revendiquant les faits est déposée dans un livre de bibliothèque publique. C'est le "
                      "début d'une relation épistolaire avec la police et les médias.",
                      "A letter claiming the facts is placed in a public library book. It is the start of an "
                      "epistolary relationship with police and media."),
-         "reliability": "CONFIRMED", "source": "biography-rader", "premium": False},
+         "reliability": "CONFIRMED", "source": "biography-rader"},
         {"n": 3, "date": "1974-1991", "title": txt("Une série et un survivant", "A series and a survivor"),
          "body": txt("Les faits s'échelonnent jusqu'en janvier 1991. Un signalement est fourni par Kevin Bright, "
                      "survivant d'une agression, sans conduire à une identification.",
                      "The offences run until January 1991. A description is given by Kevin Bright, survivor of an "
                      "attack, without leading to an identification."),
-         "reliability": "CONFIRMED", "source": "biography-rader", "premium": True},
+         "reliability": "CONFIRMED", "source": "biography-rader"},
         {"n": 4, "date": "1991-2004", "title": txt("Treize ans de silence", "Thirteen years of silence"),
          "body": txt("Plus aucune communication. L'homme occupe des fonctions sociales visibles : responsable de "
                      "troupe scoute, président du conseil paroissial, agent de conformité municipale.",
                      "No further communication. The man holds visible social roles: scout troop leader, president of "
                      "the church council, municipal compliance officer."),
-         "reliability": "CONFIRMED", "source": "biography-rader", "premium": False},
+         "reliability": "CONFIRMED", "source": "biography-rader"},
         {"n": 5, "date": "2004", "title": txt("La réémergence", "The re-emergence"),
          "body": txt("La couverture médiatique du trentième anniversaire des meurtres Otero est suivie d'une reprise "
                      "des envois de lettres, avec des allusions à d'autres faits.",
                      "Media coverage of the thirtieth anniversary of the Otero murders is followed by a resumption of "
                      "letters, with allusions to other facts."),
-         "reliability": "CONFIRMED", "source": "wiki-rader", "premium": True},
+         "reliability": "CONFIRMED", "source": "wiki-rader"},
         {"n": 6, "date": "2005-01", "title": txt("Une question posée à la police", "A question put to the police"),
          "body": txt("Il demande si une disquette peut être tracée. Les enquêteurs font répondre par voie de presse "
                      "que non. La réponse est fausse, et il y croit.",
                      "He asks whether a floppy disk can be traced. Investigators have it answered through the media "
                      "that it cannot. The answer is false, and he believes it."),
-         "reliability": "CONFIRMED", "source": "creed-btk", "premium": False},
+         "reliability": "CONFIRMED", "source": "creed-btk"},
         {"n": 7, "date": "2005-02-16", "title": txt("Deux mots dans des métadonnées", "Two words in metadata"),
          "body": txt("« Christ Lutheran Church » et « Dennis ». Une recherche en ligne donne un nom : Dennis Rader, "
                      "président du conseil paroissial.",
                      "'Christ Lutheran Church' and 'Dennis'. An online search yields a name: Dennis Rader, president "
                      "of the congregation council."),
-         "reliability": "CONFIRMED", "source": "wiki-rader", "premium": True},
+         "reliability": "CONFIRMED", "source": "wiki-rader"},
         {"n": 8, "date": "2005-02", "title": txt("La confirmation biologique", "The biological confirmation"),
          "body": txt("Un échantillon obtenu à partir de matériel médical concernant sa fille établit un lien familial "
                      "avec l'ADN des scènes. La piste devient une identification.",
                      "A sample obtained from medical material concerning his daughter establishes a family link with "
                      "scene DNA. The lead becomes an identification."),
-         "reliability": "CONFIRMED", "source": "creed-btk", "premium": True},
+         "reliability": "CONFIRMED", "source": "creed-btk"},
         {"n": 9, "date": "2005-02-25", "title": txt("Arrestation", "Arrest"),
          "body": txt("Il est arrêté au volant près de son domicile de Park City. Le chef de la police de Wichita "
                      "déclare le lendemain : « The bottom line: BTK is arrested. »",
                      "He is arrested while driving near his Park City home. The Wichita police chief declares the next "
                      "day: 'The bottom line: BTK is arrested.'"),
-         "reliability": "CONFIRMED", "source": "wiki-rader", "premium": False},
+         "reliability": "CONFIRMED", "source": "wiki-rader"},
         {"n": 10, "date": "2005-08-18", "title": txt("Dix peines consécutives", "Ten consecutive sentences"),
          "body": txt("Après un plaidoyer de culpabilité le 27 juin 2005, il est condamné à dix peines de réclusion à "
                      "perpétuité consécutives, avec un minimum de 175 ans. La peine de mort n'était pas applicable aux "
@@ -283,7 +283,7 @@ INVESTIGATION = {
                      "After a guilty plea on 27 June 2005, he is sentenced to ten consecutive life terms with a "
                      "minimum of 175 years. The death penalty was not applicable to the facts, which predate Kansas's "
                      "1994 reinstatement."),
-         "reliability": "CONFIRMED", "source": "wiki-rader", "premium": True},
+         "reliability": "CONFIRMED", "source": "wiki-rader"},
     ],
     "reality": txt(
         "L'affaire ne s'est pas résolue par le profilage ni par le signalement d'un survivant, mais par une erreur de "
@@ -706,8 +706,7 @@ CASE = {
     "country": "US", "region": "Kansas / Sedgwick County", "city": "Wichita",
     "year_start": 1974, "year_end": 2005, "period_label": txt("1974 – 2005", "1974 – 2005"),
     "status": "RESOLVED", "type": "serial",
-    "tags": ["serial_killer", "metadata", "familial_dna", "usa", "survivors", "digital_forensics"],
-    "tier": "PREMIUM", "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
+    "tags": ["serial_killer", "metadata", "familial_dna", "usa", "survivors", "digital_forensics"], "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
     "triggers": txt("Meurtres dont ceux de deux enfants ; violences décrites sans détail graphique.",
                     "Murders including those of two children; violence described without graphic detail."),
     "lat": 37.69, "lon": -97.34, "cover": "cover-btk",

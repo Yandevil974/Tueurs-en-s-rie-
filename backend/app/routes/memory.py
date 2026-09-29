@@ -1,4 +1,4 @@
-"""🕯 MÉMOIRE (§12, §46) — the permanent memorial, always free."""
+"""🕯 MÉMOIRE (§12) — the permanent memorial."""
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
@@ -38,14 +38,11 @@ def global_memorial(country: str | None = None, db: Session = Depends(get_db)):
             },
             "memorial": [{
                 "id": m.id, "title": m.title, "biography": m.biography, "testimony": m.testimony,
-                "memory": m.memory, "tier": m.tier,
+                "memory": m.memory,
             } for m in case_memorials if m.victim_id is None],
             "victims": [victim_out(v, smap) for v in rows],
         })
     return {
-        "tier": "FREE",
-        "never_paywalled": {"fr": "La mémoire des victimes n'est jamais payante.",
-                            "en": "Victim memory is never paywalled."},
         "question": {"fr": "QUI ÉTAIT CETTE PERSONNE AVANT DE DEVENIR UNE VICTIME ?",
                      "en": "WHO WAS THIS PERSON BEFORE BECOMING A VICTIM?"},
         "counts": {"cases": len(groups), "victims": total, "named": named,

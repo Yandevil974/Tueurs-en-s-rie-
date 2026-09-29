@@ -55,7 +55,7 @@ def case_card(c: Case, country=None) -> dict:
         "region": c.region, "city": c.city,
         "year_start": c.year_start, "year_end": c.year_end, "period_label": c.period_label,
         "status": c.status, "status_label": rel_status, "type": c.type, "type_label": ctype,
-        "tags": c.tags or [], "tier": c.tier, "sensitive": c.sensitive, "cover": c.cover,
+        "tags": c.tags or [], "sensitive": c.sensitive, "cover": c.cover,
         "lat": c.lat, "lon": c.lon, "summary": c.summary, "stats": c.stats or {},
         "published_at": c.published_at, "editorial": c.editorial,
         "victims_count": len(c.victims),
@@ -66,7 +66,7 @@ def case_card(c: Case, country=None) -> dict:
 def victim_out(v, smap: dict[int, dict]) -> dict:
     memorials = [
         {"id": m.id, "title": m.title, "biography": m.biography, "testimony": m.testimony,
-         "memory": m.memory, "tier": m.tier, "portrait": m.portrait, "audio_clip": m.audio_clip}
+         "memory": m.memory, "portrait": m.portrait, "audio_clip": m.audio_clip}
         for m in v.case.memorials if m.victim_id == v.id
     ]
     name = " ".join(x for x in (v.first_name, v.last_name) if x)

@@ -19,7 +19,7 @@ CASE
  ├── QUESTIONS
  ├── EXPERTS
  └── MEMORIAL
-plus: counterfactual ("ET SI ?"), lessons, errors, unknowns, admin revisions.
+plus: counterfactual ("ET SI ?"), lessons, errors and unknowns.
 
 Every substantive fact carries a reliability level (CONFIRMED / PROBABLE /
 DISPUTED / UNKNOWN) and a source id (§23, §43).
@@ -38,7 +38,6 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    UniqueConstraint,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -47,65 +46,10 @@ from .db import Base
 # --- reference constants -------------------------------------------------
 RELIABILITY = ("CONFIRMED", "PROBABLE", "DISPUTED", "UNKNOWN")
 CASE_STATUS = ("RESOLVED", "UNSOLVED", "HISTORICAL", "ONGOING", "PARTIALLY_RESOLVED")
-TIER = ("FREE", "PREMIUM")
 
 
 def _now() -> datetime:
     return datetime.now(timezone.utc)
-
-
-# =========================================================================
-# ACCOUNTS / ACCESS
-# =========================================================================
-class User(Base):
-    __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    password_hash: Mapped[str] = mapped_column(String(255))
-    display_name: Mapped[str] = mapped_column(String(120), default="")
-    role: Mapped[str] = mapped_column(String(20), default="user")  # user | editor | admin
-    tier: Mapped[str] = mapped_column(String(20), default="FREE")
-    language: Mapped[str] = mapped_column(String(8), default="fr")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    # accessibility preferences (§45)
-    a11y: Mapped[dict[str, Any]] = mapped_column(
-        JSON,
-        default=lambda: {"fontScale": 1.0, "contrast": "standard", "reduceMotion": False, "captions": True},
-    )
-
-    progresses: Mapped[list["UserProgress"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-
-
-class Notification(Base):
-    """A user-facing editorial notification (§39). Content is authored and bilingual."""
-
-    __tablename__ = "notifications"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
-    kind: Mapped[str] = mapped_column(String(30), default="editorial")
-    title: Mapped[dict[str, str]] = mapped_column(JSON, default=dict)
-    body: Mapped[dict[str, str]] = mapped_column(JSON, default=dict)
-    href: Mapped[str] = mapped_column(String(240), default="")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-
-
-class VoiceProfile(Base):
-    """🎙 MA VOIX (§58-§60): the creator's narration voice."""
-
-    __tablename__ = "voice_profiles"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
-    name: Mapped[str] = mapped_column(String(120))
-    kind: Mapped[str] = mapped_column(String(20), default="REAL")  # REAL | SYNTHETIC
-    language: Mapped[str] = mapped_column(String(8), default="fr")
-    samples: Mapped[list[Any]] = mapped_column(JSON, default=list)
-    status: Mapped[str] = mapped_column(String(20), default="draft")  # draft | validated | active
-    consent: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
 
 
 # =========================================================================
@@ -185,7 +129,8 @@ class Case(Base):
     type: Mapped[str] = mapped_column(String(40), default="serial")
     # serial | cold_case | disappearance | historical | single_homicide | miscarriage
     tags: Mapped[list[str]] = mapped_column(JSON, default=list)
-    tier: Mapped[str] = mapped_column(String(12), default="FREE")
+    # Retained as a storage-compatibility column; never used to gate access.
+    legacy_access_tier: Mapped[str] = mapped_column("tier", String(12), default="FREE")
     sensitive: Mapped[bool] = mapped_column(Boolean, default=True)
     triggers: Mapped[list[str]] = mapped_column(JSON, default=list)
     lat: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
@@ -283,7 +228,7 @@ class Victim(Base):
 
 
 class Memorial(Base):
-    """🕯 MÉMOIRE (§12) — always FREE (§46)."""
+    """🕯 MÉMOIRE (§12) — a lasting record of victims."""
 
     __tablename__ = "memorials"
 
@@ -296,7 +241,8 @@ class Memorial(Base):
     memory: Mapped[dict[str, str]] = mapped_column(JSON, default=dict)
     portrait: Mapped[str] = mapped_column(String(300), default="")
     audio_clip: Mapped[str] = mapped_column(String(300), default="")
-    tier: Mapped[str] = mapped_column(String(12), default="FREE")
+    # Retained as a storage-compatibility column; never used to gate access.
+    legacy_access_tier: Mapped[str] = mapped_column("tier", String(12), default="FREE")
     case: Mapped[Case] = relationship(back_populates="memorials")
 
 
@@ -490,7 +436,8 @@ class Course(Base):
     level: Mapped[str] = mapped_column(String(20), default="beginner")
     lessons: Mapped[list[Any]] = mapped_column(JSON, default=list)
     case_refs: Mapped[list[str]] = mapped_column(JSON, default=list)
-    tier: Mapped[str] = mapped_column(String(12), default="FREE")
+    # Retained as a storage-compatibility column; never used to gate access.
+    legacy_access_tier: Mapped[str] = mapped_column("tier", String(12), default="FREE")
 
 
 class GlossaryEntry(Base):
@@ -504,37 +451,3 @@ class GlossaryEntry(Base):
     field: Mapped[str] = mapped_column(String(60), default="criminology")
     case_refs: Mapped[list[str]] = mapped_column(JSON, default=list)
     source_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-
-
-# =========================================================================
-# ADMIN (§42, §43)
-# =========================================================================
-class Revision(Base):
-    """History of every data modification."""
-
-    __tablename__ = "revisions"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    entity: Mapped[str] = mapped_column(String(60))
-    entity_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    action: Mapped[str] = mapped_column(String(20), default="update")  # create | update | delete
-    diff: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
-    reason: Mapped[str] = mapped_column(String(400), default="")
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=_now)
-
-
-class UserProgress(Base):
-    """Resume (§8), interactive answers, gamification (§36)."""
-
-    __tablename__ = "user_progress"
-    __table_args__ = (UniqueConstraint("user_id", "kind", "ref", name="uq_progress"),)
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
-    kind: Mapped[str] = mapped_column(String(30))
-    # audio | case_section | investigation_step | question | badge | favourite | reflection
-    ref: Mapped[str] = mapped_column(String(160))
-    value: Mapped[dict[str, Any]] = mapped_column(JSON, default=dict)
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=_now, onupdate=_now)
-    user: Mapped[User] = relationship(back_populates="progresses")

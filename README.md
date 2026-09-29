@@ -32,8 +32,8 @@ remains hypothetical** — before playback resumes automatically.
   *No invented data. Every fact carries a reliability level and its dated source.*
 - **Aucune glorification**, aucune romanticisation, aucun classement par dangerosité ou intelligence.
   *No glorification, no romanticisation, no ranking by dangerousness or intelligence.*
-- **Les victimes sont au centre** et leur mémoire n'est **jamais payante**.
-  *Victims come first and their memory is never paywalled.*
+- **Les victimes sont au centre** ; leur mémoire est traitée avec dignité.
+  *Victims come first; their memory is treated with dignity.*
 - **Aucun diagnostic psychiatrique** : FAIT / HYPOTHÈSE / ANALYSE D'EXPERT / INCONNU.
   *No psychiatric diagnosis: FACT / HYPOTHESIS / EXPERT ANALYSIS / UNKNOWN.*
 - **Aucun bouton décoratif, aucun écran mort, aucune fiction présentée comme réelle.**
@@ -75,8 +75,8 @@ Justice, Conséquences, Archives, Sources, Mémoire, Zones d'ombre, Ce que l'aff
 - 🎧 **Podcasts interactifs** — 7 modes : Documentaire, Enquête, Chronologie, Victimes, Express, Psychologie, Expert.
 - 🔎 **Mode Enquête** — l'information apparaît dans l'ordre où les enquêteurs l'ont obtenue.
 - 🧠 **Dans la tête** — analyse comportementale documentée, sans diagnostic.
-- 🕯 **Mémoire** — fiches victimes complètes, toujours gratuites.
-- 🌍 **Explorer** — MONDE → CONTINENT → PAYS → RÉGION → VILLE → AFFAIRE, carte et comparateur (sans classement).
+- 🕯 **Mémoire** — fiches sur les victimes lorsque les sources disponibles permettent de les documenter.
+- 🌍 **Explorer** — carte interactive du monde : sélectionner un continent pour découvrir les dossiers associés, puis explorer les pays et régions.
 - 📚 **Archives** — SOURCE / DATE / AUTEUR / TYPE / LIEN / FIABILITÉ.
 - 🔎 **ET SI ?** — reconstruction hypothétique calculée à partir de dates documentées, avec mention obligatoire
   « CECI EST UNE RECONSTRUCTION HYPOTHÉTIQUE » et la phrase signature :
@@ -85,7 +85,6 @@ Justice, Conséquences, Archives, Sources, Mémoire, Zones d'ombre, Ce que l'aff
   *« Cette information n'est pas suffisamment documentée. »*
 - 🎓 **Formation** — criminologie, victimologie, psychologie criminelle, profilage géographique, biais cognitifs,
   sciences forensiques + glossaire (explication simple puis approfondissement).
-- 🎙 **Ma Voix** — studio de voix du créateur ; synthèse vocale uniquement avec consentement explicite, daté et signé.
 
 ---
 
@@ -93,32 +92,27 @@ Justice, Conséquences, Archives, Sources, Mémoire, Zones d'ombre, Ce que l'aff
 
 ```
 yanisx/
-├── backend/                 FastAPI + SQLAlchemy 2.0 + SQLite (swappable → Postgres)
+├── backend/                 FastAPI + SQLAlchemy + SQLite (swappable → Postgres)
 │   └── app/
 │       ├── main.py          application, CORS, handlers, carte des routes
 │       ├── db.py            engine / session / MEDIA_DIR
-│       ├── models.py        21 tables (cases, victims, memorials, timeline, evidence,
-│       │                    investigation, psychology, victimology, courts, experts,
-│       │                    counterfactuals, episodes, questions, media, sources,
-│   │                    countries, courses, glossary, users, voice_profiles,
-│       │                    revisions, user_progress)
-│       ├── ethics.py        constantes éditoriales, niveaux, badges, interdictions
-│       ├── reference.py     pays, glossaire, formations
-│       ├── case_template.py helpers txt/fact/block/item/source/question/counterfactual
-│       ├── seed.py          Python dossiers → SQLite (idempotent) + moteur ET SI ?
-│       ├── auth.py          JWT, tiers FREE/PREMIUM, rôles
-│       ├── routes/          auth, cases, episodes, counterfactuals, explore,
-│       │                    memory, reference, search, progress, media, admin
+│       ├── models.py        dossiers, victimes, chronologie, enquête, sources, audio, formations…
+│       ├── ethics.py        règles éditoriales et niveaux de fiabilité
+│       ├── reference.py     pays, glossaire et formations
+│       ├── case_template.py structure commune des dossiers
+│       ├── seed.py          dossiers Python → SQLite (idempotent)
+│       ├── routes/          cases, episodes, counterfactuals, explore, memory,
+│       │                    reference, search, media
 │       └── cases_data/      les 8 dossiers bilingues, faits sourcés
-└── frontend/                Vite + React 19 + TypeScript + zustand (application mobile/web)
+└── frontend/                Vite + React + TypeScript (web et mobile)
 ```
 
-- **Authentification** : JWT (PBKDF2-SHA256), tiers `FREE` / `PREMIUM`, rôles `user` / `editor` / `admin`.
-- **Audio** : diffusion avec support HTTP Range (seek + reprise) ; trois narrations françaises produites dans `content/media/`.
-- **Progression** : reprise audio, sections lues, réponses, favoris, réflexions, badges sobres.
-- **Frontend** : navigation mobile, lecteur persistant, pauses pédagogiques, transcription synchronisée, carte, recherche, mémoire, i18n FR/EN et studio « Ma voix ».
-- **Administration** : reseed, historique des révisions, audit de santé du catalogue
-  (victimes non sourcées, mémoire payante, épisodes sans transcription).
+- **Usage personnel** : aucune connexion, création de compte ou synchronisation utilisateur. Les réglages,
+  favoris, réflexions et progressions sont conservés localement dans le navigateur.
+- **Accès au contenu** : tous les dossiers, chapitres, analyses, archives et épisodes sont consultables sans abonnement.
+- **Audio** : diffusion avec support HTTP Range (recherche dans la piste et reprise) ; trois narrations françaises dans `content/media/`.
+- **Frontend** : lecteur persistant, pauses pédagogiques, transcription synchronisée, carte du monde, recherche,
+  mémoire, i18n FR/EN et réglages d'accessibilité.
 - **Bilingue** FR + EN dès le lancement ; architecture prête pour DE / ES / IT / PT.
 
 ---
@@ -134,17 +128,6 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000
 # docs interactives : http://localhost:8000/api/docs
 ```
 
-Comptes de démonstration / demo accounts:
-
-| email | mot de passe | tier | rôle |
-|---|---|---|---|
-| `lecteur@yanisx.app` | `lecteur-demo` | FREE | user |
-| `abonne@yanisx.app` | `abonne-demo` | PREMIUM | user |
-| `yanis@yanisx.app` | `yanis-admin` | PREMIUM | admin |
-
-> En production : changer `YANISX_SECRET`, servir en HTTPS, brancher un vrai fournisseur de paiement
-> (le tier ne doit jamais venir du client), activer les sauvegardes de `data/`.
-
 ```bash
 # 2. Frontend
 cd frontend
@@ -154,8 +137,7 @@ npm run build               # vérification de production
 npm test                    # tests unitaires
 ```
 
-Variables d'environnement / environment variables : `YANISX_DB`, `YANISX_MEDIA`, `YANISX_SECRET`,
-`YANISX_TOKEN_HOURS`, `YANISX_ORIGINS`.
+Variables d'environnement / environment variables : `YANISX_DB`, `YANISX_MEDIA`, `YANISX_ORIGINS`.
 
 ---
 
@@ -170,7 +152,7 @@ niveau de fiabilité. Aucune source n'est inventée ; une rumeur n'est jamais pr
 
 ## Identité visuelle
 
-« ARCHIVES CRIMINELLES PREMIUM » : noir, anthracite, gris, blanc cassé, rouge sombre en accent.
+Identité éditoriale : « YANIS//X — à travers mon regard », avec une palette sombre, du blanc cassé et un accent rouge.
 Aucun gore, aucun crâne, aucune esthétique Halloween.
 
 ---

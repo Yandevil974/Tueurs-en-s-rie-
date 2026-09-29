@@ -45,16 +45,6 @@ def meta(db: Session = Depends(get_db)):
                         "victimology": ethics.DISCLAIMER_VICTIMOLOGY, "insufficient_data": ethics.INSUFFICIENT_DATA,
                         "calculation_impossible": ethics.CALCULATION_IMPOSSIBLE},
         "editorial_rules": ethics.NEVER,
-        "tier": {
-            "free": {"fr": ["dossiers sélectionnés", "podcasts", "chronologies", "recherche", "découverte des victimes",
-                            "mémoire"],
-                     "en": ["selected dossiers", "podcasts", "chronologies", "search", "victim discovery", "memory"]},
-            "premium": {"fr": ["dossiers complets", "analyses approfondies", "archives", "mode expert", "mode enquête",
-                               "comparateur", "téléchargement hors ligne", "exclusivités"],
-                        "en": ["complete dossiers", "in-depth analyses", "archives", "expert mode", "investigation mode",
-                               "comparator", "offline download", "exclusives"]},
-            "never_paywalled": ethics.DISCLAIMER_VICTIMOLOGY,
-        },
     }
 
 
@@ -110,7 +100,7 @@ def courses(db: Session = Depends(get_db)):
         "count": len(rows),
         "courses": [{
             "slug": r.slug, "field": r.field, "title": r.title, "intro": r.intro, "minutes": r.minutes,
-            "level": r.level, "lessons": r.lessons or [], "tier": r.tier,
+            "level": r.level, "lessons": r.lessons or [],
             "cases": [case_card(by_slug[s], countries.get(by_slug[s].country_code))
                       for s in (r.case_refs or []) if s in by_slug],
         } for r in rows],
@@ -127,7 +117,7 @@ def course(slug: str, db: Session = Depends(get_db)):
     by_slug = {c.slug: c for c in db.query(Case).all()}
     return {
         "slug": row.slug, "field": row.field, "title": row.title, "intro": row.intro, "minutes": row.minutes,
-        "level": row.level, "lessons": row.lessons or [], "tier": row.tier,
+        "level": row.level, "lessons": row.lessons or [],
         "cases": [case_card(by_slug[s], countries.get(by_slug[s].country_code))
                   for s in (row.case_refs or []) if s in by_slug],
         "glossary": [{"slug": g.slug, "term": g.term, "simple": g.simple}

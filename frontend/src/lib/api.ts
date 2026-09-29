@@ -13,19 +13,9 @@ export class ApiError extends Error {
   }
 }
 
-let token: string | null = null;
-export const setToken = (t: string | null) => {
-  token = t;
-  if (t) localStorage.setItem("yanisx.token", t);
-  else localStorage.removeItem("yanisx.token");
-};
-export const getToken = () => token ?? localStorage.getItem("yanisx.token");
-
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers: Record<string, string> = { Accept: "application/json", ...(init.headers as object) };
   if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
-  const tk = getToken();
-  if (tk) headers.Authorization = `Bearer ${tk}`;
 
   let res: Response;
   try {
@@ -45,8 +35,6 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
 export const api = {
   get: <T,>(p: string) => request<T>(p),
   post: <T,>(p: string, body?: unknown) => request<T>(p, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) }),
-  put: <T,>(p: string, body?: unknown) => request<T>(p, { method: "PUT", body: body === undefined ? undefined : JSON.stringify(body) }),
-  patch: <T,>(p: string, body?: unknown) => request<T>(p, { method: "PATCH", body: body === undefined ? undefined : JSON.stringify(body) }),
 };
 
 export const audioUrl = (file: string) => `/api/audio/${encodeURIComponent(file)}`;
@@ -82,7 +70,6 @@ export const endpoints = {
   answer: (id: number) => `/questions/${id}/answer`,
   counterfactuals: (q = "") => `/counterfactuals${q}`,
   counterfactual: (id: number) => `/counterfactuals/${id}`,
-  reflect: (id: number) => `/counterfactuals/${id}/reflect`,
   world: () => "/explore",
   continent: (c: string) => `/explore/continent/${encodeURIComponent(c)}`,
   country: (c: string) => `/explore/country/${c}`,
@@ -99,24 +86,4 @@ export const endpoints = {
   courses: () => "/courses",
   course: (slug: string) => `/courses/${slug}`,
   countries: () => "/countries",
-  login: () => "/auth/login",
-  register: () => "/auth/register",
-  me: () => "/auth/me",
-  patchMe: () => "/auth/me",
-  a11y: () => "/auth/me/a11y",
-  progress: () => "/progress",
-  progressPut: (kind: string, ref: string) => `/progress/${kind}/${ref}`,
-  resume: () => "/progress/resume",
-  favourite: (slug: string) => `/progress/favourite/${slug}`,
-  badge: (key: string) => `/progress/badge/${key}`,
-  voices: () => "/auth/me/voices",
-  adminStats: () => "/admin/stats",
-  adminRevisions: () => "/admin/revisions",
-  adminReseed: () => "/admin/reseed",
-  adminPatchCase: (slug: string) => `/admin/cases/${slug}`,
-  adminVerifySource: (id: number) => `/admin/sources/${id}/verify`,
-  adminBroadcastNotification: () => "/admin/notifications",
-  notifications: () => "/notifications",
-  notificationRead: (id: number) => `/notifications/${id}/read`,
-  notificationsReadAll: () => "/notifications/read-all",
 };

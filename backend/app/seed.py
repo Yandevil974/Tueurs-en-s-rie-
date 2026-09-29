@@ -1,15 +1,12 @@
 """
 Seed the database from the Python case dossiers and the reference tables.
 
-Idempotent: `python -m app.seed` can be run any number of times; content tables
-are rebuilt, user tables are preserved.
+Idempotent: `python -m app.seed` can be run any number of times; catalogue
+content tables are rebuilt from the authored dossier modules.
 """
 from __future__ import annotations
 
-import hashlib
-import os
-import secrets
-from datetime import datetime, timezone
+from datetime import datetime
 
 from . import ethics, reference
 from .cases_data import CASES
@@ -32,8 +29,6 @@ from .models import (
     Question,
     Source,
     TimelineEvent,
-    User,
-    UserProgress,
     Victim,
     Victimology,
 )
@@ -41,25 +36,6 @@ from .models import (
 # ---------------------------------------------------------------------------
 # helpers
 # ---------------------------------------------------------------------------
-def _now() -> datetime:
-    return datetime.now(timezone.utc)
-
-
-def hash_password(password: str, salt: str | None = None) -> str:
-    salt = salt or secrets.token_hex(16)
-    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 120_000).hex()
-    return f"pbkdf2_sha256${salt}${digest}"
-
-
-def verify_password(password: str, stored: str) -> bool:
-    try:
-        _, salt, digest = stored.split("$")
-    except ValueError:
-        return False
-    candidate = hashlib.pbkdf2_hmac("sha256", password.encode(), salt.encode(), 120_000).hex()
-    return secrets.compare_digest(candidate, digest)
-
-
 def _bi(value) -> dict:
     """Normalise anything textual to {"fr": ..., "en": ...}."""
     if isinstance(value, dict):
@@ -217,12 +193,11 @@ def seed_reference(db) -> None:
         if row is None:
             db.add(Course(slug=c["slug"], field=c.get("field", "criminology"), title=c["title"], intro=c["intro"],
                           minutes=c.get("minutes", 8), level=c.get("level", "beginner"),
-                          lessons=c.get("lessons", []), case_refs=c.get("case_refs", []),
-                          tier=c.get("tier", "FREE")))
+                          lessons=c.get("lessons", []), case_refs=c.get("case_refs", [])))
         else:
             row.title, row.intro, row.lessons = c["title"], c["intro"], c.get("lessons", [])
             row.field, row.minutes, row.level = c.get("field", "criminology"), c.get("minutes", 8), c.get("level", "beginner")
-            row.case_refs, row.tier = c.get("case_refs", []), c.get("tier", "FREE")
+            row.case_refs = c.get("case_refs", [])
 
 
 def _purge_content(db) -> None:
@@ -261,7 +236,7 @@ def seed_cases(db) -> None:
             country_code=data.get("country", ""), region=data.get("region", ""), city=data.get("city", ""),
             year_start=int(data.get("year_start") or 0), year_end=int(data.get("year_end") or 0),
             period_label=_bi(data.get("period_label")), status=data.get("status", "RESOLVED"),
-            type=data.get("type", "serial"), tags=_list(data.get("tags")), tier=data.get("tier", "FREE"),
+            type=data.get("type", "serial"), tags=_list(data.get("tags")),
             sensitive=bool(data.get("sensitive", True)), triggers=_bi(data.get("triggers")),
             lat=data.get("lat"), lon=data.get("lon"), published_at=data.get("published_at", ""),
             editorial=data.get("editorial", "yanis"), summary=_bi(data.get("summary")),
@@ -302,7 +277,7 @@ def seed_cases(db) -> None:
             db.flush()
             full = " ".join(x for x in (v.get("first_name"), v.get("last_name")) if x)
             db.add(Memorial(
-                case_id=case.id, victim_id=victim.id, tier="FREE",
+                case_id=case.id, victim_id=victim.id,
                 title=_bi((v.get("life") or {}).get("fr", {}).get("headline") or full),
                 biography=_bi(v.get("life")), testimony=_bi(v.get("disappearance")),
                 memory=_bi(v.get("note")) if v.get("note") else {}, portrait="", audio_clip="",
@@ -312,7 +287,7 @@ def seed_cases(db) -> None:
         if mem:
             # Case-level memorial page (the permanent 🕯 Mémoire section).
             v0 = db.query(Victim).filter_by(case_id=case.id).order_by(Victim.order_index).first()
-            db.add(Memorial(case_id=case.id, victim_id=v0.id if v0 else None, tier="FREE",
+            db.add(Memorial(case_id=case.id, victim_id=v0.id if v0 else None,
                             title=_bi(mem.get("title")), biography=_bi(mem.get("biography")),
                             testimony=_bi(mem.get("testimony")), memory=_bi(mem.get("memory")),
                             portrait="", audio_clip=""))
@@ -411,29 +386,6 @@ def seed_cases(db) -> None:
                                   source_id=sid(payload.get("source"))))
 
 
-def seed_users(db) -> None:
-    defaults = [
-        ("yanis@yanisx.app", "yanis-admin", "Yanis", "admin", "PREMIUM"),
-        ("lecteur@yanisx.app", "lecteur-demo", "Lecteur", "user", "FREE"),
-        ("abonne@yanisx.app", "abonne-demo", "Abonné", "user", "PREMIUM"),
-    ]
-    for email, password, name, role, tier in defaults:
-        if db.query(User).filter_by(email=email).first() is None:
-            db.add(User(email=email, password_hash=hash_password(password), display_name=name, role=role, tier=tier,
-                        language="fr"))
-    db.flush()
-    demo = db.query(User).filter_by(email="lecteur@yanisx.app").first()
-    if demo is not None:
-        for kind, ref, value in (
-            ("badge", "dossier_discovered", {"case": "affaire-gregory", "at": _now().isoformat()}),
-            ("question", "affaire-gregory:1:0", {"choice": "b", "correct": True}),
-            ("audio", "affaire-gregory:1", {"at_sec": 240, "mode": "documentary"}),
-            ("favourite", "affaire-gregory", {"on": True}),
-        ):
-            if db.query(UserProgress).filter_by(user_id=demo.id, kind=kind, ref=ref).first() is None:
-                db.add(UserProgress(user_id=demo.id, kind=kind, ref=ref, value=value))
-
-
 def seed(force: bool = True) -> dict:
     init_db()
     db = SessionLocal()
@@ -444,7 +396,6 @@ def seed(force: bool = True) -> dict:
             _purge_content(db)
             db.flush()
         seed_cases(db)
-        seed_users(db)
         db.commit()
         counts = {
             "cases": db.query(Case).count(),
@@ -461,7 +412,6 @@ def seed(force: bool = True) -> dict:
             "glossary": db.query(GlossaryEntry).count(),
             "courses": db.query(Course).count(),
             "countries": db.query(Country).count(),
-            "users": db.query(User).count(),
         }
         return counts
     finally:

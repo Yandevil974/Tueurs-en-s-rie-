@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Search from "./pages/Search";
@@ -30,7 +30,6 @@ import Training, { GlossaryPage, GlossaryEntryPage, CoursePage } from "./pages/T
 import WhatIf, { WhatIfDetail } from "./pages/WhatIf";
 import Ethics from "./pages/Ethics";
 import Account from "./pages/Account";
-import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
 export default function App() {
@@ -84,8 +83,8 @@ export default function App() {
         <Route path="/et-si/:id" element={<WhatIfDetail />} />
 
         <Route path="/ethique" element={<Ethics />} />
-        <Route path="/compte" element={<Account />} />
-        <Route path="/admin" element={<Admin />} />
+        <Route path="/reglages" element={<Account />} />
+        <Route path="/compte" element={<Navigate to="/reglages" replace />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Layout>

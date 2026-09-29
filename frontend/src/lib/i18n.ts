@@ -8,7 +8,7 @@ type Dict = Record<string, { fr: string; en: string }>;
 export const UI: Dict = {
   "app.name": { fr: "YANIS//X", en: "YANIS//X" },
   "app.tagline": { fr: "à travers mon regard", en: "through my eyes" },
-  "app.identity": { fr: "Archives criminelles premium", en: "Premium criminal archives" },
+  "app.identity": { fr: "Archives documentaires", en: "Documentary archives" },
 
   "nav.home": { fr: "Accueil", en: "Home" },
   "nav.search": { fr: "Rechercher", en: "Search" },
@@ -24,13 +24,15 @@ export const UI: Dict = {
   "nav.training": { fr: "Formation", en: "Training" },
   "nav.whatif": { fr: "Et si ?", en: "What if?" },
   "nav.ethics": { fr: "Éthique", en: "Ethics" },
-  "nav.account": { fr: "Compte", en: "Account" },
+  "nav.settings": { fr: "Réglages", en: "Settings" },
 
+  "home.hero.title": { fr: "Comprendre les faits. Garder les victimes au centre.", en: "Understand the record. Keep victims at the centre." },
+  "home.hero.description": { fr: "Des dossiers sourcés, des chronologies et des récits audio pour distinguer ce qui est établi, discuté ou encore inconnu.", en: "Sourced case files, timelines and audio stories that separate what is established, disputed or still unknown." },
+  "home.hero.browse": { fr: "Parcourir les dossiers", en: "Browse the dossiers" },
   "home.continue": { fr: "Reprendre", en: "Resume" },
   "home.dossiers": { fr: "Dossiers", en: "Dossiers" },
   "home.latest": { fr: "Derniers dossiers publiés", en: "Latest published dossiers" },
   "home.journey": { fr: "Le parcours", en: "The journey" },
-  "home.free": { fr: "En accès libre", en: "Free access" },
   "home.unsolved": { fr: "Non élucidés", en: "Unsolved" },
   "home.memory": { fr: "Ne jamais oublier les victimes", en: "Never forget the victims" },
   "home.analyst": { fr: "L'Analyste", en: "The Analyst" },
@@ -55,10 +57,6 @@ export const UI: Dict = {
   "common.link": { fr: "Lien", en: "Link" },
   "common.reliability": { fr: "Fiabilité", en: "Reliability" },
   "common.verified": { fr: "Vérifié le", en: "Verified on" },
-  "common.premium": { fr: "Premium", en: "Premium" },
-  "common.free": { fr: "Gratuit", en: "Free" },
-  "common.locked": { fr: "Verrouillé", en: "Locked" },
-  "common.unlock": { fr: "Débloquer", en: "Unlock" },
   "common.empty": { fr: "Rien à afficher pour l'instant.", en: "Nothing to display yet." },
   "common.network": {
     fr: "Serveur injoignable. Vérifie la connexion puis réessaie.",
@@ -154,15 +152,7 @@ export const UI: Dict = {
   "explore.compare": { fr: "Comparateur", en: "Comparator" },
   "explore.map": { fr: "Carte", en: "Map" },
 
-  "account.login": { fr: "Connexion", en: "Sign in" },
-  "account.register": { fr: "Créer un compte", en: "Create an account" },
-  "account.logout": { fr: "Se déconnecter", en: "Sign out" },
-  "account.email": { fr: "Adresse e-mail", en: "Email address" },
-  "account.password": { fr: "Mot de passe", en: "Password" },
-  "account.badges": { fr: "Badges", en: "Badges" },
   "account.a11y": { fr: "Accessibilité", en: "Accessibility" },
-  "account.voice": { fr: "Ma voix", en: "My voice" },
-  "account.demo": { fr: "Comptes de démonstration", en: "Demo accounts" },
 };
 
 export function tr(lang: Lang, key: string): string {

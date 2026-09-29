@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { Any } from "../lib/api";
 import { pick } from "../lib/i18n";
 import { useApp } from "../state/app";
-import { Bi_, Cover, StatusBadge, TierBadge, useLang } from "./ui";
+import { Bi_, Cover, StatusBadge, useLang } from "./ui";
 
 export default function CaseCard({ c, compact }: { c: Any; compact?: boolean }) {
   const lang = useLang();
@@ -33,7 +33,6 @@ export default function CaseCard({ c, compact }: { c: Any; compact?: boolean }) 
             {c.victims_count} {lang === "fr" ? "victime(s) documentée(s)" : "documented victim(s)"}
           </span>
           {c.episodes_count > 0 && <span className="tiny">· {c.episodes_count} 🎧</span>}
-          <TierBadge tier={c.tier} />
           {fav && <span className="tiny">★</span>}
         </div>
       </div>

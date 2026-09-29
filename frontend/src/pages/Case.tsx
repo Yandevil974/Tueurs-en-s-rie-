@@ -20,7 +20,6 @@ import {
   Reliability,
   SourceLine,
   StatusBadge,
-  TierBadge,
   useLang,
 } from "../components/ui";
 
@@ -115,7 +114,6 @@ export default function CasePage() {
         <div className="overlay">
           <div className="row wrap" style={{ gap: 6 }}>
             <StatusBadge status={c.status} />
-            <TierBadge tier={c.tier} />
           </div>
           <h1 className="h1" style={{ fontSize: 23, margin: "7px 0 3px" }}><Bi_ v={c.title} /></h1>
           <div className="small">{c.country_name?.[lang] || c.country} · {c.region} · <Bi_ v={c.period_label} /></div>
@@ -172,7 +170,7 @@ export default function CasePage() {
             <Link key={s.key} to={`/dossiers/${c.slug}/dossier#${s.key}`} className="card tight">
               <div className="between">
                 <div><div className="eyebrow">{s.key.replace(/_/g, " ")}</div><div className="h2" style={{ fontSize: 14, marginTop: 3 }}><Bi_ v={s.title} /></div></div>
-                {s.locked ? <span className="badge premium">🔒 Premium</span> : <span className="tiny">→</span>}
+                <span className="tiny">→</span>
               </div>
             </Link>
           ))}
@@ -230,19 +228,13 @@ export function DossierPage() {
           <article id={s.key} key={s.key || i} className="card">
             <div className="between" style={{ marginBottom: 10 }}>
               <div><div className="eyebrow blood">{String(i + 1).padStart(2, "0")} · {s.key.replace(/_/g, " ")}</div><h2 className="h2" style={{ marginTop: 4 }}><Bi_ v={s.title} /></h2></div>
-              {s.tier === "PREMIUM" && <TierBadge tier="PREMIUM" />}
             </div>
-            {s.locked ? <LockedChapter /> : <Blocks blocks={s.blocks || []} />}
+            <Blocks blocks={s.blocks || []} />
           </article>
         ))}
       </div>
     </>
   );
-}
-
-function LockedChapter() {
-  const lang = useLang();
-  return <div className="locked"><div style={{ fontSize: 22 }}>🔒</div><div className="h2" style={{ fontSize: 14, margin: "7px 0 4px" }}>{lang === "fr" ? "Chapitre Premium" : "Premium chapter"}</div><div className="small">{lang === "fr" ? "Le dossier conserve son existence ; le contenu est clairement marqué comme verrouillé." : "The chapter remains visible; its content is clearly marked as locked."}</div><Link className="btn sm primary" style={{ marginTop: 10 }} to="/compte">{tr(lang, "common.unlock")}</Link></div>;
 }
 
 /* -------------------------------------------------------------- victimes */
@@ -262,7 +254,7 @@ export function VictimsPage() {
         <p className="lede" style={{ margin: 0 }}>{tr(lang, "victim.question")}</p>
       </PageTitle>
       {data.ethics_note && <div className="note" style={{ marginBottom: 13 }}><Bi_ v={data.ethics_note} /></div>}
-      <div className="row wrap" style={{ gap: 6, marginBottom: 12 }}><span className="badge free">{tr(lang, "common.free")}</span><span className="badge">{data.count}</span></div>
+      <div className="row wrap" style={{ gap: 6, marginBottom: 12 }}><span className="badge">{data.count} {lang === "fr" ? "fiche(s)" : "file(s)"}</span></div>
       {!data.victims?.length && <Missing />}
       <div className="stack">
         {(data.victims || []).map((v: Any) => {
@@ -323,7 +315,16 @@ export function InvestigationPage() {
     <PageTitle eyebrow="🔎" title={tr(lang, "case.investigation")}><p className="small" style={{ margin: 0 }}>{lang === "fr" ? "Mode Enquête : révélation dans l'ordre où l'information est devenue disponible." : "Investigation mode: reveal information in the order it became available."}</p></PageTitle>
     <div className="note neutral" style={{ marginBottom: 12 }}>{lang === "fr" ? "Aucune information ne revient dans le passé : on raisonne avec ce que l'on savait à chaque étape." : "No information is sent back in time: reason with what was known at each step."}</div>
     <div className="tabs">{steps.map((s, i) => <button key={i} className={`chip ${i === step ? "on" : ""}`} onClick={() => setStep(i)} aria-pressed={i === step}>{String(i + 1).padStart(2, "0")} · <Bi_ v={s.title || s.phase || { fr: `Étape ${i + 1}`, en: `Step ${i + 1}` }} /></button>)}</div>
-    {current ? <article className="card" style={{ marginTop: 8 }}><div className="between"><div><div className="eyebrow blood">{current.date || current.phase || `Étape ${step + 1}`}</div><h2 className="h2" style={{ marginTop: 5 }}><Bi_ v={current.title} /></h2></div>{current.locked && <span className="badge premium">🔒 Premium</span>}</div>{current.locked ? <LockedChapter /> : <><p style={{ color: "var(--bone-dim)", fontSize: 15 }}><Bi_ v={current.body || current.description || current.text} /></p>{current.what_was_known && <div className="note neutral"><strong>{lang === "fr" ? "Ce qui était connu" : "What was known"}</strong><br /><Bi_ v={current.what_was_known} /></div>}{current.question && <div className="note warn" style={{ marginTop: 10 }}>❓ <Bi_ v={current.question} /></div>}<div className="row wrap" style={{ gap: 6, marginTop: 10 }}>{current.reliability && <Reliability level={current.reliability} />}{current.source && <span className="tiny">{current.source}</span>}</div></>}</article> : <Empty />}
+    {current ? (
+      <article className="card" style={{ marginTop: 8 }}>
+        <div className="eyebrow blood">{current.date || current.phase || `Étape ${step + 1}`}</div>
+        <h2 className="h2" style={{ marginTop: 5 }}><Bi_ v={current.title} /></h2>
+        <p style={{ color: "var(--bone-dim)", fontSize: 15 }}><Bi_ v={current.body || current.description || current.text} /></p>
+        {current.what_was_known && <div className="note neutral"><strong>{lang === "fr" ? "Ce qui était connu" : "What was known"}</strong><br /><Bi_ v={current.what_was_known} /></div>}
+        {current.question && <div className="note warn" style={{ marginTop: 10 }}>❓ <Bi_ v={current.question} /></div>}
+        <div className="row wrap" style={{ gap: 6, marginTop: 10 }}>{current.reliability && <Reliability level={current.reliability} />}{current.source && <span className="tiny">{current.source}</span>}</div>
+      </article>
+    ) : <Empty />}
     <div className="between" style={{ marginTop: 12 }}><button className="btn sm" disabled={step <= 0} onClick={() => setStep(step - 1)}>←</button><span className="tiny">{steps.length ? `${step + 1} / ${steps.length}` : ""}</span><button className="btn sm" disabled={step >= steps.length - 1} onClick={() => setStep(step + 1)}>→</button></div>
     {data.errors?.length > 0 && <section className="block-sec"><h2 className="h3" style={{ marginBottom: 8 }}>{lang === "fr" ? "Erreurs de l'enquête" : "Investigation errors"}</h2><Items list={data.errors} /></section>}
   </>;
@@ -337,7 +338,7 @@ export function EvidencePage() {
   if (loading) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return <Empty />;
-  return <><BackLink to={`/dossiers/${slug}`} /><PageTitle eyebrow="🔍" title={tr(lang, "case.clues")}><p className="small" style={{ margin: 0 }}>{lang === "fr" ? "Un indice est présenté avec son poids documentaire, pas comme une certitude automatique." : "Each clue is presented with its documentary weight, not as an automatic certainty."}</p></PageTitle>{data.locked && <LockedChapter />}<div className="stack" style={{ marginTop: 12 }}>{(data.evidence || []).map((e: Any) => <article key={e.id} className="card"><div className="between"><h2 className="h2" style={{ fontSize: 15 }}><Bi_ v={e.title} /></h2><Reliability level={e.reliability} /></div><div className="tiny" style={{ margin: "5px 0" }}>{e.kind} {e.weight ? `· ${e.weight}` : ""}</div><p style={{ margin: 0, color: "var(--bone-dim)", fontSize: 14.5 }}><Bi_ v={e.description} /></p><SourceLine source={e.source} /></article>)}{!data.evidence?.length && <Missing />}</div></>;
+  return <><BackLink to={`/dossiers/${slug}`} /><PageTitle eyebrow="🔍" title={tr(lang, "case.clues")}><p className="small" style={{ margin: 0 }}>{lang === "fr" ? "Un indice est présenté avec son poids documentaire, pas comme une certitude automatique." : "Each clue is presented with its documentary weight, not as an automatic certainty."}</p></PageTitle><div className="stack" style={{ marginTop: 12 }}>{(data.evidence || []).map((e: Any) => <article key={e.id} className="card"><div className="between"><h2 className="h2" style={{ fontSize: 15 }}><Bi_ v={e.title} /></h2><Reliability level={e.reliability} /></div><div className="tiny" style={{ margin: "5px 0" }}>{e.kind} {e.weight ? `· ${e.weight}` : ""}</div><p style={{ margin: 0, color: "var(--bone-dim)", fontSize: 14.5 }}><Bi_ v={e.description} /></p><SourceLine source={e.source} /></article>)}{!data.evidence?.length && <Missing />}</div></>;
 }
 
 /* ------------------------------------------------------------- psychologie */
@@ -348,7 +349,7 @@ export function PsychologyPage() {
   if (loading) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return <Empty />;
-  return <><BackLink to={`/dossiers/${slug}`} /><PageTitle eyebrow="🧠" title={tr(lang, "case.psychology")}><p className="small" style={{ margin: 0 }}>{lang === "fr" ? "Dans la tête : comportement documenté, jamais diagnostic psychiatrique automatique." : "Inside the mind: documented behaviour, never an automatic psychiatric diagnosis."}</p></PageTitle><div className="disclaimer" style={{ marginBottom: 13 }}><Bi_ v={data.disclaimer} /></div>{data.locked ? <LockedChapter /> : <Blocks blocks={data.blocks || []} />}<div className="note neutral" style={{ marginTop: 16 }}>{lang === "fr" ? "Chaque élément doit rester séparé : FAIT · HYPOTHÈSE · ANALYSE D'EXPERT · INCONNU." : "Each element must remain separate: FACT · HYPOTHESIS · EXPERT ANALYSIS · UNKNOWN."}</div></>;
+  return <><BackLink to={`/dossiers/${slug}`} /><PageTitle eyebrow="🧠" title={tr(lang, "case.psychology")}><p className="small" style={{ margin: 0 }}>{lang === "fr" ? "Dans la tête : comportement documenté, jamais diagnostic psychiatrique automatique." : "Inside the mind: documented behaviour, never an automatic psychiatric diagnosis."}</p></PageTitle><div className="disclaimer" style={{ marginBottom: 13 }}><Bi_ v={data.disclaimer} /></div><Blocks blocks={data.blocks || []} /><div className="note neutral" style={{ marginTop: 16 }}>{lang === "fr" ? "Chaque élément doit rester séparé : FAIT · HYPOTHÈSE · ANALYSE D'EXPERT · INCONNU." : "Each element must remain separate: FACT · HYPOTHESIS · EXPERT ANALYSIS · UNKNOWN."}</div></>;
 }
 
 /* --------------------------------------------------------------- victimology */
@@ -407,7 +408,7 @@ export function MemorialPage() {
   if (loading) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return <Empty />;
-  return <><BackLink to={`/dossiers/${slug}`} /><PageTitle eyebrow="🕯" title={tr(lang, "case.memory")}><p className="lede" style={{ margin: 0 }}>{tr(lang, "victim.question")}</p></PageTitle><div className="note" style={{ marginBottom: 13 }}>{pick(data.never_paywalled, lang)}</div><div className="stack">{(data.memorials || []).map((m: Any) => <article className="card" key={m.id}>{m.title && <h2 className="h2" style={{ fontSize: 15, marginBottom: 7 }}><Bi_ v={m.title} /></h2>}{m.biography && <p style={{ color: "var(--bone-dim)", fontSize: 15 }}><Bi_ v={m.biography} /></p>}{m.testimony && <p style={{ color: "var(--bone-dim)", fontSize: 14.5, fontStyle: "italic" }}><Bi_ v={m.testimony} /></p>}{m.memory && <div className="note neutral"><Bi_ v={m.memory} /></div>}</article>)}{!data.memorials?.length && <Missing />}</div></>;
+  return <><BackLink to={`/dossiers/${slug}`} /><PageTitle eyebrow="🕯" title={tr(lang, "case.memory")}><p className="lede" style={{ margin: 0 }}>{tr(lang, "victim.question")}</p></PageTitle><div className="note" style={{ marginBottom: 13 }}>{pick(data.editorial_note, lang)}</div><div className="stack">{(data.memorials || []).map((m: Any) => <article className="card" key={m.id}>{m.title && <h2 className="h2" style={{ fontSize: 15, marginBottom: 7 }}><Bi_ v={m.title} /></h2>}{m.biography && <p style={{ color: "var(--bone-dim)", fontSize: 15 }}><Bi_ v={m.biography} /></p>}{m.testimony && <p style={{ color: "var(--bone-dim)", fontSize: 14.5, fontStyle: "italic" }}><Bi_ v={m.testimony} /></p>}{m.memory && <div className="note neutral"><Bi_ v={m.memory} /></div>}</article>)}{!data.memorials?.length && <Missing />}</div></>;
 }
 
 /* ---------------------------------------------------------------- experts */

@@ -33,7 +33,6 @@ export default function Memory() {
 
       {data && (
         <div className="row wrap" style={{ gap: 6, marginBottom: 14 }}>
-          <span className="badge free">{lang === "fr" ? "Accès libre permanent" : "Permanent free access"}</span>
           <span className="badge">
             {data.counts.victims} {lang === "fr" ? "victimes" : "victims"}
           </span>

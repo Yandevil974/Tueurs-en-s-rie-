@@ -1,18 +1,16 @@
-from . import (admin, auth, cases, counterfactuals, episodes, explore, media, memory, notifications, progress, reference, search)
+from . import cases, counterfactuals, episodes, explore, media, memory, reference, search
 
+# Personal instance: account, subscription, notification and remote-progress routes
+# are intentionally not mounted. Personal state stays in the browser on-device.
 ROUTERS = [
-    auth.router,
     cases.router,
     episodes.router,
     counterfactuals.router,
     explore.router,
     memory.router,
-    notifications.router,
     reference.router,
     search.router,
-    progress.router,
     media.router,
-    admin.router,
 ]
 
 __all__ = ["ROUTERS"]

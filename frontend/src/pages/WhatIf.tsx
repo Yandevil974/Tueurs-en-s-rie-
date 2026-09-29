@@ -1,10 +1,19 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { api, endpoints, type Any } from "../lib/api";
+import { endpoints, type Any } from "../lib/api";
 import { useApi } from "../lib/hooks";
 import { pick, tr } from "../lib/i18n";
-import { useApp } from "../state/app";
 import { Bi_, Empty, ErrorState, Loading, PageTitle, Reliability, SourceLine, useLang } from "../components/ui";
+
+const REFLECTIONS_KEY = "yanisx.reflections";
+
+function readReflections(): Record<string, { text: string; saved_at: string }> {
+  try {
+    return JSON.parse(localStorage.getItem(REFLECTIONS_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
 
 export default function WhatIf() {
   const lang = useLang();
@@ -28,9 +37,8 @@ export default function WhatIf() {
 export function WhatIfDetail() {
   const { id = "" } = useParams();
   const lang = useLang();
-  const user = useApp((s) => s.user);
   const { data, loading, error, reload } = useApi<Any>(endpoints.counterfactual(Number(id)), [id]);
-  const [reflection, setReflection] = useState("");
+  const [reflection, setReflection] = useState(() => readReflections()[id]?.text || "");
   const [saved, setSaved] = useState<Any | null>(null);
   const [saveError, setSaveError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -43,12 +51,22 @@ export function WhatIfDetail() {
   const offences: Any[] = data.documented_offences_after || [];
 
   const save = async () => {
-    if (!reflection.trim()) return;
-    setSaving(true); setSaveError("");
-    try { setSaved(await api.post<Any>(endpoints.reflect(Number(id)), { text: reflection })); } catch (e: any) { setSaveError(e.message); } finally { setSaving(false); }
+    const text = reflection.trim();
+    if (!text) return;
+    setSaving(true);
+    setSaveError("");
+    try {
+      const next = { ...readReflections(), [id]: { text, saved_at: new Date().toISOString() } };
+      localStorage.setItem(REFLECTIONS_KEY, JSON.stringify(next));
+      setSaved({ private: { fr: "Réflexion enregistrée uniquement sur cet appareil.", en: "Reflection saved only on this device." } });
+    } catch {
+      setSaveError(lang === "fr" ? "Impossible d’enregistrer sur cet appareil." : "Could not save on this device.");
+    } finally {
+      setSaving(false);
+    }
   };
 
-  return <><Link className="tiny" to="/et-si" style={{ display: "inline-block", padding: "14px 0 6px" }}>← {tr(lang, "nav.whatif")}</Link><PageTitle eyebrow="🔎" title={<Bi_ v={data.title} />}><p className="lede" style={{ margin: 0 }}><Bi_ v={data.question} /></p></PageTitle><div className="disclaimer" style={{ marginBottom: 13 }}><Bi_ v={data.disclaimer} /></div><div className="note" style={{ marginBottom: 13 }}><em><Bi_ v={data.signature_line} /></em></div><section className="card"><div className="h3" style={{ marginBottom: 8 }}>{tr(lang, "whatif.computing")}</div>{data.jurisdiction_note && <p className="small"><Bi_ v={data.jurisdiction_note} /></p>}<div className="stack" style={{ gap: 9 }}>{events.map((e: Any, i: number) => <div key={i} className="card tight"><div className="row wrap" style={{ gap: 6 }}><span className="badge">{e.date || "—"}</span>{e.reliability && <Reliability level={e.reliability} />}</div><div style={{ marginTop: 5, color: "var(--bone-dim)", fontSize: 14 }}><Bi_ v={e.label || e.description || e.event || e.text} /></div></div>)}</div>{data.computable && comp.status !== "impossible" ? <div className="note neutral" style={{ marginTop: 12 }}><strong>{lang === "fr" ? "Résultat calculé" : "Computed result"}</strong><ComputationView data={data} comp={comp} /></div> : <div className="note warn" style={{ marginTop: 12 }}>{tr(lang, "whatif.impossible")}</div>}</section>{offences.length > 0 && <section className="block-sec"><h2 className="h3" style={{ marginBottom: 8 }}>{lang === "fr" ? "Faits documentés postérieurs" : "Documented subsequent facts"}</h2><div className="stack">{offences.map((x: Any, i: number) => <Item key={i} x={x} />)}</div></section>}<section className="card" style={{ marginTop: 14 }}><div className="eyebrow blood">{tr(lang, "whatif.reflect")}</div><p className="small">{lang === "fr" ? "Il n'y a pas de bonne réponse et aucun score. La réflexion est privée." : "There is no right answer and no score. The reflection is private."}</p><textarea className="ta" value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={lang === "fr" ? "Ce que cette hypothèse vous fait questionner…" : "What this hypothesis makes you question…"} maxLength={4000} />{!user ? <div className="note neutral" style={{ marginTop: 10 }}>{lang === "fr" ? "Connecte-toi pour enregistrer ta réflexion — elle ne sera jamais publiée." : "Sign in to save your reflection — it will never be published."}<br /><Link className="btn sm" style={{ marginTop: 8 }} to="/compte">{tr(lang, "account.login")}</Link></div> : <button className="btn primary wide" style={{ marginTop: 10 }} disabled={saving || !reflection.trim()} onClick={save}>{saving ? "…" : tr(lang, "whatif.save")}</button>}{saveError && <div className="note warn" style={{ marginTop: 9 }}>{saveError}</div>}{saved && <div className="note" style={{ marginTop: 9 }}>{pick(saved.private, lang)}</div>}</section><SourceLine source={data.source} /></>;
+  return <><Link className="tiny" to="/et-si" style={{ display: "inline-block", padding: "14px 0 6px" }}>← {tr(lang, "nav.whatif")}</Link><PageTitle eyebrow="🔎" title={<Bi_ v={data.title} />}><p className="lede" style={{ margin: 0 }}><Bi_ v={data.question} /></p></PageTitle><div className="disclaimer" style={{ marginBottom: 13 }}><Bi_ v={data.disclaimer} /></div><div className="note" style={{ marginBottom: 13 }}><em><Bi_ v={data.signature_line} /></em></div><section className="card"><div className="h3" style={{ marginBottom: 8 }}>{tr(lang, "whatif.computing")}</div>{data.jurisdiction_note && <p className="small"><Bi_ v={data.jurisdiction_note} /></p>}<div className="stack" style={{ gap: 9 }}>{events.map((e: Any, i: number) => <div key={i} className="card tight"><div className="row wrap" style={{ gap: 6 }}><span className="badge">{e.date || "—"}</span>{e.reliability && <Reliability level={e.reliability} />}</div><div style={{ marginTop: 5, color: "var(--bone-dim)", fontSize: 14 }}><Bi_ v={e.label || e.description || e.event || e.text} /></div></div>)}</div>{data.computable && comp.status !== "impossible" ? <div className="note neutral" style={{ marginTop: 12 }}><strong>{lang === "fr" ? "Résultat calculé" : "Computed result"}</strong><ComputationView data={data} comp={comp} /></div> : <div className="note warn" style={{ marginTop: 12 }}>{tr(lang, "whatif.impossible")}</div>}</section>{offences.length > 0 && <section className="block-sec"><h2 className="h3" style={{ marginBottom: 8 }}>{lang === "fr" ? "Faits documentés postérieurs" : "Documented subsequent facts"}</h2><div className="stack">{offences.map((x: Any, i: number) => <Item key={i} x={x} />)}</div></section>}<section className="card" style={{ marginTop: 14 }}><div className="eyebrow blood">{tr(lang, "whatif.reflect")}</div><p className="small">{lang === "fr" ? "Il n'y a pas de bonne réponse et aucun score. La réflexion est privée." : "There is no right answer and no score. The reflection is private."}</p><textarea className="ta" value={reflection} onChange={(e) => setReflection(e.target.value)} placeholder={lang === "fr" ? "Ce que cette hypothèse vous fait questionner…" : "What this hypothesis makes you question…"} maxLength={4000} /><button className="btn primary wide" style={{ marginTop: 10 }} disabled={saving || !reflection.trim()} onClick={save}>{saving ? "…" : tr(lang, "whatif.save")}</button>{saveError && <div className="note warn" style={{ marginTop: 9 }}>{saveError}</div>}{saved && <div className="note" style={{ marginTop: 9 }}>{pick(saved.private, lang)}</div>}</section><SourceLine source={data.source} /></>;
 }
 
 function ComputationView({ data, comp }: { data: Any; comp: Any }) {

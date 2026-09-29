@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import { endpoints, type Any } from "../lib/api";
-import { useApi, fmtDate } from "../lib/hooks";
+import { useApi } from "../lib/hooks";
 import { pick, tr } from "../lib/i18n";
 import { useApp } from "../state/app";
 import { usePlayer, fmtTime } from "../state/player";
 import CaseCard from "../components/CaseCard";
-import { Bi_, Cover, Loading, ErrorState, PageTitle, useLang } from "../components/ui";
+import WorldCaseMap from "../components/WorldCaseMap";
+import { Bi_, Cover, ErrorState, Loading, useLang } from "../components/ui";
+import { useState } from "react";
+
+type CaseFilter = "all" | "unresolved" | "resolved";
 
 export default function Home() {
   const lang = useLang();
@@ -14,14 +18,16 @@ export default function Home() {
   const loadResume = useApp((s) => s.loadResume);
   const load = usePlayer((s) => s.load);
   const play = usePlayer((s) => s.play);
-  const { data, loading, error, reload } = useApi<Any>(endpoints.cases());
+  const [filter, setFilter] = useState<CaseFilter>("all");
+  const casesRequest = useApi<Any>(endpoints.cases());
+  const worldRequest = useApi<Any>(endpoints.world());
 
-  const cases: Any[] = data?.cases || [];
-  const free = cases.filter((c) => c.tier === "FREE");
-  const unsolved = cases.filter((c) => ["UNSOLVED", "ONGOING", "PARTIALLY_RESOLVED"].includes(c.status));
+  const cases: Any[] = casesRequest.data?.cases || [];
   const recent = [...cases].sort((a, b) => (b.published_at || "").localeCompare(a.published_at || ""));
-  const hero = cases[0];
-
+  const featured = recent[0];
+  const unresolved = cases.filter((c) => ["UNSOLVED", "ONGOING", "PARTIALLY_RESOLVED"].includes(c.status));
+  const resolved = cases.filter((c) => c.status === "RESOLVED");
+  const shownCases = filter === "unresolved" ? unresolved : filter === "resolved" ? resolved : recent;
   const resumeRows: Any[] = (resume?.audio || []).slice(0, 4);
 
   const openResume = async (row: Any) => {
@@ -34,146 +40,126 @@ export default function Home() {
   };
 
   return (
-    <>
-      <PageTitle eyebrow={tr(lang, "app.identity")} title={<>YANIS<em style={{ color: "var(--blood-bright)", fontStyle: "normal" }}>//</em>X</>}>
-        <p className="lede" style={{ marginTop: 2 }}>
-          {meta?.app ? pick(meta.app.tagline, lang) : tr(lang, "app.tagline")}
-        </p>
-      </PageTitle>
+    <div className="home-page">
+      <section className="home-welcome">
+        <div className="home-welcome-orbit" aria-hidden="true" />
+        <div className="home-welcome-copy">
+          <div className="eyebrow blood">{tr(lang, "app.identity")} · {tr(lang, "app.tagline")}</div>
+          <div className="home-wordmark" aria-label="YANIS X">
+            YANIS<span>//X</span>
+          </div>
+          <h1>{tr(lang, "home.hero.title")}</h1>
+          <p>{tr(lang, "home.hero.description")}</p>
+          <div className="home-hero-actions">
+            <Link className="btn primary sm" to="/bibliotheque">{tr(lang, "home.hero.browse")} <span aria-hidden="true">→</span></Link>
+            <Link className="btn ghost sm" to="/memoire">🕯 {tr(lang, "nav.memory")}</Link>
+          </div>
+        </div>
+        <div className="home-stats" aria-label={lang === "fr" ? "Le catalogue" : "The catalogue"}>
+          <div><strong>{meta?.counts?.cases ?? cases.length}</strong><span>{lang === "fr" ? "dossiers" : "dossiers"}</span></div>
+          <div><strong>{meta?.counts?.victims ?? "—"}</strong><span>{lang === "fr" ? "victimes documentées" : "documented victims"}</span></div>
+          <div><strong>{meta?.counts?.sources ?? "—"}</strong><span>{lang === "fr" ? "sources" : "sources"}</span></div>
+        </div>
+      </section>
 
       {meta?.signature_line && (
-        <div className="note" style={{ marginBottom: 16 }}>
-          <em>
-            <Bi_ v={meta.signature_line} />
-          </em>
-        </div>
+        <blockquote className="home-signature">
+          <span className="eyebrow">{lang === "fr" ? "La ligne éditoriale" : "Editorial principle"}</span>
+          <p><Bi_ v={meta.signature_line} /></p>
+        </blockquote>
       )}
 
-      {hero && (
-        <Link to={`/dossiers/${hero.slug}`} className="hero" style={{ display: "block", marginBottom: 18 }}>
-          <Cover slug={hero.slug} title={hero.title} country={hero.country} period={hero.period_label} tall />
-          <div className="overlay">
-            <div className="eyebrow blood">{tr(lang, "home.latest")}</div>
-            <div className="h1" style={{ fontSize: 21, margin: "6px 0 4px" }}>
-              <Bi_ v={hero.title} />
-            </div>
-            <div className="small">
-              {hero.country_name?.[lang] || hero.country} · <Bi_ v={hero.period_label} /> ·{" "}
-              {pick(meta?.statuses?.find((s: Any) => s.key === hero.status)?.label, lang)}
-            </div>
-          </div>
-        </Link>
-      )}
+      <WorldCaseMap
+        cases={cases}
+        continents={worldRequest.data?.continents || []}
+        loading={casesRequest.loading || worldRequest.loading}
+      />
 
       {resumeRows.length > 0 && (
-        <section className="block-sec">
-          <div className="between" style={{ marginBottom: 8 }}>
-            <h2 className="h3">{tr(lang, "home.continue")}</h2>
-            <Link className="tiny" to="/bibliotheque">
-              {tr(lang, "nav.library")} →
-            </Link>
+        <section className="block-sec home-resume">
+          <div className="between home-section-heading">
+            <div>
+              <div className="eyebrow blood">{lang === "fr" ? "Votre écoute" : "Your listening"}</div>
+              <h2 className="h2">{tr(lang, "home.continue")}</h2>
+            </div>
+            <Link className="tiny" to="/bibliotheque">{tr(lang, "nav.library")} →</Link>
           </div>
           <div className="stack">
-            {resumeRows.map((r, i) => (
-              <button key={i} className="card tight" style={{ textAlign: "left" }} onClick={() => openResume(r)}>
-                <div className="between">
-                  <div style={{ minWidth: 0 }}>
-                    <div className="h2" style={{ fontSize: 13.5 }}>
-                      {r.episode_title ? <Bi_ v={r.episode_title} /> : r.ref || r.case_id}
-                    </div>
-                    <div className="tiny mono">
-                      {r.case_id || r.ref} · {fmtTime(r.at_sec || 0)}
-                      {r.duration_sec ? ` / ${fmtTime(r.duration_sec)}` : ""}
-                    </div>
-                  </div>
-                  <span className="playbtn" style={{ width: 38, height: 38, flex: "0 0 38px" }}>
-                    ▶
-                  </span>
-                </div>
-                {r.duration_sec ? (
-                  <div className="progressline" style={{ marginTop: 9 }}>
-                    <i style={{ width: `${Math.min(100, ((r.at_sec || 0) / r.duration_sec) * 100)}%` }} />
-                  </div>
-                ) : null}
+            {resumeRows.map((row: Any, index: number) => (
+              <button key={`${row.ref || row.case_id}-${index}`} className="resume-row" onClick={() => openResume(row)}>
+                <span className="resume-play" aria-hidden="true">▶</span>
+                <span className="resume-copy">
+                  <strong>{row.episode_title ? <Bi_ v={row.episode_title} /> : row.ref || row.case_id}</strong>
+                  <small>{row.case_id || row.ref} · {fmtTime(row.at_sec || 0)}{row.duration_sec ? ` / ${fmtTime(row.duration_sec)}` : ""}</small>
+                  {row.duration_sec > 0 && <span className="progressline"><i style={{ width: `${Math.min(100, ((row.at_sec || 0) / row.duration_sec) * 100)}%` }} /></span>}
+                </span>
               </button>
             ))}
           </div>
         </section>
       )}
 
-      {loading && <Loading />}
-      {error && <ErrorState message={error} onRetry={reload} />}
+      {casesRequest.loading && <Loading />}
+      {casesRequest.error && <ErrorState message={casesRequest.error} onRetry={casesRequest.reload} />}
 
-      {data && (
-        <>
-          <section className="block-sec">
-            <div className="between" style={{ marginBottom: 8 }}>
-              <h2 className="h3">{tr(lang, "home.free")}</h2>
-              <span className="tiny">{free.length}</span>
+      {featured && (
+        <section className="home-featured block-sec">
+          <div className="between home-section-heading">
+            <div>
+              <div className="eyebrow blood">{tr(lang, "home.latest")}</div>
+              <h2 className="h2">{lang === "fr" ? "À la une" : "Featured dossier"}</h2>
             </div>
-            <div className="rail">
-              {free.map((c) => (
-                <CaseCard key={c.slug} c={c} compact />
-              ))}
+            <Link className="tiny" to="/bibliotheque">{tr(lang, "common.all")} →</Link>
+          </div>
+          <Link to={`/dossiers/${featured.slug}`} className="home-feature-card">
+            <div className="home-feature-cover">
+              <Cover slug={featured.slug} title={featured.title} country={featured.country} period={featured.period_label} />
             </div>
-          </section>
-
-          <section className="block-sec">
-            <div className="between" style={{ marginBottom: 8 }}>
-              <h2 className="h3">{tr(lang, "home.unsolved")}</h2>
-              <Link className="tiny" to="/cold-cases">
-                {tr(lang, "nav.coldcases")} →
-              </Link>
-            </div>
-            <div className="rail">
-              {unsolved.map((c) => (
-                <CaseCard key={c.slug} c={c} compact />
-              ))}
-            </div>
-          </section>
-
-          <section className="block-sec">
-            <div className="between" style={{ marginBottom: 8 }}>
-              <h2 className="h3">{tr(lang, "home.dossiers")}</h2>
-              <Link className="tiny" to="/bibliotheque">
-                {tr(lang, "common.all")} →
-              </Link>
-            </div>
-            <div className="stack">
-              {recent.map((c) => (
-                <CaseCard key={c.slug} c={c} />
-              ))}
-            </div>
-          </section>
-
-          <Link to="/memoire" className="card" style={{ display: "block", marginBottom: 14 }}>
-            <div className="between">
-              <div>
-                <div className="eyebrow blood">🕯 {tr(lang, "nav.memory")}</div>
-                <div className="h2" style={{ fontSize: 15, marginTop: 5 }}>
-                  {tr(lang, "home.memory")}
-                </div>
-                <div className="tiny" style={{ marginTop: 4 }}>
-                  {meta?.counts?.victims} {lang === "fr" ? "fiches victimes" : "victim files"} ·{" "}
-                  {lang === "fr" ? "toujours en accès libre" : "always free"}
-                </div>
+            <div className="home-feature-copy">
+              <div className="row wrap" style={{ gap: 6 }}>
+                <span className="badge blood">{featured.country_name?.[lang] || featured.country}</span>
+                <span className="tiny"><Bi_ v={featured.period_label} /></span>
               </div>
-              <span className="candle">🕯</span>
+              <h3><Bi_ v={featured.title} /></h3>
+              <p><Bi_ v={featured.subtitle || featured.summary} /></p>
+              <span className="home-feature-link">{tr(lang, "common.open")} <span aria-hidden="true">→</span></span>
             </div>
           </Link>
-
-          <section className="block-sec">
-            <h2 className="h3" style={{ marginBottom: 9 }}>
-              {tr(lang, "home.journey")}
-            </h2>
-            <div className="tiny" style={{ letterSpacing: "0.08em", lineHeight: 2 }}>
-              {lang === "fr"
-                ? "ÉCOUTER → DÉCOUVRIR → RÉFLÉCHIR → QUESTIONNER → ANALYSER → COMPRENDRE → ENQUÊTER → APPRENDRE → RENDRE HOMMAGE"
-                : "LISTEN → DISCOVER → REFLECT → QUESTION → ANALYSE → UNDERSTAND → INVESTIGATE → LEARN → PAY HOMAGE"}
-            </div>
-          </section>
-        </>
+        </section>
       )}
-    </>
+
+      {casesRequest.data && (
+        <section className="block-sec home-catalogue">
+          <div className="between home-section-heading">
+            <div>
+              <div className="eyebrow blood">{lang === "fr" ? "Le catalogue" : "The catalogue"}</div>
+              <h2 className="h2">{tr(lang, "home.dossiers")}</h2>
+            </div>
+            <span className="badge">{shownCases.length} {lang === "fr" ? "dossier(s)" : "dossier(s)"}</span>
+          </div>
+          <div className="tabs home-case-filters" role="group" aria-label={lang === "fr" ? "Filtrer les dossiers" : "Filter dossiers"}>
+            <button className={`chip ${filter === "all" ? "on" : ""}`} aria-pressed={filter === "all"} onClick={() => setFilter("all")}>
+              {lang === "fr" ? "Tous" : "All"} <span>{cases.length}</span>
+            </button>
+            <button className={`chip ${filter === "unresolved" ? "on" : ""}`} aria-pressed={filter === "unresolved"} onClick={() => setFilter("unresolved")}>
+              {lang === "fr" ? "Non résolues / en cours" : "Unresolved / ongoing"} <span>{unresolved.length}</span>
+            </button>
+            <button className={`chip ${filter === "resolved" ? "on" : ""}`} aria-pressed={filter === "resolved"} onClick={() => setFilter("resolved")}>
+              {lang === "fr" ? "Résolues" : "Resolved"} <span>{resolved.length}</span>
+            </button>
+          </div>
+          <div className="home-case-grid">
+            {shownCases.map((caseFile) => <CaseCard key={caseFile.slug} c={caseFile} />)}
+          </div>
+          {!shownCases.length && <div className="empty">{lang === "fr" ? "Aucun dossier dans cette sélection." : "No dossier in this selection."}</div>}
+        </section>
+      )}
+
+      <Link to="/memoire" className="home-memory-link">
+        <span className="home-memory-icon" aria-hidden="true">🕯</span>
+        <span><small>{lang === "fr" ? "Au centre de chaque dossier" : "At the heart of every dossier"}</small><strong>{tr(lang, "home.memory")}</strong></span>
+        <span className="home-feature-link" aria-hidden="true">→</span>
+      </Link>
+    </div>
   );
 }

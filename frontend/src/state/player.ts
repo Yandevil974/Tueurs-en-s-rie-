@@ -73,6 +73,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
     useApp.getState().saveProgress("audio", ref, {
       at_sec: Math.round(position),
       episode_id: episode.id,
+      episode_title: episode.title,
+      duration_sec: episode.duration_sec,
       case_title: episode.case_id,
     });
   };

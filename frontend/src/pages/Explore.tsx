@@ -5,7 +5,8 @@ import { useApi, useLocal } from "../lib/hooks";
 import { pick, tr } from "../lib/i18n";
 import { useApp } from "../state/app";
 import CaseCard from "../components/CaseCard";
-import { Bi_, Empty, ErrorState, Loading, PageTitle, Reliability, StatusBadge, useLang } from "../components/ui";
+import WorldCaseMap from "../components/WorldCaseMap";
+import { Bi_, Empty, ErrorState, Loading, PageTitle, StatusBadge, useLang } from "../components/ui";
 
 /* ------------------------------------------------------------- 🌍 monde */
 export default function Explore() {
@@ -187,105 +188,28 @@ export function CityPage() {
 }
 
 /* ------------------------------------------------------- 🗺 carte */
-const W = 720;
-const H = 360;
-const proj = (lat: number, lon: number) => ({ x: ((lon + 180) / 360) * W, y: ((90 - lat) / 180) * H });
-
 export function CaseMap() {
   const lang = useLang();
-  const { data, loading, error, reload } = useApi<Any>(endpoints.map());
-  const [sel, setSel] = useState<Any | null>(null);
-  const points: Any[] = (data?.case_points || []).filter((p: Any) => p.lat != null && p.lon != null);
-  const places: Any[] = data?.locations || [];
+  const casesRequest = useApi<Any>(endpoints.cases());
+  const worldRequest = useApi<Any>(endpoints.world());
+  const loading = casesRequest.loading || worldRequest.loading;
 
   return (
     <>
       <PageTitle eyebrow="🗺" title={tr(lang, "explore.map")}>
         <Link className="tiny" to="/explorer">← {tr(lang, "nav.explore")}</Link>
       </PageTitle>
-      {loading && <Loading />}
-      {error && <ErrorState message={error} onRetry={reload} />}
-      {data && (
-        <>
-          <div className="note neutral" style={{ marginBottom: 12 }}>{pick(data.no_exact_address, lang)}</div>
-          <svg className="map" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={tr(lang, "explore.map")}>
-            <rect width={W} height={H} fill="#0c0e12" />
-            <g stroke="#1c2027" strokeWidth="0.6">
-              {Array.from({ length: 13 }).map((_, i) => (
-                <line key={`m${i}`} x1={(i * W) / 12} y1="0" x2={(i * W) / 12} y2={H} />
-              ))}
-              {Array.from({ length: 7 }).map((_, i) => (
-                <line key={`p${i}`} x1="0" y1={(i * H) / 6} x2={W} y2={(i * H) / 6} />
-              ))}
-            </g>
-            <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke="#2b3138" strokeWidth="1" strokeDasharray="4 4" />
-            <text x="8" y={H / 2 - 6} fill="#5c636c" fontSize="9" fontFamily="monospace">0°</text>
-            {points.map((p) => {
-              const { x, y } = proj(p.lat, p.lon);
-              const color = p.status === "RESOLVED" ? "#3f9e63" : p.status === "UNSOLVED" ? "#c2603a" : "#c9a227";
-              return (
-                <g key={p.slug} className="pin" onClick={() => setSel(p)}>
-                  <circle cx={x} cy={y} r="10" fill={color} opacity="0.14" />
-                  <circle cx={x} cy={y} r="4" fill={color} stroke="#0b0c0e" strokeWidth="1" />
-                </g>
-              );
-            })}
-            {places.filter((l) => l.lat != null).map((l, i) => {
-              const { x, y } = proj(l.lat, l.lon);
-              return <circle key={i} cx={x} cy={y} r="1.8" fill="#e8e4dc" opacity="0.5" />;
-            })}
-          </svg>
-          <div className="tiny" style={{ margin: "8px 0 14px" }}>
-            {lang === "fr"
-              ? "Projection équirectangulaire schématique. Les points sont les dossiers ; les petites marques, les lieux documentés."
-              : "Schematic equirectangular projection. Dots are dossiers; small marks are documented places."}
-          </div>
-
-          {sel && (
-            <div className="card" style={{ marginBottom: 12 }}>
-              <div className="h2" style={{ fontSize: 15, marginBottom: 6 }}>
-                <Bi_ v={sel.title} />
-              </div>
-              <div className="row wrap" style={{ gap: 6 }}>
-                <StatusBadge status={sel.status} />
-                <span className="badge">{sel.country}</span>
-                <span className="tiny mono">
-                  {sel.lat?.toFixed(2)}, {sel.lon?.toFixed(2)}
-                </span>
-              </div>
-              <Link className="btn sm primary" style={{ marginTop: 11 }} to={`/dossiers/${sel.slug}`}>
-                {tr(lang, "common.open")} →
-              </Link>
-            </div>
-          )}
-
-          <div className="stack">
-            {places.map((l) => (
-              <div key={l.id} className="card tight">
-                <div className="between">
-                  <div style={{ minWidth: 0 }}>
-                    <div className="h2" style={{ fontSize: 13.5 }}>
-                      <Bi_ v={l.names} />
-                    </div>
-                    <div className="tiny">
-                      {l.city} {l.region ? `· ${l.region}` : ""} · {l.country} · {l.kind} · {l.date}
-                    </div>
-                  </div>
-                  <Reliability level={l.reliability} />
-                </div>
-                {l.note && (l.note.fr || l.note.en) && (
-                  <div className="small" style={{ marginTop: 6 }}>
-                    <Bi_ v={l.note} />
-                  </div>
-                )}
-                <Link className="tiny" style={{ display: "inline-block", marginTop: 7, textDecoration: "underline" }} to={`/dossiers/${l.case_id}`}>
-                  {l.case_id} →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </>
+      {(casesRequest.error || worldRequest.error) && (
+        <ErrorState
+          message={casesRequest.error || worldRequest.error || undefined}
+          onRetry={() => { casesRequest.reload(); worldRequest.reload(); }}
+        />
       )}
+      <WorldCaseMap
+        cases={casesRequest.data?.cases || []}
+        continents={worldRequest.data?.continents || []}
+        loading={loading}
+      />
     </>
   );
 }

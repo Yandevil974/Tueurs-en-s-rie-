@@ -283,19 +283,19 @@ INVESTIGATION = {
                      "Between 5 p.m. and 9.15 p.m. on 16 October 1984: a noticed absence, an anonymous call, a body "
                      "found in the river. That is all the time the investigation has for what would become one of the "
                      "longest files in French judicial history."),
-         "reliability": "CONFIRMED", "source": "en-wiki-gregory", "premium": False},
+         "reliability": "CONFIRMED", "source": "en-wiki-gregory"},
         {"n": 2, "date": "1984-10", "title": txt("Un corbeau", "An anonymous writer"),
          "body": txt("Des courriers et des cassettes parviennent à la famille et à la presse. Leur auteur n'a jamais "
                      "été identifié avec certitude. Les expertises ultérieures ont écarté Christine Villemin.",
                      "Letters and tapes reach the family and the press. Their author has never been identified with "
                      "certainty. Later examinations ruled out Christine Villemin.",),
-         "reliability": "CONFIRMED", "source": "wiki-gregory-fr", "premium": False},
+         "reliability": "CONFIRMED", "source": "wiki-gregory-fr"},
         {"n": 3, "date": "1984-11", "title": txt("Une première inculpation", "A first indictment"),
          "body": txt("Bernard Laroche est inculpé, sur la base notamment des déclarations d'une mineure. Cette base "
                      "sera discutée par un magistrat.",
                      "Bernard Laroche is indicted, on the basis notably of a minor's statements. That basis would be "
                      "questioned by a magistrate."),
-         "reliability": "PROBABLE", "source": "wiki-gregory-fr", "premium": True},
+         "reliability": "PROBABLE", "source": "wiki-gregory-fr"},
         {"n": 4, "date": "1985", "title": txt("Deux événements qui déforment le dossier", "Two events that distort the file"),
          "body": txt("Bernard Laroche est tué par le père de l'enfant, qui sera condamné pour ce meurtre. Christine "
                      "Villemin est inculpée. À partir de là, le dossier cesse d'être seulement une enquête : il "
@@ -303,34 +303,34 @@ INVESTIGATION = {
                      "Bernard Laroche is killed by the child's father, who will be convicted for that murder. "
                      "Christine Villemin is indicted. From then on, the file ceases to be only an investigation: it "
                      "becomes a public case."),
-         "reliability": "CONFIRMED", "source": "en-wiki-gregory", "premium": False},
+         "reliability": "CONFIRMED", "source": "en-wiki-gregory"},
         {"n": 5, "date": "1987", "title": txt("Le dépaysement et le silence d'un juge", "The transfer and a judge's silence"),
          "body": txt("Le dossier est dépaysé à Dijon. Le juge Maurice Simon choisit de ne pas communiquer avec la "
                      "presse. Ses travaux contribueront à innocenter la mère de l'enfant.",
                      "The file is transferred to Dijon. Judge Maurice Simon chooses not to communicate with the press. "
                      "His work would help clear the child's mother."),
-         "reliability": "CONFIRMED", "source": "ici-dates-cles", "premium": True},
+         "reliability": "CONFIRMED", "source": "ici-dates-cles"},
         {"n": 6, "date": "1990", "title": txt("Un juge remplacé par un accident", "A judge replaced by an accident"),
          "body": txt("Le 28 janvier 1990, le juge Simon est victime d'un infarctus, tombe dans le coma et souffre "
                      "d'amnésie au réveil. Il abandonne l'affaire. La continuité de l'instruction est rompue.",
                      "On 28 January 1990, judge Simon suffers a heart attack, falls into a coma and suffers amnesia on "
                      "waking. He gives up the case. The continuity of the investigation is broken."),
-         "reliability": "CONFIRMED", "source": "wiki-gregory-fr", "premium": False},
+         "reliability": "CONFIRMED", "source": "wiki-gregory-fr"},
         {"n": 7, "date": "1993", "title": txt("Un non-lieu", "A dismissal"),
          "body": txt("Christine Villemin bénéficie d'un non-lieu, huit ans après son inculpation.",
                      "Christine Villemin obtains a dismissal, eight years after her indictment."),
-         "reliability": "CONFIRMED", "source": "lesjours-gregory", "premium": False},
+         "reliability": "CONFIRMED", "source": "lesjours-gregory"},
         {"n": 8, "date": "2000-2001", "title": txt("L'ADN arrive, et ne tranche pas", "DNA arrives, and does not settle it"),
          "body": txt("Des comparaisons ADN sont effectuées sur les cordelettes, l'anorak, le menton de l'enfant et "
                      "certains courriers. Une ordonnance de non-lieu est rendue en 2001. La technique nouvelle ne "
                      "produit pas d'identification.",
                      "DNA comparisons are made on the cords, the anorak, the child's chin and certain letters. A "
                      "dismissal order is issued in 2001. The new technique produces no identification."),
-         "reliability": "CONFIRMED", "source": "ici-dates-cles", "premium": True},
+         "reliability": "CONFIRMED", "source": "ici-dates-cles"},
         {"n": 9, "date": "2008", "title": txt("Une réouverture", "A reopening"),
          "body": txt("Le procureur général de la cour d'appel de Dijon requiert la réouverture de l'instruction.",
                      "The Prosecutor General of the Dijon court of appeal requests the reopening of the investigation."),
-         "reliability": "CONFIRMED", "source": "obs-chronologie", "premium": False},
+         "reliability": "CONFIRMED", "source": "obs-chronologie"},
         {"n": 10, "date": "2017-2018", "title": txt("Des mises en examen, puis leur annulation", "Indictments, then their annulment"),
          "body": txt("En 2017, un grand-oncle et une grand-tante sont mis en examen ; le premier juge d'instruction "
                      "du dossier se donne la mort. En 2018, un arrêt annule ces mises en examen, sans annuler le "
@@ -340,7 +340,7 @@ INVESTIGATION = {
                      "takes his own life. In 2018, a ruling annuls those indictments, without annulling Christine "
                      "Villemin's dismissal. The same ruling retains 'very serious indications' of abduction against "
                      "Bernard Laroche, while stating it is impossible to assert that he murdered the child."),
-         "reliability": "CONFIRMED", "source": "wiki-gregory-fr", "premium": True},
+         "reliability": "CONFIRMED", "source": "wiki-gregory-fr"},
     ],
     "reality": txt(
         "Voici comment l'enquête s'est réellement déroulée : quarante ans de procédure, plusieurs réouvertures, des "
@@ -913,8 +913,7 @@ CASE = {
                        "No person has been convicted of this murder. The file has seen several reopenings and "
                        "annulments of acts."),
     "type": "cold_case",
-    "tags": ["cold_case", "child_victim", "france", "judicial_errors", "media_frenzy", "dna", "unsolved", "annulled_acts"],
-    "tier": "FREE", "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
+    "tags": ["cold_case", "child_victim", "france", "judicial_errors", "media_frenzy", "dna", "unsolved", "annulled_acts"], "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
     "triggers": txt("Meurtre d'un enfant de 4 ans ; mise en cause publique de la mère ; suicides et meurtre au sein "
                     "de la procédure.",
                     "Murder of a 4-year-old child; public accusation against the mother; suicides and a murder within "

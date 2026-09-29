@@ -285,19 +285,19 @@ INVESTIGATION = {
                      "d'autres affaires.",
                      "Pascale Escarfail is raped and killed in her Paris studio. Nothing yet links this crime to "
                      "other cases."),
-         "reliability": "CONFIRMED", "source": "parismatch-archives", "premium": False},
+         "reliability": "CONFIRMED", "source": "parismatch-archives"},
         {"n": 2, "date": "1991-1994", "title": txt("Des scènes qui se ressemblent", "Scenes that look alike"),
          "body": txt("D'autres femmes sont tuées dans l'est parisien. Le mode opératoire est constant : intrusion au "
                      "domicile, victime attachée et bâillonnée au sparadrap, viol, homicide à l'arme blanche.",
                      "Other women are killed in eastern Paris. The method is constant: intrusion into the home, victim "
                      "tied and gagged with adhesive tape, rape, homicide with a blade."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": False},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 3, "date": "1994-12-10", "title": txt("Une trace biologique", "A biological trace"),
          "body": txt("De l'ADN est découvert au domicile d'Agnès Nijkamp. À cette date, le rapprochement avec les "
                      "autres affaires n'est pas établi.",
                      "DNA is discovered at Agnès Nijkamp's home. At that date, the link with the other cases is not "
                      "established."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": True},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 4, "date": "1995", "title": txt("Des survivantes", "Survivors"),
          "body": txt("Deux agressions n'aboutissent pas : Élisabeth Ortega s'enfuit, une empreinte à signe distinctif "
                      "est relevée ; Mélanie Bacou échappe à l'agresseur, qui abandonne son portefeuille. Ce dernier "
@@ -305,7 +305,7 @@ INVESTIGATION = {
                      "Two attacks do not succeed: Élisabeth Ortega escapes and a footprint with a distinctive feature "
                      "is recorded; Mélanie Bacou escapes the attacker, who abandons his wallet. The latter leads to a "
                      "30-month sentence."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": False},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 5, "date": "1995-1997", "title": txt("Le ratage documenté par la presse", "The miss documented by the press"),
          "body": txt("Paris Match relève qu'aucune comparaison similaire n'est effectuée entre les traces découvertes "
                      "chez Agnès Nijkamp (1994) et celles relevées lors de l'agression d'Élisabeth O. (1995). C'est un "
@@ -313,25 +313,25 @@ INVESTIGATION = {
                      "Paris Match notes that no similar comparison was made between the traces discovered at Agnès "
                      "Nijkamp's (1994) and those recorded during the attack on Élisabeth O. (1995). This is "
                      "compartmentalisation between files, not an absence of traces."),
-         "reliability": "PROBABLE", "source": "parismatch-archives", "premium": True},
+         "reliability": "PROBABLE", "source": "parismatch-archives"},
         {"n": 6, "date": "1997-11-15", "title": txt("Un dernier meurtre", "A last murder"),
          "body": txt("Estelle Magd, 25 ans, est tuée. À ce moment, les enquêteurs ont établi un lien entre les "
                      "crimes et identifient une trace ADN commune sur les lieux.",
                      "Estelle Magd, 25, is killed. At that point, investigators have established a link between the "
                      "crimes and identify a common DNA trace at the scenes."),
-         "reliability": "CONFIRMED", "source": "bfmtv-fea", "premium": False},
+         "reliability": "CONFIRMED", "source": "bfmtv-fea"},
         {"n": 7, "date": "1998-01", "title": txt("L'identification", "The identification"),
          "body": txt("Le laboratoire du docteur Olivier Pascal identifie un profil, décrit comme obtenu presque par "
                      "hasard. Deux jours plus tard, Guy Georges est arrêté.",
                      "Doctor Olivier Pascal's laboratory identifies a profile, described as obtained almost by chance. "
                      "Two days later, Guy Georges is arrested."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": True},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
         {"n": 8, "date": "2001-04-05", "title": txt("Le verdict", "The verdict"),
          "body": txt("Après trois semaines d'audience ouvertes le 19 mars 2001, la cour d'assises de Paris condamne "
                      "Guy Georges à la réclusion criminelle à perpétuité, assortie d'une période de sûreté de 22 ans.",
                      "After three weeks of hearings opened on 19 March 2001, the Paris assize court sentences Guy "
                      "Georges to life imprisonment with a 22-year minimum term."),
-         "reliability": "CONFIRMED", "source": "sudouest-parcours", "premium": False},
+         "reliability": "CONFIRMED", "source": "sudouest-parcours"},
     ],
     "reality": txt(
         "L'affaire s'est résolue par la biologie, pas par le profil. Le rapprochement des scènes est intervenu tard, "
@@ -620,21 +620,21 @@ UNKNOWNS = [
 ]
 
 SECTIONS = [
-    {"key": "introduction", "title": txt("Introduction", "Introduction"), "tier": "FREE", "blocks": [
+    {"key": "introduction", "title": txt("Introduction", "Introduction"), "blocks": [
         block("paragraph", "Sept femmes, six ans, un secteur de Paris", "Seven women, six years, one sector of Paris",
               "Entre 1991 et 1997, sept femmes sont violées et tuées dans l'est parisien. L'affaire se résoudra par "
               "une trace biologique, et produira une modification durable du droit français.",
               "Between 1991 and 1997, seven women were raped and killed in eastern Paris. The case would be solved by "
               "a biological trace, and produce a lasting change in French law.",
               "CONFIRMED", "sudouest-parcours")]},
-    {"key": "context", "title": txt("Contexte", "Context"), "tier": "FREE", "blocks": [
+    {"key": "context", "title": txt("Contexte", "Context"), "blocks": [
         block("paragraph", "Paris au début des années 1990", "Paris in the early 1990s",
               "Les faits s'inscrivent dans un Paris où la police scientifique se développe et où les fichiers "
               "génétiques n'existent pas encore : le FNAEG sera créé en 1998.",
               "The facts take place in a Paris where forensic science was developing and genetic databases did not "
               "yet exist: the FNAEG would be created in 1998.",
               "CONFIRMED", "francetv-au-bout-de-l-enquete")]},
-    {"key": "offender", "title": txt("Auteur", "Author"), "tier": "PREMIUM", "blocks": [
+    {"key": "offender", "title": txt("Auteur", "Author"), "blocks": [
         block("paragraph", "Guy Georges, né Guy Rampillon", "Guy Georges, born Guy Rampillon",
               "Né le 15 octobre 1962. Condamné une première fois en 1984 à dix ans de prison. Arrêté en janvier 1998, "
               "condamné le 5 avril 2001 à la réclusion criminelle à perpétuité assortie d'une période de sûreté de "
@@ -642,47 +642,47 @@ SECTIONS = [
               "Born on 15 October 1962. First sentenced in 1984 to ten years in prison. Arrested in January 1998, "
               "sentenced on 5 April 2001 to life imprisonment with a 22-year minimum term.",
               "CONFIRMED", "sudouest-parcours")]},
-    {"key": "victims", "title": txt("Victimes", "Victims"), "tier": "FREE", "blocks": []},
-    {"key": "timeline", "title": txt("Chronologie", "Chronology"), "tier": "FREE", "blocks": []},
-    {"key": "investigation", "title": txt("Enquête", "Investigation"), "tier": "FREE", "blocks": []},
-    {"key": "clues", "title": txt("Indices et preuves", "Clues and evidence"), "tier": "PREMIUM", "blocks": []},
-    {"key": "behaviour", "title": txt("Analyse comportementale", "Behavioural analysis"), "tier": "PREMIUM", "blocks": [
+    {"key": "victims", "title": txt("Victimes", "Victims"), "blocks": []},
+    {"key": "timeline", "title": txt("Chronologie", "Chronology"), "blocks": []},
+    {"key": "investigation", "title": txt("Enquête", "Investigation"), "blocks": []},
+    {"key": "clues", "title": txt("Indices et preuves", "Clues and evidence"), "blocks": []},
+    {"key": "behaviour", "title": txt("Analyse comportementale", "Behavioural analysis"), "blocks": [
         block("behaviour", "Un mode opératoire stable", "A stable method",
               "Intrusion au domicile, contrainte par sparadrap, viol, homicide à l'arme blanche. La stabilité permet "
               "le rapprochement ; elle n'explique pas le passage à l'acte.",
               "Intrusion into the home, restraint with adhesive tape, rape, homicide with a blade. Stability enables "
               "linkage; it does not explain the act.",
               "CONFIRMED", "sudouest-parcours")]},
-    {"key": "psychology", "title": txt("Psychologie", "Psychology"), "tier": "PREMIUM", "blocks": []},
-    {"key": "victimology", "title": txt("Victimologie", "Victimology"), "tier": "FREE", "blocks": []},
-    {"key": "geography", "title": txt("Géographie", "Geography"), "tier": "FREE", "blocks": [
+    {"key": "psychology", "title": txt("Psychologie", "Psychology"), "blocks": []},
+    {"key": "victimology", "title": txt("Victimologie", "Victimology"), "blocks": []},
+    {"key": "geography", "title": txt("Géographie", "Geography"), "blocks": [
         block("paragraph", "L'est parisien", "Eastern Paris",
               "Les faits se concentrent dans les 10e, 11e, 12e et 14e arrondissements, avec une première victime en "
               "1991 rue Delambre. La carte affiche les secteurs, jamais les adresses privées.",
               "The facts concentrate in the 10th, 11th, 12th and 14th arrondissements, with a first victim in 1991 on "
               "rue Delambre. The map displays sectors, never private addresses.",
               "PROBABLE", "parismatch-archives")]},
-    {"key": "arrest", "title": txt("Arrestation", "Arrest"), "tier": "FREE", "blocks": [
+    {"key": "arrest", "title": txt("Arrestation", "Arrest"), "blocks": [
         block("paragraph", "Janvier 1998", "January 1998",
               "Deux jours après l'identification d'un profil génétique par le laboratoire du docteur Olivier Pascal, "
               "Guy Georges est interpellé. Il avoue deux autres crimes après son interpellation, selon Paris Match.",
               "Two days after the identification of a genetic profile by Doctor Olivier Pascal's laboratory, Guy "
               "Georges was arrested. He confessed to two other crimes after his arrest, according to Paris Match.",
               "CONFIRMED", "sudouest-parcours")]},
-    {"key": "trial", "title": txt("Procès", "Trial"), "tier": "FREE", "blocks": []},
-    {"key": "justice", "title": txt("Justice", "Justice"), "tier": "FREE", "blocks": []},
-    {"key": "consequences", "title": txt("Conséquences", "Consequences"), "tier": "FREE", "blocks": [
+    {"key": "trial", "title": txt("Procès", "Trial"), "blocks": []},
+    {"key": "justice", "title": txt("Justice", "Justice"), "blocks": []},
+    {"key": "consequences", "title": txt("Conséquences", "Consequences"), "blocks": [
         block("paragraph", "Le FNAEG", "The FNAEG",
               "La loi du 17 juin 1998 crée le fichier national automatisé des empreintes génétiques. C'est la "
               "conséquence structurelle la plus documentée de cette affaire.",
               "The law of 17 June 1998 created the national automated database of genetic fingerprints. It is the "
               "most documented structural consequence of this case.",
               "CONFIRMED", "francetv-au-bout-de-l-enquete")]},
-    {"key": "archives", "title": txt("Archives", "Archives"), "tier": "PREMIUM", "blocks": []},
-    {"key": "sources", "title": txt("Sources", "Sources"), "tier": "FREE", "blocks": []},
-    {"key": "memorial", "title": txt("Mémoire", "Memory"), "tier": "FREE", "blocks": []},
-    {"key": "unknowns", "title": txt("Zones d'ombre", "Unknown zones"), "tier": "FREE", "blocks": []},
-    {"key": "lessons", "title": txt("Ce que l'affaire nous apprend", "What the case teaches us"), "tier": "FREE", "blocks": []},
+    {"key": "archives", "title": txt("Archives", "Archives"), "blocks": []},
+    {"key": "sources", "title": txt("Sources", "Sources"), "blocks": []},
+    {"key": "memorial", "title": txt("Mémoire", "Memory"), "blocks": []},
+    {"key": "unknowns", "title": txt("Zones d'ombre", "Unknown zones"), "blocks": []},
+    {"key": "lessons", "title": txt("Ce que l'affaire nous apprend", "What the case teaches us"), "blocks": []},
 ]
 
 EPISODES = [
@@ -860,8 +860,7 @@ CASE = {
     "country": "FR", "region": "Île-de-France / Paris", "city": "Paris",
     "year_start": 1991, "year_end": 2001, "period_label": txt("1991 – 2001", "1991 – 2001"),
     "status": "RESOLVED", "type": "serial",
-    "tags": ["serial_killer", "dna", "fneg", "france", "survivors", "forensic"],
-    "tier": "PREMIUM", "editorial": "yanis", "published_at": "2026-09-24",
+    "tags": ["serial_killer", "dna", "fneg", "france", "survivors", "forensic"], "editorial": "yanis", "published_at": "2026-09-24",
     "sensitive": True,
     "triggers": txt("Viols et meurtres ; description du mode opératoire sans détail graphique.",
                     "Rapes and murders; description of the method without graphic detail."),

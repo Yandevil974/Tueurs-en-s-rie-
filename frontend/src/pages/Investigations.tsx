@@ -20,8 +20,8 @@ export default function Investigations() {
       </PageTitle>
       <div className="note neutral" style={{ marginBottom: 14 }}>
         {lang === "fr"
-          ? "Le Mode Enquête révèle : disparition → témoignage → premier indice → nouvelle piste → élément scientifique → arrestation. Les étapes verrouillées restent visibles comme telles."
-          : "Investigation Mode reveals: disappearance → testimony → first clue → new lead → scientific element → arrest. Locked steps remain visible as locked."}
+          ? "Le Mode Enquête révèle : disparition → témoignage → premier indice → nouvelle piste → élément scientifique → arrestation. Chaque étape documentée reste consultable dans son ordre chronologique."
+          : "Investigation Mode reveals: disappearance → testimony → first clue → new lead → scientific element → arrest. Every documented step remains available in chronological order."}
       </div>
       <div className="row wrap" style={{ gap: 8, marginBottom: 14 }}>
         <Link className="chip" to="/archives">🗂 {tr(lang, "nav.archives")}</Link>

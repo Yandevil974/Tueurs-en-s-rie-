@@ -1,11 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { api, endpoints, type Any } from "../lib/api";
 import { useApi } from "../lib/hooks";
 import { pick, tr } from "../lib/i18n";
 import { useApp } from "../state/app";
 import CaseCard from "../components/CaseCard";
-import { Bi_, ErrorState, Loading, PageTitle, TierBadge, useLang } from "../components/ui";
+import { Bi_, ErrorState, Loading, PageTitle, useLang } from "../components/ui";
 
 const OFFLINE_KEY = "yanisx.offline";
 
@@ -20,7 +20,6 @@ function readOffline(): Record<string, Any> {
 export default function Library() {
   const lang = useLang();
   const meta = useApp((s) => s.meta);
-  const tier = useApp((s) => s.tier);
   const favourites = useApp((s) => s.favourites);
   const [filters, setFilters] = useState({ status: "", type: "", country: "", tag: "", sort: "editorial", q: "" });
   const [offline, setOffline] = useState<Record<string, Any>>(readOffline());
@@ -49,7 +48,6 @@ export default function Library() {
   const favCases = all.filter((c) => favourites.includes(c.slug));
 
   const download = async (ep: Any) => {
-    if (tier !== "PREMIUM") return;
     setBusy(String(ep.id));
     try {
       const full = await api.get<Any>(endpoints.episode(ep.id));
@@ -68,12 +66,7 @@ export default function Library() {
     setOffline(next);
   };
 
-  const episodes: Any[] = data ? (data.cases || []).flatMap((c: Any) => []) : [];
   const { data: epData } = useApi<Any>(endpoints.episodes());
-
-  useEffect(() => {
-    /* rien à synchroniser : la liste des épisodes arrive par epData */
-  }, [epData]);
 
   return (
     <>
@@ -97,72 +90,45 @@ export default function Library() {
       )}
 
       <section className="block-sec">
-        <h2 className="h3" style={{ marginBottom: 8 }}>
-          ⬇ {lang === "fr" ? "Hors ligne" : "Offline"}
-        </h2>
-        {tier !== "PREMIUM" ? (
-          <div className="locked">
-            <div style={{ fontSize: 22 }}>🔒</div>
-            <div className="h2" style={{ fontSize: 14, margin: "8px 0 5px" }}>
-              {lang === "fr" ? "Téléchargement réservé à l'abonnement" : "Download reserved for subscribers"}
-            </div>
-            <div className="small" style={{ marginBottom: 12 }}>
-              {lang === "fr"
-                ? "La mémoire des victimes, les chronologies et les sources restent en accès libre."
-                : "Victim memory, chronologies and sources remain free."}
-            </div>
-            <Link className="btn sm primary" to="/compte">
-              {tr(lang, "nav.account")} →
-            </Link>
-          </div>
-        ) : Object.keys(offline).length === 0 ? (
-          <div className="empty">{lang === "fr" ? "Aucun épisode téléchargé." : "No downloaded episode."}</div>
+        <div className="between" style={{ marginBottom: 8 }}>
+          <h2 className="h3">⬇ {lang === "fr" ? "Hors ligne" : "Offline"}</h2>
+          <span className="tiny">{Object.keys(offline).length} {lang === "fr" ? "enregistré(s)" : "saved"}</span>
+        </div>
+        {Object.keys(offline).length === 0 ? (
+          <div className="empty">{lang === "fr" ? "Aucun épisode téléchargé. Choisis-en un ci-dessous pour l'emporter avec toi." : "No downloaded episodes. Choose one below to keep it with you."}</div>
         ) : (
           <div className="stack">
             {Object.values(offline).map((o: Any) => (
               <div key={o.id} className="card tight">
                 <div className="between">
                   <div style={{ minWidth: 0 }}>
-                    <div className="h2" style={{ fontSize: 13.5 }}>
-                      <Bi_ v={o.title} />
-                    </div>
-                    <div className="tiny mono">
-                      {o.case_id} · {new Date(o.saved_at).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB")}
-                    </div>
+                    <div className="h2" style={{ fontSize: 13.5 }}><Bi_ v={o.title} /></div>
+                    <div className="tiny mono">{o.case_id} · {new Date(o.saved_at).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-GB")}</div>
                   </div>
                   <div className="row" style={{ gap: 6 }}>
-                    <Link className="btn sm ghost" to={`/podcasts/${o.id}`}>
-                      {tr(lang, "common.open")}
-                    </Link>
-                    <button className="iconbtn" style={{ width: 34, height: 34 }} onClick={() => removeOffline(String(o.id))} aria-label={lang === "fr" ? "Supprimer" : "Remove"}>
-                      🗑
-                    </button>
+                    <Link className="btn sm ghost" to={`/podcasts/${o.id}`}>{tr(lang, "common.open")}</Link>
+                    <button className="iconbtn" style={{ width: 34, height: 34 }} onClick={() => removeOffline(String(o.id))} aria-label={lang === "fr" ? "Supprimer" : "Remove"}>🗑</button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
-
-        {tier === "PREMIUM" && (
-          <div className="stack" style={{ marginTop: 10 }}>
-            {(epData?.episodes || []).map((ep: Any) => (
-              <div key={ep.id} className="card tight">
-                <div className="between">
-                  <div style={{ minWidth: 0 }}>
-                    <div className="h2" style={{ fontSize: 13 }}>
-                      <Bi_ v={ep.title} />
-                    </div>
-                    <div className="tiny">{ep.case_id}</div>
-                  </div>
-                  <button className="btn sm" disabled={busy === String(ep.id) || Boolean(offline[ep.id])} onClick={() => download(ep)}>
-                    {offline[ep.id] ? "✓" : busy === String(ep.id) ? "…" : "⬇"}
-                  </button>
+        <div className="stack" style={{ marginTop: 10 }}>
+          {(epData?.episodes || []).map((ep: Any) => (
+            <div key={ep.id} className="card tight">
+              <div className="between">
+                <div style={{ minWidth: 0 }}>
+                  <div className="h2" style={{ fontSize: 13 }}><Bi_ v={ep.title} /></div>
+                  <div className="tiny">{ep.case_id}</div>
                 </div>
+                <button className="btn sm" disabled={busy === String(ep.id) || Boolean(offline[ep.id])} onClick={() => download(ep)}>
+                  {offline[ep.id] ? "✓" : busy === String(ep.id) ? "…" : lang === "fr" ? "Télécharger" : "Download"}
+                </button>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
       </section>
 
       <hr className="rule" />
@@ -224,7 +190,7 @@ export default function Library() {
         )}
       </div>
       <div className="tiny" style={{ margin: "14px 0" }}>
-        {filtered.length} / {all.length} · <TierBadge />
+        {filtered.length} / {all.length} {lang === "fr" ? "dossiers affichés" : "dossiers shown"}
       </div>
     </>
   );

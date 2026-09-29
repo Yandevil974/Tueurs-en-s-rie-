@@ -268,56 +268,56 @@ INVESTIGATION = {
                      "point de départ de tout le dossier de complicité.",
                      "Monique Olivier meets Michel Fourniret while he is imprisoned. That relationship is the "
                      "starting point of the whole complicity file."),
-         "reliability": "CONFIRMED", "source": "radiofrance-olivier", "premium": False},
+         "reliability": "CONFIRMED", "source": "radiofrance-olivier"},
         {"n": 2, "date": "1987-2003", "title": txt("Une série entre deux pays", "A series across two countries"),
          "body": txt("Des faits sont commis entre la France et la Belgique. La justice française en jugera une partie "
                      "en 2008, une autre en 2018, une troisième en 2023.",
                      "Offences are committed between France and Belgium. French justice would try part of them in "
                      "2008, another part in 2018, a third in 2023."),
-         "reliability": "CONFIRMED", "source": "radiofrance-olivier", "premium": False},
+         "reliability": "CONFIRMED", "source": "radiofrance-olivier"},
         {"n": 3, "date": "2003-01-09", "title": txt("Un dernier fait : Estelle Mouzin", "A last offence: Estelle Mouzin"),
          "body": txt("Estelle Mouzin, 9 ans, disparaît à Guermantes. Ce fait ne sera rattaché au couple que dix-sept "
                      "ans plus tard. Un dossier distinct lui est consacré dans cette application.",
                      "Estelle Mouzin, 9, disappears in Guermantes. This offence would be linked to the couple only "
                      "seventeen years later. A separate file is devoted to her in this application."),
-         "reliability": "CONFIRMED", "source": "ici-olivier-2023", "premium": False},
+         "reliability": "CONFIRMED", "source": "ici-olivier-2023"},
         {"n": 4, "date": "2008-05", "title": txt("Une première condamnation pour complicité", "A first conviction for complicity"),
          "body": txt("La cour d'assises des Ardennes prononce la réclusion criminelle à perpétuité avec 28 ans de "
                      "sûreté, pour complicité dans le meurtre de sept jeunes femmes ou adolescentes.",
                      "The Ardennes assize court pronounces life imprisonment with a 28-year minimum term, for "
                      "complicity in the murder of seven young women or teenagers."),
-         "reliability": "CONFIRMED", "source": "radiofrance-olivier", "premium": True},
+         "reliability": "CONFIRMED", "source": "radiofrance-olivier"},
         {"n": 5, "date": "2018", "title": txt("Une deuxième condamnation", "A second conviction"),
          "body": txt("La cour d'assises des Yvelines prononce 20 ans de réclusion pour complicité dans le meurtre de "
                      "Farida Hammiche.",
                      "The Yvelines assize court pronounces 20 years for complicity in the murder of Farida Hammiche."),
-         "reliability": "CONFIRMED", "source": "ici-olivier-2023", "premium": True},
+         "reliability": "CONFIRMED", "source": "ici-olivier-2023"},
         {"n": 6, "date": "2020", "title": txt("Une parole qui déverrouille trois dossiers", "A statement that unlocks three files"),
          "body": txt("Ses accusations, puis ses précisions sur le lieu de séquestration et le transport du corps, "
                      "permettent de rattacher trois affaires : Estelle Mouzin, Joanna Parrish, Marie-Angèle Domèce.",
                      "Her accusations, then her precisions on the place of confinement and the transport of the body, "
                      "allow three cases to be linked: Estelle Mouzin, Joanna Parrish, Marie-Angèle Domèce."),
-         "reliability": "CONFIRMED", "source": "franceinfo-2023", "premium": False},
+         "reliability": "CONFIRMED", "source": "franceinfo-2023"},
         {"n": 7, "date": "2021-05-10", "title": txt("Un procès devient impossible pour l'auteur principal",
                                                      "A trial becomes impossible for the principal author"),
          "body": txt("Michel Fourniret meurt en détention. L'action publique est éteinte à son égard : il ne sera "
                      "jamais jugé pour les faits concernant Estelle Mouzin.",
                      "Michel Fourniret dies in custody. Public prosecution is extinguished with respect to him: he "
                      "will never be tried for the facts concerning Estelle Mouzin."),
-         "reliability": "CONFIRMED", "source": "actu-proces-2023", "premium": True},
+         "reliability": "CONFIRMED", "source": "actu-proces-2023"},
         {"n": 8, "date": "2023-12-19", "title": txt("Trois semaines d'audience, onze heures de délibéré",
                                                      "Three weeks of hearing, eleven hours of deliberation"),
          "body": txt("La cour d'assises des Hauts-de-Seine condamne Monique Olivier à la perpétuité avec 20 ans de "
                      "sûreté. Le parquet avait requis la peine maximale, soit 22 ans de sûreté.",
                      "The Hauts-de-Seine assize court sentences Monique Olivier to life with a 20-year minimum term. "
                      "The prosecution had requested the maximum penalty, i.e. a 22-year minimum term."),
-         "reliability": "CONFIRMED", "source": "franceinfo-2023", "premium": False},
+         "reliability": "CONFIRMED", "source": "franceinfo-2023"},
         {"n": 9, "date": "2025-09", "title": txt("D'autres dossiers encore ouverts", "Other files still open"),
          "body": txt("Elle est placée en garde à vue dans le dossier de la disparition de Cécile Vallin en 1997 en "
                      "Savoie ; la mesure est levée après dix heures.",
                      "She is placed in police custody in the file of Cécile Vallin's 1997 disappearance in Savoie; "
                      "the measure is lifted after ten hours."),
-         "reliability": "CONFIRMED", "source": "franceinfo-cecile-vallin", "premium": True},
+         "reliability": "CONFIRMED", "source": "franceinfo-cecile-vallin"},
     ],
     "reality": txt(
         "Ce dossier s'est construit par vagues judiciaires successives : 2008, 2018, 2023. Chaque vague a porté sur "
@@ -803,8 +803,7 @@ CASE = {
                        "Three convictions for complicity pronounced; the principal author died without being tried for "
                        "the 2023 facts; investigations continue on other disappearances."),
     "type": "serial",
-    "tags": ["serial_killer", "complicity", "france", "belgium", "multiple_trials", "death_of_offender", "child_victim"],
-    "tier": "PREMIUM", "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
+    "tags": ["serial_killer", "complicity", "france", "belgium", "multiple_trials", "death_of_offender", "child_victim"], "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
     "triggers": txt("Enlèvements, viols et meurtres, dont celui d'une enfant de 9 ans ; évocation sans description "
                     "graphique.",
                     "Abductions, rapes and murders, including that of a 9-year-old child; mentioned without graphic "

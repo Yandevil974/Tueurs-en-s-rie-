@@ -8,7 +8,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from .. import ethics
-from ..auth import current_user, is_premium
 from ..db import get_db
 from ..models import (Case, Country, Court, Episode, Evidence, Expert, Investigation, Location, Memorial, Psychology,
                       Question, Source, TimelineEvent, Victim, Victimology)
@@ -25,30 +24,11 @@ def _get_case(db: Session, slug: str) -> Case:
     return c
 
 
-def _premium_gate(c: Case, user) -> bool:
-    """True when the caller may see PREMIUM material."""
-    return c.tier == "FREE" or is_premium(user)
-
-
-def _strip_premium(sections: list[dict]) -> list[dict]:
-    out = []
-    for s in sections:
-        row = dict(s)
-        if row.get("tier") == "PREMIUM":
-            row["locked"] = True
-            row["blocks"] = []
-        else:
-            row["locked"] = False
-        out.append(row)
-    return out
-
-
 @router.get("")
 def list_cases(
     country: Optional[str] = None,
     status_: Optional[str] = Query(default=None, alias="status"),
     type_: Optional[str] = Query(default=None, alias="type"),
-    tier: Optional[str] = None,
     tag: Optional[str] = None,
     decade: Optional[int] = None,
     q: Optional[str] = None,
@@ -63,8 +43,6 @@ def list_cases(
         query = query.filter(Case.status == status_.upper())
     if type_:
         query = query.filter(Case.type == type_)
-    if tier:
-        query = query.filter(Case.tier == tier.upper())
     rows = query.all()
     if tag:
         rows = [r for r in rows if tag in (r.tags or [])]
@@ -96,35 +74,27 @@ def list_cases(
         "filters": {
             "statuses": [{"key": k, "label": v} for k, v in ethics.STATUS.items()],
             "types": [{"key": k, "label": v} for k, v in ethics.CASE_TYPE.items()],
-            "tiers": [{"key": "FREE", "label": {"fr": "Gratuit", "en": "Free"}},
-                      {"key": "PREMIUM", "label": {"fr": "Premium", "en": "Premium"}}],
             "tags": sorted({t for c in db.query(Case).all() for t in (c.tags or [])}),
         },
     }
 
 
 @router.get("/{slug}")
-def get_case(slug: str, lang: Optional[str] = None, db: Session = Depends(get_db), user=Depends(current_user)):
+def get_case(slug: str, lang: Optional[str] = None, db: Session = Depends(get_db)):
+    """Return the complete dossier."""
     c = _get_case(db, slug)
     country = db.get(Country, c.country_code)
-    premium_ok = _premium_gate(c, user)
-    sections = c.sections or []
-    if not premium_ok:
-        sections = _strip_premium(sections)
-    steps = []
+    sections = [
+        {key: value for key, value in section.items() if key not in {"tier", "locked", "upgrade"}}
+        for section in (c.sections or [])
+        if isinstance(section, dict)
+    ]
     inv = db.query(Investigation).filter_by(case_id=c.id).first()
-    if inv is not None:
-        steps = inv.steps or []
-        if not premium_ok:
-            # Free visitors see the first two steps; the mode Enquête complet est premium (§46).
-            steps = [dict(s, locked=True) if i >= 2 and s.get("premium") else s for i, s in enumerate(steps)]
     return {
         "case": case_card(c, country),
         "status_note": (c.stats or {}).get("status_note", {}),
         "triggers": c.triggers,
         "sections": sections,
-        "premium_ok": premium_ok,
-        "premium_required_for": [] if premium_ok else [s["key"] for s in (c.sections or []) if s.get("tier") == "PREMIUM"],
         "stats": c.stats or {},
         "episodes": [episode_out(e, full=False) for e in c.episodes],
         "victims_count": len(c.victims),
@@ -133,22 +103,17 @@ def get_case(slug: str, lang: Optional[str] = None, db: Session = Depends(get_db
 
 
 @router.get("/{slug}/sections/{key}")
-def get_section(slug: str, key: str, db: Session = Depends(get_db), user=Depends(current_user)):
+def get_section(slug: str, key: str, db: Session = Depends(get_db)):
     c = _get_case(db, slug)
     section = next((s for s in (c.sections or []) if s.get("key") == key), None)
     if section is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f"Section introuvable / Section not found: {key}")
-    if section.get("tier") == "PREMIUM" and not _premium_gate(c, user):
-        return {"key": key, "title": section.get("title"), "tier": "PREMIUM", "locked": True, "blocks": [],
-                "upgrade": {"fr": "Ce chapitre fait partie du dossier complet (Premium).",
-                            "en": "This chapter is part of the complete dossier (Premium)."}}
-    return {"key": key, "title": section.get("title"), "tier": section.get("tier", "FREE"), "locked": False,
-            "blocks": section.get("blocks", [])}
+    return {"key": key, "title": section.get("title"), "blocks": section.get("blocks", [])}
 
 
 @router.get("/{slug}/victims")
 def get_victims(slug: str, db: Session = Depends(get_db)):
-    """§11-§12: victim files are ALWAYS free."""
+    """§11-§12: victim files are central to every dossier."""
     c = _get_case(db, slug)
     smap = sources_map(db, c.id)
     rows = db.query(Victim).filter_by(case_id=c.id).order_by(Victim.order_index).all()
@@ -159,7 +124,7 @@ def get_victims(slug: str, db: Session = Depends(get_db)):
         "count": len(rows),
         "victims": [victim_out(v, smap) for v in rows],
         "case_memorial": [{"id": m.id, "title": m.title, "biography": m.biography, "testimony": m.testimony,
-                           "memory": m.memory, "tier": m.tier} for m in case_memorial],
+                           "memory": m.memory} for m in case_memorial],
         "ethics_note": ethics.DISCLAIMER_VICTIMOLOGY,
         "extra": {k: (c.stats or {}).get(k) for k in ("survivors", "other_victim", "other_victims", "other_proceedings")
                   if (c.stats or {}).get(k) is not None},
@@ -171,12 +136,12 @@ def get_memorial(slug: str, db: Session = Depends(get_db)):
     c = _get_case(db, slug)
     rows = db.query(Memorial).filter_by(case_id=c.id).all()
     return {
-        "case_id": c.slug, "tier": "FREE", "title": c.title,
+        "case_id": c.slug, "title": c.title,
         "memorials": [{"id": m.id, "victim_id": m.victim_id, "title": m.title, "biography": m.biography,
                        "testimony": m.testimony, "memory": m.memory, "portrait": m.portrait,
                        "audio_clip": m.audio_clip} for m in rows],
-        "never_paywalled": {"fr": "La mémoire des victimes n'est jamais payante.",
-                            "en": "Victim memory is never paywalled."},
+        "editorial_note": {"fr": "La mémoire des victimes reste au cœur de ce dossier.",
+                            "en": "Victims' memory remains at the heart of this dossier."},
     }
 
 
@@ -205,53 +170,40 @@ def get_geography(slug: str, db: Session = Depends(get_db)):
 
 
 @router.get("/{slug}/evidence")
-def get_evidence(slug: str, db: Session = Depends(get_db), user=Depends(current_user)):
+def get_evidence(slug: str, db: Session = Depends(get_db)):
     c = _get_case(db, slug)
     smap = sources_map(db, c.id)
     rows = db.query(Evidence).filter_by(case_id=c.id).all()
-    locked = not _premium_gate(c, user)
-    return {"case_id": c.slug, "count": len(rows), "locked": locked,
+    return {"case_id": c.slug, "count": len(rows),
             "evidence": [evidence_out(r, smap) for r in rows]}
 
 
 @router.get("/{slug}/investigation")
-def get_investigation(slug: str, db: Session = Depends(get_db), user=Depends(current_user)):
-    """§25 MODE ENQUÊTE: information revealed in the order it became available."""
+def get_investigation(slug: str, db: Session = Depends(get_db)):
+    """§25: information is revealed in the order it became available."""
     c = _get_case(db, slug)
     inv = db.query(Investigation).filter_by(case_id=c.id).first()
     if inv is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Aucune enquête documentée / No documented investigation")
-    premium_ok = _premium_gate(c, user)
-    steps = []
-    for i, s in enumerate(inv.steps or []):
-        row = dict(s)
-        if not premium_ok and (row.get("premium") or i >= 2):
-            row["locked"] = True
-            row["body"] = {"fr": "Étape réservée au mode Enquête (Premium).",
-                           "en": "Step reserved for Investigation mode (Premium)."}
-        else:
-            row["locked"] = False
-        steps.append(row)
+    steps = [
+        {key: value for key, value in step.items() if key not in {"premium", "tier", "locked", "upgrade"}}
+        for step in (inv.steps or [])
+        if isinstance(step, dict)
+    ]
     return {
         "case_id": c.slug, "steps": steps, "reality": inv.reality,
         "errors": [item_out(e) for e in (inv.errors or [])],
         "cold_case": inv.cold_case or {},
-        "premium_ok": premium_ok,
-        "premium_required": not premium_ok,
     }
 
 
 @router.get("/{slug}/psychology")
-def get_psychology(slug: str, db: Session = Depends(get_db), user=Depends(current_user)):
+def get_psychology(slug: str, db: Session = Depends(get_db)):
     c = _get_case(db, slug)
     row = db.query(Psychology).filter_by(case_id=c.id).first()
-    smap = sources_map(db, c.id)
     if row is None:
-        return {"case_id": c.slug, "blocks": [], "disclaimer": ethics.DISCLAIMER_PSYCHOLOGY, "locked": False}
-    locked = not _premium_gate(c, user)
-    blocks = [] if locked else row.blocks or []
-    return {"case_id": c.slug, "blocks": blocks, "disclaimer": row.disclaimer or ethics.DISCLAIMER_PSYCHOLOGY,
-            "locked": locked,
+        return {"case_id": c.slug, "blocks": [], "disclaimer": ethics.DISCLAIMER_PSYCHOLOGY}
+    return {"case_id": c.slug, "blocks": row.blocks or [], "disclaimer": row.disclaimer or ethics.DISCLAIMER_PSYCHOLOGY,
             "no_diagnosis": ethics.DISCLAIMER_PSYCHOLOGY,
             "levels": [{"key": k, "label": {"fr": v["fr"], "en": v["en"]}, "color": v["color"], "dot": v["dot"]}
                        for k, v in ethics.RELIABILITY.items()]}
@@ -259,7 +211,7 @@ def get_psychology(slug: str, db: Session = Depends(get_db), user=Depends(curren
 
 @router.get("/{slug}/victimology")
 def get_victimology(slug: str, db: Session = Depends(get_db)):
-    """§13: victimology is NEVER paywalled and never justifies the crime."""
+    """§13: victimology puts victims first and never justifies the crime."""
     c = _get_case(db, slug)
     row = db.query(Victimology).filter_by(case_id=c.id).first()
     if row is None:

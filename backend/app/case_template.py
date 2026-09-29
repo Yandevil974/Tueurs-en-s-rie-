@@ -98,35 +98,32 @@ def counterfactual(kind: str, title_fr: str, title_en: str, question_fr: str, qu
 
 # The 20 mandatory dossier sections (§9). Titles are fixed so that every case
 # exposes the same navigation; content comes from the dedicated modules.
-DEFAULT_SECTIONS: list[tuple[str, str, str, str]] = [
-    ("introduction", "Introduction", "Introduction", "FREE"),
-    ("context", "Contexte", "Context", "FREE"),
-    ("offender", "Auteur", "Author", "PREMIUM"),
-    ("victims", "Victimes", "Victims", "FREE"),
-    ("timeline", "Chronologie", "Chronology", "FREE"),
-    ("investigation", "Enquête", "Investigation", "FREE"),
-    ("clues", "Indices et preuves", "Clues and evidence", "PREMIUM"),
-    ("behaviour", "Analyse comportementale", "Behavioural analysis", "PREMIUM"),
-    ("psychology", "Psychologie", "Psychology", "PREMIUM"),
-    ("victimology", "Victimologie", "Victimology", "FREE"),
-    ("geography", "Géographie", "Geography", "FREE"),
-    ("arrest", "Arrestation", "Arrest", "FREE"),
-    ("trial", "Procès", "Trial", "FREE"),
-    ("justice", "Justice", "Justice", "FREE"),
-    ("consequences", "Conséquences", "Consequences", "FREE"),
-    ("archives", "Archives", "Archives", "PREMIUM"),
-    ("sources", "Sources", "Sources", "FREE"),
-    ("memorial", "Mémoire", "Memory", "FREE"),
-    ("unknowns", "Zones d'ombre", "Unknown zones", "FREE"),
-    ("lessons", "Ce que l'affaire nous apprend", "What the case teaches us", "FREE"),
+DEFAULT_SECTIONS: list[tuple[str, str, str]] = [
+    ("introduction", "Introduction", "Introduction"),
+    ("context", "Contexte", "Context"),
+    ("offender", "Auteur", "Author"),
+    ("victims", "Victimes", "Victims"),
+    ("timeline", "Chronologie", "Chronology"),
+    ("investigation", "Enquête", "Investigation"),
+    ("clues", "Indices et preuves", "Clues and evidence"),
+    ("behaviour", "Analyse comportementale", "Behavioural analysis"),
+    ("psychology", "Psychologie", "Psychology"),
+    ("victimology", "Victimologie", "Victimology"),
+    ("geography", "Géographie", "Geography"),
+    ("arrest", "Arrestation", "Arrest"),
+    ("trial", "Procès", "Trial"),
+    ("justice", "Justice", "Justice"),
+    ("consequences", "Conséquences", "Consequences"),
+    ("archives", "Archives", "Archives"),
+    ("sources", "Sources", "Sources"),
+    ("memorial", "Mémoire", "Memory"),
+    ("unknowns", "Zones d'ombre", "Unknown zones"),
+    ("lessons", "Ce que l'affaire nous apprend", "What the case teaches us"),
 ]
 
 
 def default_sections() -> list[dict[str, Any]]:
-    return [
-        {"key": k, "title": txt(fr, en), "tier": tier, "blocks": []}
-        for k, fr, en, tier in DEFAULT_SECTIONS
-    ]
+    return [{"key": k, "title": txt(fr, en), "blocks": []} for k, fr, en in DEFAULT_SECTIONS]
 
 
 def merge_sections(base: list[dict[str, Any]], extra: list[dict[str, Any]]) -> list[dict[str, Any]]:

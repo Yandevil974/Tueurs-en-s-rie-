@@ -52,12 +52,6 @@ export function StatusBadge({ status }: { status: string }) {
   return <span className="badge blood">{found ? pick(found.label, lang) : status}</span>;
 }
 
-export function TierBadge({ tier }: { tier?: string }) {
-  const lang = useLang();
-  if (!tier) return null;
-  return <span className={`badge ${tier === "FREE" ? "free" : "premium"}`}>{tier === "FREE" ? (lang === "fr" ? "Libre" : "Free") : "Premium"}</span>;
-}
-
 /* ------------------------------------------------------------------ états */
 export function Loading({ label }: { label?: string }) {
   const lang = useLang();
