@@ -8,6 +8,7 @@ declare global {
       seekTo: (sec: number) => void;
       getCurrentPosition: () => number;
       isPlaying: () => boolean;
+      setSpeed?: (speed: number) => void;
     };
   }
 }
@@ -372,6 +373,9 @@ export const usePlayer = create<PlayerState>((set, get) => {
     },
     nudge: (delta) => get().seek(get().position + delta),
     setSpeed: (s) => {
+      if (window.AndroidNativeAudio && window.AndroidNativeAudio.setSpeed) {
+        window.AndroidNativeAudio.setSpeed(s);
+      }
       if (audioEl) audioEl.playbackRate = s;
       set({ speed: s });
     },
@@ -454,3 +458,17 @@ export const fmtTime = (sec: number) => {
   const m = Math.floor(s / 60);
   return `${m}:${String(s % 60).padStart(2, "0")}`;
 };
+
+if (typeof window !== "undefined") {
+  (window as any).__onNativeAudioEnded = () => {
+    const st = usePlayer.getState();
+    const ep = st.episode;
+    if (ep && ep.number) {
+      usePlayer.getState().load(ep.id + 1).then(() => {
+        usePlayer.getState().play();
+      }).catch(() => {
+        usePlayer.getState().pause();
+      });
+    }
+  };
+}

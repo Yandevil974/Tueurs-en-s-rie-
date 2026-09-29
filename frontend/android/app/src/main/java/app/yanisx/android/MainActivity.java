@@ -52,8 +52,35 @@ public class MainActivity extends BridgeActivity {
                         mediaPlayer.setDataSource(cacheFile.getAbsolutePath());
                     }
 
+                    mediaPlayer.setOnCompletionListener(mp -> {
+                        runOnUiThread(() -> {
+                            if (bridge != null && bridge.getWebView() != null) {
+                                bridge.getWebView().evaluateJavascript("if (window.__onNativeAudioEnded) window.__onNativeAudioEnded();", null);
+                            }
+                        });
+                    });
+
                     mediaPlayer.prepare();
+                    mediaPlayer.setVolume(1.0f, 1.0f);
                     mediaPlayer.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
+        @JavascriptInterface
+        public void setSpeed(float speed) {
+            runOnUiThread(() -> {
+                try {
+                    if (mediaPlayer != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        android.media.PlaybackParams params = mediaPlayer.getPlaybackParams();
+                        params.setSpeed(speed);
+                        mediaPlayer.setPlaybackParams(params);
+                    }
+                    if (textToSpeech != null) {
+                        textToSpeech.setSpeechRate(speed);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -65,6 +92,9 @@ public class MainActivity extends BridgeActivity {
             runOnUiThread(() -> {
                 if (mediaPlayer != null && mediaPlayer.isPlaying()) {
                     mediaPlayer.pause();
+                }
+                if (textToSpeech != null) {
+                    textToSpeech.stop();
                 }
             });
         }
@@ -85,6 +115,9 @@ public class MainActivity extends BridgeActivity {
                     mediaPlayer.stop();
                     mediaPlayer.release();
                     mediaPlayer = null;
+                }
+                if (textToSpeech != null) {
+                    textToSpeech.stop();
                 }
             });
         }
