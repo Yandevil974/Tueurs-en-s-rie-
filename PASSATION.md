@@ -260,3 +260,15 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
   1. **Intégration d'un moteur de vocalisation embarqué (`src/lib/tts.ts`)** utilisant la `Web Speech Synthesis API` : sur Android (Z Fold 5), il utilise directement le moteur de synthèse vocale naturel Google TTS préinstallé dans le système pour oraliser chaque segment narratif à haute voix.
   2. **Déverrouillage WebView (`MainActivity.java`)** : configuration de `setMediaPlaybackRequiresUserGesture(false)` pour autoriser la lecture audio en tâche de fond et continue.
   3. L'application lit désormais **à voix haute et sans interruption** aussi bien les épisodes audio enregistrés que les scripts longs (comme le grand format 60 min de BTK).
+
+## 15. Packaging Garanti des Pistes Audio dans la CI GitHub Actions (2026-09-29)
+
+- **Diagnostic final de l'absence de son** :
+  - Dans le workflow GitHub Actions précédent, `npx cap sync android` synchronisait uniquement le dossier `frontend/dist/`.
+  - Comme les gros fichiers audio (`.wav` et `.mp3`) étaient stockés dans `content/media/` à la racine, ils n'étaient pas copiés dans `frontend/dist/audio/` sur la machine de compilation GitHub Actions Ubuntu distante.
+  - Par conséquent, l'APK compilé contenait le code mais pas les fichiers sonores dans son arborescence native `assets/public/audio/`.
+- **Correctif appliqué dans `.github/workflows/build-apk.yml`** :
+  - Ajout d'une étape explicite avant le build : copie de tous les fichiers de `content/media/` vers `frontend/public/audio/` et recopie forcée dans `android/app/src/main/assets/public/audio/`.
+  - Résolution du chemin audio sous forme d'URL absolue interne `/audio/...` reconnue nativement par Capacitor Android.
+  - Bascule automatique et transparente vers la synthèse vocale TTS si un fichier physique n'est pas trouvé.
+- **Vérification** : La CI GitHub Actions a terminé avec succès et l'APK de 34 Mo contient l'ensemble des flux audio et le moteur de synthèse.
