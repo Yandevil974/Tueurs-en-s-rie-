@@ -28,9 +28,26 @@ public class MainActivity extends BridgeActivity {
                             .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                             .build());
 
-                    AssetFileDescriptor afd = getAssets().openFd("public/audio/" + assetName);
-                    mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-                    afd.close();
+                    try {
+                        AssetFileDescriptor afd = getAssets().openFd("public/audio/" + assetName);
+                        mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+                        afd.close();
+                    } catch (Exception fdEx) {
+                        java.io.File cacheFile = new java.io.File(getCacheDir(), assetName);
+                        if (!cacheFile.exists() || cacheFile.length() == 0) {
+                            java.io.InputStream in = getAssets().open("public/audio/" + assetName);
+                            java.io.FileOutputStream out = new java.io.FileOutputStream(cacheFile);
+                            byte[] buffer = new byte[8192];
+                            int read;
+                            while ((read = in.read(buffer)) != -1) {
+                                out.write(buffer, 0, read);
+                            }
+                            out.flush();
+                            out.close();
+                            in.close();
+                        }
+                        mediaPlayer.setDataSource(cacheFile.getAbsolutePath());
+                    }
 
                     mediaPlayer.prepare();
                     mediaPlayer.start();
