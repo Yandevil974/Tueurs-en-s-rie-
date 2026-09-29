@@ -690,8 +690,8 @@
         "whatif"
       ],
       "duration_sec": 3600,
-      "audio": "",
-      "audio_status": "script_only",
+      "audio": "yanisx-btk-ep1-special.mp3",
+      "audio_status": "produced",
       "voice_profile": "yanis-real",
       "chapters": [
         {

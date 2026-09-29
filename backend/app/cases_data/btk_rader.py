@@ -576,7 +576,7 @@ EPISODES = [
         "title": txt("BTK : Trente ans d'ombre, le piège numérique et les dix disparus", "BTK: Thirty years of shadow, the digital trap and the ten victims"),
         "description": txt("Grand format d'investigation 60 minutes. Kansas, 1974-2005. De la rupture du foyer Otero jusqu'au mensonge tactique de la disquette : déconstruction du mythe du prédateur, analyse des angles morts institutionnels et hommage aux dix vies volées.", "60-minute in-depth investigative special. Kansas, 1974-2005. From the shattered Otero home to the tactical floppy disk deception: deconstructing the predator myth, analyzing institutional blind spots, and honoring ten stolen lives."),
         "modes": ["documentary", "investigation", "chronology", "expert", "psychology", "victims", "whatif"],
-        "audio_status": "script_only", "voice_profile": "yanis-real",
+        "audio_status": "produced", "audio": "yanisx-btk-ep1-special.mp3", "voice_profile": "yanis-real",
         "duration_sec": 3600,
         "chapters": [
             {"at": 0, "title": txt("Prologue : L'illusion du monstre insaisissable", 'Prologue: The illusion of the elusive monster')},

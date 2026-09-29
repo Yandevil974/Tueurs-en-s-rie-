@@ -55,6 +55,20 @@ let timer: number | null = null;
 let lastSave = 0;
 let currentTtsSegmentId: string | null = null;
 
+function getOrCreateAudio(): HTMLAudioElement {
+  if (!audioEl) {
+    audioEl = document.getElementById("yanisx-native-audio") as HTMLAudioElement;
+    if (!audioEl) {
+      audioEl = document.createElement("audio");
+      audioEl.id = "yanisx-native-audio";
+      audioEl.setAttribute("playsinline", "true");
+      audioEl.setAttribute("webkit-playsinline", "true");
+      document.body.appendChild(audioEl);
+    }
+  }
+  return audioEl;
+}
+
 /* ---------------------------------------------------------------
  * Restitution Bluetooth (voiture).
  * --------------------------------------------------------------- */
@@ -257,19 +271,17 @@ export const usePlayer = create<PlayerState>((set, get) => {
         let audioMissing = false;
         if (ep.audio_status === "produced" && ep.audio) {
           usingAudio = true;
-          const url = audioUrl(ep.audio);
-          audioEl = new Audio();
-          audioEl.src = url;
-          audioEl.preload = "auto";
-          audioEl.addEventListener("ended", () => {
+          const el = getOrCreateAudio();
+          el.src = audioUrl(ep.audio);
+          el.preload = "auto";
+          el.onended = () => {
             set({ playing: false });
             publishState(false);
             releaseWakeLock();
-          });
-          audioEl.addEventListener("error", (e) => {
-            console.warn("Échec lecture fichier audio, bascule vocale TTS:", e);
+          };
+          el.onerror = () => {
             set({ usingAudio: false, audioMissing: true });
-          });
+          };
         } else if (ep.audio_status === "produced" && !ep.audio) {
           audioMissing = true;
         }
