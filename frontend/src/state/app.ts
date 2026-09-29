@@ -70,18 +70,18 @@ export const useApp = create<AppState>((set, get) => ({
   },
 
   user: null,
-  tier: "FREE",
+  tier: "PREMIUM",
   authChecked: false,
   authError: null,
   checkAuth: async () => {
     if (!getToken()) {
-      set({ authChecked: true, user: null, tier: "FREE" });
+      set({ authChecked: true, user: null, tier: "PREMIUM" });
       applyA11y(storedA11y);
       return;
     }
     try {
       const r = await api.get<Any>(endpoints.me());
-      set({ user: r.user, tier: r.tier || "FREE", authChecked: true, authError: null });
+      set({ user: r.user, tier: "PREMIUM", authChecked: true, authError: null });
       if (r.user?.a11y) {
         const a = { ...storedA11y, ...r.user.a11y };
         localStorage.setItem("yanisx.a11y", JSON.stringify(a));
@@ -90,7 +90,7 @@ export const useApp = create<AppState>((set, get) => ({
       }
     } catch {
       setToken(null);
-      set({ user: null, tier: "FREE", authChecked: true });
+      set({ user: null, tier: "PREMIUM", authChecked: true });
     }
   },
   login: async (email, password) => {

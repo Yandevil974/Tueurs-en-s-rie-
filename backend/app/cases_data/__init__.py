@@ -1,9 +1,9 @@
-"""The launch catalogue: 8 fully sourced dossiers (§37 "start with 10-20 cases")."""
+"""The launch catalogue: 9 fully sourced dossiers (§37 "start with 10-20 cases")."""
 from __future__ import annotations
 
 from . import (btk_rader, emile_louis, estelle_mouzin, fourniret_olivier,
                golden_state_killer, gregory_villemin, guy_georges,
-               peter_sutcliffe)
+               peter_sutcliffe, robert_pickton)
 
 # Order = editorial order on the home page.
 CASES: list[dict] = [
@@ -15,6 +15,7 @@ CASES: list[dict] = [
     btk_rader.CASE,
     golden_state_killer.CASE,
     peter_sutcliffe.CASE,
+    robert_pickton.CASE,
 ]
 
 CASE_IDS: list[str] = [c["id"] for c in CASES]

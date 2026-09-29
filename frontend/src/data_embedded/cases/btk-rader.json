@@ -1,0 +1,428 @@
+{
+  "case": {
+    "id": "btk-rader",
+    "slug": "btk-rader",
+    "title": {
+      "fr": "Dennis Rader, dit « BTK »",
+      "en": "Dennis Rader, known as 'BTK'"
+    },
+    "subtitle": {
+      "fr": "Comté de Sedgwick, Kansas, 1974-1991. Dix victimes, treize ans de silence, et un fichier que l'on croyait effacé.",
+      "en": "Sedgwick County, Kansas, 1974-1991. Ten victims, thirteen years of silence, and a file believed erased."
+    },
+    "country": "US",
+    "country_name": {
+      "fr": "États-Unis",
+      "en": "United States"
+    },
+    "region": "Kansas / Sedgwick County",
+    "city": "Wichita",
+    "year_start": 1974,
+    "year_end": 2005,
+    "period_label": {
+      "fr": "1974 – 2005",
+      "en": "1974 – 2005"
+    },
+    "status": "RESOLVED",
+    "status_label": {
+      "fr": "Résolue",
+      "en": "Resolved"
+    },
+    "type": "serial",
+    "type_label": {
+      "fr": "Tueur en série",
+      "en": "Serial killer"
+    },
+    "tags": [
+      "serial_killer",
+      "metadata",
+      "familial_dna",
+      "usa",
+      "survivors",
+      "digital_forensics"
+    ],
+    "tier": "PREMIUM",
+    "sensitive": true,
+    "cover": "cover-btk",
+    "lat": 37.69,
+    "lon": -97.34,
+    "summary": {
+      "fr": "Entre le 15 janvier 1974 et le 19 janvier 1991, dix personnes sont tuées dans le comté de Sedgwick, au Kansas. Quatre membres de la famille Otero comptent parmi les premières victimes ; leur fils de 15 ans découvre les corps. L'auteur communique par lettres avec la police et les médias, puis observe treize ans de silence. En 2004, il reprend contact. En janvier 2005, il demande si une disquette peut être tracée ; les enquêteurs font répondre que non. Le 16 février 2005, les métadonnées d'un document supprimé sur une disquette reçue livrent deux indications — « Christ Lutheran Church » et un modificateur nommé « Dennis » — qui conduisent à Dennis Rader, président du conseil paroissial. Un lien familial est confirmé par comparaison ADN. Il est arrêté le 25 février 2005, plaide coupable le 27 juin, et est condamné le 18 août à dix peines consécutives de réclusion à perpétuité, avec un minimum de 175 ans.",
+      "en": "Between 15 January 1974 and 19 January 1991, ten people were killed in Sedgwick County, Kansas. Four members of the Otero family are among the first victims; their 15-year-old son found the bodies. The author communicated by letter with police and media, then observed thirteen years of silence. In 2004, he resumed contact. In January 2005, he asked whether a floppy disk could be traced; investigators had it answered that it could not. On 16 February 2005, the metadata of a deleted document on a received floppy disk yielded two indications — 'Christ Lutheran Church' and a modifier named 'Dennis' — leading to Dennis Rader, president of the congregation council. A family link was confirmed by DNA comparison. He was arrested on 25 February 2005, pleaded guilty on 27 June, and was sentenced on 18 August to ten consecutive life terms with a minimum of 175 years."
+    },
+    "stats": {
+      "victims_documented": 5,
+      "survivors_documented": 1,
+      "duration_years": 31,
+      "experts_agreement": {
+        "fr": "Les deux lectures convergent : c'est l'auteur qui a produit l'élément décisif.",
+        "en": "Both readings converge: it is the author who produced the decisive element."
+      },
+      "experts_disagreement": {
+        "fr": "Elles divergent sur la part de chance et celle de méthode dans l'exploitation de la disquette.",
+        "en": "They differ on the share of luck and of method in exploiting the floppy disk."
+      },
+      "experts_uncertain": {
+        "fr": "Ce qui reste incertain : l'existence éventuelle d'autres faits, démentie par le parquet.",
+        "en": "What remains uncertain: the possible existence of other offences, denied by the prosecution."
+      }
+    },
+    "published_at": "2026-09-24",
+    "editorial": "yanis",
+    "victims_count": 5,
+    "episodes_count": 1
+  },
+  "status_note": {},
+  "triggers": {
+    "fr": "Meurtres dont ceux de deux enfants ; violences décrites sans détail graphique.",
+    "en": "Murders including those of two children; violence described without graphic detail."
+  },
+  "sections": [
+    {
+      "key": "introduction",
+      "title": {
+        "fr": "Introduction",
+        "en": "Introduction"
+      },
+      "tier": "FREE",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "title": {
+            "fr": "Trente ans, dix victimes, une disquette",
+            "en": "Thirty years, ten victims, a floppy disk"
+          },
+          "body": {
+            "fr": "Entre 1974 et 1991, dix personnes sont tuées dans le comté de Sedgwick, au Kansas. L'auteur écrit à la police et aux médias, se donne un surnom, puis se tait pendant treize ans. Son identification viendra d'un support qu'il a lui-même choisi d'envoyer.",
+            "en": "Between 1974 and 1991, ten people are killed in Sedgwick County, Kansas. The author writes to police and media, gives himself a nickname, then falls silent for thirteen years. His identification would come from a medium he chose to send himself."
+          },
+          "items": [],
+          "reliability": "CONFIRMED",
+          "source": "wiki-rader"
+        }
+      ],
+      "locked": false
+    },
+    {
+      "key": "context",
+      "title": {
+        "fr": "Contexte",
+        "en": "Context"
+      },
+      "tier": "FREE",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "title": {
+            "fr": "Wichita et Park City",
+            "en": "Wichita and Park City"
+          },
+          "body": {
+            "fr": "Les faits se déroulent dans une agglomération du Kansas, sur un périmètre restreint, pendant une période où ni les fichiers génétiques ni l'exploitation des supports numériques n'existaient en criminalistique.",
+            "en": "The offences take place in a Kansas metropolitan area, over a restricted perimeter, during a period when neither genetic databases nor the exploitation of digital media existed in forensic science."
+          },
+          "items": [],
+          "reliability": "CONFIRMED",
+          "source": "creed-btk"
+        }
+      ],
+      "locked": false
+    },
+    {
+      "key": "offender",
+      "title": {
+        "fr": "Auteur",
+        "en": "Author"
+      },
+      "tier": "PREMIUM",
+      "blocks": [],
+      "locked": true
+    },
+    {
+      "key": "victims",
+      "title": {
+        "fr": "Victimes",
+        "en": "Victims"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "timeline",
+      "title": {
+        "fr": "Chronologie",
+        "en": "Chronology"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "investigation",
+      "title": {
+        "fr": "Enquête",
+        "en": "Investigation"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "clues",
+      "title": {
+        "fr": "Indices et preuves",
+        "en": "Clues and evidence"
+      },
+      "tier": "PREMIUM",
+      "blocks": [],
+      "locked": true
+    },
+    {
+      "key": "behaviour",
+      "title": {
+        "fr": "Analyse comportementale",
+        "en": "Behavioural analysis"
+      },
+      "tier": "PREMIUM",
+      "blocks": [],
+      "locked": true
+    },
+    {
+      "key": "psychology",
+      "title": {
+        "fr": "Psychologie",
+        "en": "Psychology"
+      },
+      "tier": "PREMIUM",
+      "blocks": [],
+      "locked": true
+    },
+    {
+      "key": "victimology",
+      "title": {
+        "fr": "Victimologie",
+        "en": "Victimology"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "geography",
+      "title": {
+        "fr": "Géographie",
+        "en": "Geography"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "arrest",
+      "title": {
+        "fr": "Arrestation",
+        "en": "Arrest"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "trial",
+      "title": {
+        "fr": "Procès",
+        "en": "Trial"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "justice",
+      "title": {
+        "fr": "Justice",
+        "en": "Justice"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "consequences",
+      "title": {
+        "fr": "Conséquences",
+        "en": "Consequences"
+      },
+      "tier": "FREE",
+      "blocks": [
+        {
+          "kind": "paragraph",
+          "title": {
+            "fr": "Un précédent technique",
+            "en": "A technical precedent"
+          },
+          "body": {
+            "fr": "L'affaire est citée comme l'un des premiers exemples d'identification par métadonnées numériques couplée à une comparaison ADN familiale. Elle pose aussi la question des techniques d'enquête impliquant une réponse fausse délibérée.",
+            "en": "The case is cited as one of the first examples of identification through digital metadata coupled with a familial DNA comparison. It also raises the question of investigative techniques involving a deliberate false answer."
+          },
+          "items": [],
+          "reliability": "CONFIRMED",
+          "source": "creed-btk"
+        }
+      ],
+      "locked": false
+    },
+    {
+      "key": "archives",
+      "title": {
+        "fr": "Archives",
+        "en": "Archives"
+      },
+      "tier": "PREMIUM",
+      "blocks": [],
+      "locked": true
+    },
+    {
+      "key": "sources",
+      "title": {
+        "fr": "Sources",
+        "en": "Sources"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "memorial",
+      "title": {
+        "fr": "Mémoire",
+        "en": "Memory"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "unknowns",
+      "title": {
+        "fr": "Zones d'ombre",
+        "en": "Unknown zones"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    },
+    {
+      "key": "lessons",
+      "title": {
+        "fr": "Ce que l'affaire nous apprend",
+        "en": "What the case teaches us"
+      },
+      "tier": "FREE",
+      "blocks": [],
+      "locked": false
+    }
+  ],
+  "premium_ok": false,
+  "premium_required_for": [
+    "offender",
+    "clues",
+    "behaviour",
+    "psychology",
+    "archives"
+  ],
+  "stats": {
+    "victims_documented": 5,
+    "survivors_documented": 1,
+    "duration_years": 31,
+    "experts_agreement": {
+      "fr": "Les deux lectures convergent : c'est l'auteur qui a produit l'élément décisif.",
+      "en": "Both readings converge: it is the author who produced the decisive element."
+    },
+    "experts_disagreement": {
+      "fr": "Elles divergent sur la part de chance et celle de méthode dans l'exploitation de la disquette.",
+      "en": "They differ on the share of luck and of method in exploiting the floppy disk."
+    },
+    "experts_uncertain": {
+      "fr": "Ce qui reste incertain : l'existence éventuelle d'autres faits, démentie par le parquet.",
+      "en": "What remains uncertain: the possible existence of other offences, denied by the prosecution."
+    }
+  },
+  "episodes": [
+    {
+      "id": 10,
+      "case_id": "btk-rader",
+      "number": 1,
+      "title": {
+        "fr": "BTK : Trente ans d'ombre, le piège numérique et les dix disparus",
+        "en": "BTK: Thirty years of shadow, the digital trap and the ten victims"
+      },
+      "description": {
+        "fr": "Grand format d'investigation 60 minutes. Kansas, 1974-2005. De la rupture du foyer Otero jusqu'au mensonge tactique de la disquette : déconstruction du mythe du prédateur, analyse des angles morts institutionnels et hommage aux dix vies volées.",
+        "en": "60-minute in-depth investigative special. Kansas, 1974-2005. From the shattered Otero home to the tactical floppy disk deception: deconstructing the predator myth, analyzing institutional blind spots, and honoring ten stolen lives."
+      },
+      "modes": [
+        "documentary",
+        "investigation",
+        "chronology",
+        "expert",
+        "psychology",
+        "victims",
+        "whatif"
+      ],
+      "duration_sec": 3600,
+      "audio": "",
+      "audio_status": "script_only",
+      "voice_profile": "yanis-real",
+      "chapters": [
+        {
+          "at": 0,
+          "title": {
+            "fr": "Prologue : L'illusion du monstre insaisissable",
+            "en": "Prologue: The illusion of the elusive monster"
+          }
+        },
+        {
+          "at": 600,
+          "title": {
+            "fr": "Acte I : Wichita, 15 janvier 1974 — La rupture d'un foyer",
+            "en": "Act I: Wichita, 15 January 1974 — The shattered home"
+          }
+        },
+        {
+          "at": 1300,
+          "title": {
+            "fr": "Acte II : L'empreinte de la terreur et le profil fantôme",
+            "en": "Act II: The imprint of terror and the phantom profile"
+          }
+        },
+        {
+          "at": 2000,
+          "title": {
+            "fr": "Acte III : Le masque social — Le président, le scout et le censeur",
+            "en": "Act III: The social mask — President, scout and inspector"
+          }
+        },
+        {
+          "at": 2700,
+          "title": {
+            "fr": "Acte IV : Le carrefour « ET SI ? » — La vanité contre le piège",
+            "en": "Act IV: The 'WHAT IF?' crossroad — Vanity vs the trap"
+          }
+        },
+        {
+          "at": 3200,
+          "title": {
+            "fr": "Épilogue : 16 février 2005 — L'effondrement d'un homme médiocre",
+            "en": "Epilogue: 16 February 2005 — The collapse of a mediocre man"
+          }
+        }
+      ],
+      "published_at": "2026-09-24",
+      "segments_count": 13
+    }
+  ],
+  "victims_count": 5,
+  "investigation_steps_count": 10
+}

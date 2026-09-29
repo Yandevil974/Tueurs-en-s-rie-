@@ -51,7 +51,7 @@ remains hypothetical** — before playback resumes automatically.
 
 ---
 
-## Catalogue de lancement / Launch catalogue — 8 dossiers
+## Catalogue de lancement / Launch catalogue — 9 dossiers
 
 | Dossier | Pays | Période | Statut |
 |---|---|---|---|
@@ -63,6 +63,7 @@ remains hypothetical** — before playback resumes automatically.
 | BTK — Dennis Rader | 🇺🇸 | 1974 – 2005 | Résolue |
 | Golden State Killer — Joseph DeAngelo | 🇺🇸 | 1974 – 2020 | Résolue |
 | Peter Sutcliffe (Yorkshire) | 🇬🇧 | 1975 – 2020 | Résolue |
+| Robert Pickton — les disparues du Downtown Eastside | 🇨🇦 | 1978 – 2024 | Résolue — 20 victimes sans procès |
 
 Chaque dossier expose la structure canonique en **20 chapitres** : Introduction, Contexte, Auteur, Victime(s),
 Chronologie, Enquête, Indices, Analyse comportementale, Psychologie, Victimologie, Géographie, Arrestation, Procès,
@@ -109,7 +110,7 @@ yanisx/
 │       ├── auth.py          JWT, tiers FREE/PREMIUM, rôles
 │       ├── routes/          auth, cases, episodes, counterfactuals, explore,
 │       │                    memory, reference, search, progress, media, admin
-│       └── cases_data/      les 8 dossiers bilingues, faits sourcés
+│       └── cases_data/      les 9 dossiers bilingues, faits sourcés
 └── frontend/                Vite + React 19 + TypeScript + zustand (application mobile/web)
 ```
 
@@ -161,9 +162,13 @@ Variables d'environnement / environment variables : `YANISX_DB`, `YANISX_MEDIA`,
 
 ## Sources
 
-Toutes les sources sont publiques, datées et vérifiées le **2026-09-24** (presse : franceinfo, ICI / Radio France,
+Toutes les sources sont publiques, datées et vérifiées le **2026-09-24** pour les huit premiers dossiers, et le **2026-09-28** pour Robert Pickton (presse : franceinfo, ICI / Radio France,
 Le Monde, RTL, L'Obs, Les Jours, actu.fr, Marie Claire, Ouest-France ; archives collaboratives : Wikipédia FR/EN,
-littérature scientifique). Elles sont exposées par l'API `/api/archives` et `/api/cases/{slug}/sources` avec leur
+littérature scientifique). Le dossier **Robert Pickton** s'appuie en outre sur des sources primaires : les cinq
+volumes du rapport *Forsaken* de la Missing Women Commission of Inquiry (Gouvernement de la Colombie-Britannique,
+2012), l'Enquête nationale sur les femmes et filles autochtones assassinées et disparues (2019), la Gazette de la
+GRC, et la presse (CBC, The Globe and Mail, The Guardian, Toronto Star, Reuters, APTN, Vancouver Sun). Elles sont
+exposées par l'API `/api/archives` et `/api/cases/{slug}/sources` avec leur
 niveau de fiabilité. Aucune source n'est inventée ; une rumeur n'est jamais présentée comme un fait.
 
 ---

@@ -1,11 +1,24 @@
+declare global {
+  interface Window {
+    AndroidNativeAudio?: {
+      playAudio: (assetName: string) => void;
+      pauseAudio: () => void;
+      resumeAudio: () => void;
+      resumeAudio: () => void;
+      stopAudio: () => void;
+      seekTo: (sec: number) => void;
+      getCurrentPosition: () => number;
+      isPlaying: () => boolean;
+      setSpeed?: (speed: number) => void;
+    };
+  }
+}
 /**
  * 🎧 Le moteur du podcast interactif (§3, §8, §26).
  *
  * Deux sources de lecture, jamais une fausse promesse :
- *  - `audio_status === "produced"` + fichier présent  → élément <audio> réel,
- *    diffusé en HTTP Range par le backend (seek + reprise).
- *  - sinon → lecture synchronisée de la transcription (le texte défile au
- *    rythme des horodatages du script). L'interface le dit explicitement.
+ *  - `audio_status === "produced"` + fichier présent  → élément <audio> réel.
+ *  - sinon (ou en secours) → moteur de synthèse vocale TTS intégré.
  *
  * Dans les deux cas : pause aux points pédagogiques, question à choix
  * multiples, explication en cinq volets, puis reprise.
@@ -13,6 +26,7 @@
 import { create } from "zustand";
 import { api, endpoints, audioUrl, type Any } from "../lib/api";
 import { useApp } from "./app";
+import { tts } from "../lib/tts";
 
 export type Segment = { id: string; t: number; speaker?: string; text: string; text_en?: string };
 
@@ -54,6 +68,120 @@ type PlayerState = {
 let audioEl: HTMLAudioElement | null = null;
 let timer: number | null = null;
 let lastSave = 0;
+let currentTtsSegmentId: string | null = null;
+
+function getOrCreateAudio(): HTMLAudioElement {
+  if (!audioEl) {
+    audioEl = document.getElementById("yanisx-native-audio") as HTMLAudioElement;
+    if (!audioEl) {
+      audioEl = document.createElement("audio");
+      audioEl.id = "yanisx-native-audio";
+      audioEl.setAttribute("playsinline", "true");
+      audioEl.setAttribute("webkit-playsinline", "true");
+      document.body.appendChild(audioEl);
+    }
+  }
+  return audioEl;
+}
+
+/* ---------------------------------------------------------------
+ * Restitution Bluetooth (voiture).
+ * --------------------------------------------------------------- */
+let mediaSessionBound = false;
+let wakeLock: { release: () => Promise<void> } | null = null;
+
+const mediaSessionSupported = () =>
+  typeof navigator !== "undefined" && "mediaSession" in navigator;
+
+const acquireWakeLock = async () => {
+  if (!("wakeLock" in navigator) || wakeLock) return;
+  try {
+    wakeLock = await (navigator as unknown as { wakeLock: { request: (t: string) => Promise<{ release: () => Promise<void> }> } }).wakeLock.request("screen");
+  } catch {
+    /* refusé */
+  }
+};
+const releaseWakeLock = async () => {
+  try {
+    await wakeLock?.release();
+  } catch {
+    /* déjà relâché */
+  }
+  wakeLock = null;
+};
+
+const episodeLabel = (ep: Any | null) => {
+  if (!ep) return "";
+  const t = ep.title;
+  return (t && typeof t === "object" ? t.fr || t.en : t) || "";
+};
+
+const publishMetadata = (ep: Any | null) => {
+  if (!mediaSessionSupported() || !ep) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: episodeLabel(ep),
+      artist: "YANIS//X",
+      album: "à travers mon regard",
+      artwork: [
+        { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+        { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      ],
+    });
+  } catch {
+    /* métadonnées indisponibles */
+  }
+};
+
+const publishState = (playing: boolean) => {
+  if (!mediaSessionSupported()) return;
+  try {
+    navigator.mediaSession.playbackState = playing ? "playing" : "paused";
+  } catch {
+    /* ignoré */
+  }
+};
+
+const chapterJump = (get: () => PlayerState, dir: 1 | -1) => {
+  const st = get();
+  const chs: number[] = Array.isArray(st.episode?.chapters)
+    ? st.episode.chapters.map((c: Any) => c.at).filter((n: unknown): n is number => typeof n === "number")
+    : [];
+  if (!chs.length) {
+    st.seek(Math.max(0, Math.min(st.duration, st.position + dir * 30)));
+    return;
+  }
+  const ordered = [...chs].sort((a, b) => a - b);
+  const next =
+    dir === 1
+      ? ordered.find((t) => t > st.position + 1)
+      : [...ordered].reverse().find((t) => t < st.position - 1);
+  st.seek(next == null ? (dir === 1 ? ordered[ordered.length - 1] : 0) : next);
+};
+
+const bindMediaSession = (get: () => PlayerState) => {
+  if (!mediaSessionSupported() || mediaSessionBound) return;
+  mediaSessionBound = true;
+  const handlers: [MediaSessionAction, (d: never) => void][] = [
+    ["play", () => get().play()],
+    ["pause", () => get().pause()],
+    ["stop", () => get().stop()],
+    ["seekbackward", (d: { seekOffset?: number } | null) => get().nudge(-(d?.seekOffset || 15))],
+    ["seekforward", (d: { seekOffset?: number } | null) => get().nudge(d?.seekOffset || 30)],
+    ["seekto", (d: { seekTime?: number } | null) => {
+      if (typeof d?.seekTime === "number") get().seek(d.seekTime);
+    }],
+    ["previoustrack", () => chapterJump(get, -1)],
+    ["nexttrack", () => chapterJump(get, 1)],
+  ];
+  for (const [action, fn] of handlers) {
+    try {
+      navigator.mediaSession.setActionHandler(action, fn as MediaSessionActionHandler);
+    } catch {
+      /* action non supportée */
+    }
+  }
+};
 
 const stopTimer = () => {
   if (timer !== null) {
@@ -87,6 +215,11 @@ export const usePlayer = create<PlayerState>((set, get) => {
       else set({ position: p });
     } else {
       set({ position: Math.min(st.duration, st.position + 0.25 * st.speed) });
+      const cur = get().currentSegment();
+      if (cur && cur.id !== currentTtsSegmentId && cur.text) {
+        currentTtsSegmentId = cur.id;
+        tts.speak(cur.text);
+      }
     }
 
     const pos = get().position;
@@ -95,13 +228,18 @@ export const usePlayer = create<PlayerState>((set, get) => {
     );
     if (q) {
       if (audioEl) audioEl.pause();
+      tts.pause();
       set({ playing: false, pending: q, explanation: null });
+      publishState(false);
       save();
       return;
     }
     if (pos >= st.duration && st.duration > 0) {
       set({ playing: false });
       if (audioEl) audioEl.pause();
+      tts.stop();
+      publishState(false);
+      releaseWakeLock();
       save();
     } else {
       save();
@@ -112,6 +250,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
     stopTimer();
     timer = window.setInterval(tick, 250);
   };
+
+  bindMediaSession(() => get());
 
   return {
     episode: null,
@@ -145,15 +285,18 @@ export const usePlayer = create<PlayerState>((set, get) => {
         let usingAudio = false;
         let audioMissing = false;
         if (ep.audio_status === "produced" && ep.audio) {
-          const probe = await fetch(audioUrl(ep.audio), { method: "HEAD" }).catch(() => null);
-          if (probe && probe.ok) {
-            usingAudio = true;
-            audioEl = new Audio(audioUrl(ep.audio));
-            audioEl.preload = "auto";
-            audioEl.addEventListener("ended", () => set({ playing: false }));
-          } else {
-            audioMissing = true;
-          }
+          usingAudio = true;
+          const el = getOrCreateAudio();
+          el.src = new URL(audioUrl(ep.audio), window.location.href).href;
+          el.preload = "auto";
+          el.onended = () => {
+            set({ playing: false });
+            publishState(false);
+            releaseWakeLock();
+          };
+          el.onerror = () => {
+            set({ usingAudio: false, audioMissing: true });
+          };
         } else if (ep.audio_status === "produced" && !ep.audio) {
           audioMissing = true;
         }
@@ -171,6 +314,8 @@ export const usePlayer = create<PlayerState>((set, get) => {
           explanation: null,
         });
         if (usingAudio && audioEl) audioEl.currentTime = start;
+        publishMetadata(ep);
+        publishState(false);
         startTimer();
       } catch (e: any) {
         set({ loading: false, error: e.message || "episode" });
@@ -181,36 +326,78 @@ export const usePlayer = create<PlayerState>((set, get) => {
       const { pending, duration, position } = get();
       if (pending) return;
       if (duration > 0 && position >= duration - 0.5) set({ position: 0 });
-      if (audioEl && get().usingAudio) {
+      const currentEp = get().episode;
+      if (window.AndroidNativeAudio && currentEp && currentEp.audio) {
+        if (position > 0.5 && window.AndroidNativeAudio.resumeAudio) {
+          window.AndroidNativeAudio.resumeAudio();
+        } else {
+          window.AndroidNativeAudio.playAudio(currentEp.audio);
+        }
+      } else if (audioEl && get().usingAudio) {
         audioEl.playbackRate = get().speed;
-        audioEl.play().catch(() => set({ usingAudio: false }));
+        audioEl.play().catch((err) => {
+          console.warn("Échec audioEl.play():", err);
+          set({ usingAudio: false, audioMissing: true });
+          const cur = get().currentSegment();
+          if (cur && cur.text) {
+            tts.speak(cur.text);
+          }
+        });
+      } else {
+        const cur = get().currentSegment();
+        if (cur && cur.text) {
+          tts.speak(cur.text);
+        } else {
+          tts.resume();
+        }
       }
       set({ playing: true });
+      publishState(true);
+      acquireWakeLock();
       startTimer();
     },
     pause: () => {
+      if (window.AndroidNativeAudio) {
+        window.AndroidNativeAudio.pauseAudio();
+      }
       if (audioEl) audioEl.pause();
+      tts.pause();
       set({ playing: false });
+      publishState(false);
+      releaseWakeLock();
       save();
     },
     toggle: () => (get().playing ? get().pause() : get().play()),
     seek: (sec) => {
       const clamped = Math.max(0, Math.min(get().duration || sec, sec));
+      if (window.AndroidNativeAudio) {
+        window.AndroidNativeAudio.seekTo(Math.round(clamped));
+      }
       if (audioEl && get().usingAudio) audioEl.currentTime = clamped;
       set({ position: clamped });
     },
     nudge: (delta) => get().seek(get().position + delta),
     setSpeed: (s) => {
+      if (window.AndroidNativeAudio && window.AndroidNativeAudio.setSpeed) {
+        window.AndroidNativeAudio.setSpeed(s);
+      }
       if (audioEl) audioEl.playbackRate = s;
       set({ speed: s });
     },
     stop: () => {
       save();
       stopTimer();
+      if (window.AndroidNativeAudio) {
+        window.AndroidNativeAudio.stopAudio();
+      }
       if (audioEl) {
         audioEl.pause();
         audioEl = null;
       }
+      tts.stop();
+      currentTtsSegmentId = null;
+      publishState(false);
+      releaseWakeLock();
       set({ episode: null, playing: false, position: 0, pending: null, explanation: null, usingAudio: false });
     },
 
@@ -276,3 +463,17 @@ export const fmtTime = (sec: number) => {
   const m = Math.floor(s / 60);
   return `${m}:${String(s % 60).padStart(2, "0")}`;
 };
+
+if (typeof window !== "undefined") {
+  (window as any).__onNativeAudioEnded = () => {
+    const st = usePlayer.getState();
+    const ep = st.episode;
+    if (ep && ep.number) {
+      usePlayer.getState().load(ep.id + 1).then(() => {
+        usePlayer.getState().play();
+      }).catch(() => {
+        usePlayer.getState().pause();
+      });
+    }
+  };
+}

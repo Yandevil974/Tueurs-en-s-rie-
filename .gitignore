@@ -24,6 +24,8 @@ content/media/*.mp3
 content/media/*.wav
 content/media/*.m4a
 content/media/*.ogg
+# Segments intermédiaires de montage audio (concatenés puis supprimés)
+content/media/build/
 
 # --- Secrets & local config ---
 .env

@@ -1,7 +1,11 @@
 /**
- * Client API. Toujours en URL relative : le serveur de dev relaie /api vers le
- * backend, donc le navigateur n'appelle jamais localhost (§contraintes aperçu).
+ * Client API hybride YANIS//X.
+ * 
+ * En environnement mobile autonome (Android APK) ou sans réseau :
+ * - Les données sont résolues directement et instantanément depuis le bundle JavaScript compilé (`src/lib/data.ts`).
+ * - L'audio est accessible relativement sans dépendre d'un serveur d'API.
  */
+import { getEmbeddedPayload } from "./data";
 
 export class ApiError extends Error {
   status: number;
@@ -22,24 +26,31 @@ export const setToken = (t: string | null) => {
 export const getToken = () => token ?? localStorage.getItem("yanisx.token");
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const cleanPath = path.split("?")[0];
+
+  // 1. Si on a des données compilées en dur, on les sert directement
+  const localPayload = getEmbeddedPayload(cleanPath);
+  if (localPayload) {
+    return localPayload as T;
+  }
+
+  // 2. Sinon essai réseau
   const headers: Record<string, string> = { Accept: "application/json", ...(init.headers as object) };
   if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
   const tk = getToken();
   if (tk) headers.Authorization = `Bearer ${tk}`;
 
-  let res: Response;
   try {
-    res = await fetch(`/api${path}`, { ...init, headers });
+    const res = await fetch(`/api${path}`, { ...init, headers });
+    if (res.ok) {
+      const text = await res.text();
+      return (text ? JSON.parse(text) : null) as T;
+    }
   } catch {
-    throw new ApiError(0, null, "Connexion au serveur impossible / Cannot reach the server");
+    // Échec réseau ignoré
   }
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
-  if (!res.ok) {
-    const detail = (data && (data.detail || data.message)) || res.statusText;
-    throw new ApiError(res.status, data, typeof detail === "string" ? detail : JSON.stringify(detail));
-  }
-  return data as T;
+
+  throw new ApiError(404, null, `Ressource indisponible : ${path}`);
 }
 
 export const api = {
@@ -49,7 +60,13 @@ export const api = {
   patch: <T,>(p: string, body?: unknown) => request<T>(p, { method: "PATCH", body: body === undefined ? undefined : JSON.stringify(body) }),
 };
 
-export const audioUrl = (file: string) => `/api/audio/${encodeURIComponent(file)}`;
+export const audioUrl = (file: string) => {
+  const enc = encodeURIComponent(file);
+  if (typeof window !== "undefined" && (window.location.protocol === "capacitor:" || window.location.protocol === "http:")) {
+    return `./audio/${enc}`;
+  }
+  return `/audio/${enc}`;
+};
 
 /** Types lâches : le contenu est bilingue et polymorphe par conception. */
 export type Bi = { fr?: string; en?: string } | string | null | undefined;
