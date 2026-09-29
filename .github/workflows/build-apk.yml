@@ -77,7 +77,7 @@ jobs:
             - **Package :** `app.yanisx.android`
             - **Usage en voiture :** Prise en charge Bluetooth intégrée et Media Session.
             - **Accès complet :** Mode Premium déverrouillé directement pour vos tests.
-            - **Audio embarqué :** Toutes les pistes audio sont packagées en dur dans l'APK.
+            - **Audio embarqué :** Fichiers audio réels et moteur vocal de synthèse TTS inclus.
           files: yanisx-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

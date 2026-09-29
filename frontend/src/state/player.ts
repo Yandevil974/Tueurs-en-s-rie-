@@ -2,10 +2,8 @@
  * 🎧 Le moteur du podcast interactif (§3, §8, §26).
  *
  * Deux sources de lecture, jamais une fausse promesse :
- *  - `audio_status === "produced"` + fichier présent  → élément <audio> réel,
- *    diffusé en HTTP Range par le backend (seek + reprise).
- *  - sinon → lecture synchronisée de la transcription (le texte défile au
- *    rythme des horodatages du script). L'interface le dit explicitement.
+ *  - `audio_status === "produced"` + fichier présent  → élément <audio> réel.
+ *  - sinon (ou en secours) → moteur de synthèse vocale TTS intégré.
  *
  * Dans les deux cas : pause aux points pédagogiques, question à choix
  * multiples, explication en cinq volets, puis reprise.
@@ -57,21 +55,8 @@ let timer: number | null = null;
 let lastSave = 0;
 let currentTtsSegmentId: string | null = null;
 
-
 /* ---------------------------------------------------------------
  * Restitution Bluetooth (voiture).
- *
- * Android ne diffuse en Bluetooth que le lecteur « actif » du système. Sans
- * Media Session, un `<audio>` joué dans une page web n'apparaît ni sur l'écran
- * de bord, ni dans la notification de verrouillage, et les boutons au
- * volant ne font rien — le conducteur n'a alors aucun moyen de changer de
- * piste sans déverrouiller le téléphone.
- *
- * `setActionHandler` publie ces commandes. Précision importante : `previoustrack`
- * et `nexttrack` ne changent pas d'épisode ici, ils sautent d'un chapitre à
- * l'autre. C'est ce que le conducteur attend d'un bouton « précédent /
- * suivant » sur un trajet, et cela fonctionne même quand un seul épisode est
- * chargé.
  * --------------------------------------------------------------- */
 let mediaSessionBound = false;
 let wakeLock: { release: () => Promise<void> } | null = null;
@@ -79,13 +64,12 @@ let wakeLock: { release: () => Promise<void> } | null = null;
 const mediaSessionSupported = () =>
   typeof navigator !== "undefined" && "mediaSession" in navigator;
 
-/** L'écran ne doit pas s'éteindre pendant une écoute en voiture. */
 const acquireWakeLock = async () => {
   if (!("wakeLock" in navigator) || wakeLock) return;
   try {
     wakeLock = await (navigator as unknown as { wakeLock: { request: (t: string) => Promise<{ release: () => Promise<void> }> } }).wakeLock.request("screen");
   } catch {
-    /* refusé (batterie, onglet caché) : sans gravité */
+    /* refusé */
   }
 };
 const releaseWakeLock = async () => {
@@ -116,7 +100,7 @@ const publishMetadata = (ep: Any | null) => {
       ],
     });
   } catch {
-    /* métadonnées indisponibles : la lecture continue */
+    /* métadonnées indisponibles */
   }
 };
 
@@ -165,7 +149,7 @@ const bindMediaSession = (get: () => PlayerState) => {
     try {
       navigator.mediaSession.setActionHandler(action, fn as MediaSessionActionHandler);
     } catch {
-      /* action non supportée par ce navigateur : ignorée */
+      /* action non supportée */
     }
   }
 };
@@ -202,7 +186,6 @@ export const usePlayer = create<PlayerState>((set, get) => {
       else set({ position: p });
     } else {
       set({ position: Math.min(st.duration, st.position + 0.25 * st.speed) });
-      // Vocalisation automatique du segment courant (TTS)
       const cur = get().currentSegment();
       if (cur && cur.id !== currentTtsSegmentId && cur.text) {
         currentTtsSegmentId = cur.id;
@@ -225,6 +208,7 @@ export const usePlayer = create<PlayerState>((set, get) => {
     if (pos >= st.duration && st.duration > 0) {
       set({ playing: false });
       if (audioEl) audioEl.pause();
+      tts.stop();
       publishState(false);
       releaseWakeLock();
       save();
@@ -319,7 +303,6 @@ export const usePlayer = create<PlayerState>((set, get) => {
         audioEl.playbackRate = get().speed;
         audioEl.play().catch((err) => {
           console.warn("Échec audioEl.play():", err);
-          // Si le fichier audio natif échoue à démarrer, on bascule immédiatement sur le moteur vocal TTS
           set({ usingAudio: false, audioMissing: true });
           const cur = get().currentSegment();
           if (cur && cur.text) {
@@ -360,13 +343,13 @@ export const usePlayer = create<PlayerState>((set, get) => {
     },
     stop: () => {
       save();
-      tts.stop();
-      currentTtsSegmentId = null;
       stopTimer();
       if (audioEl) {
         audioEl.pause();
         audioEl = null;
       }
+      tts.stop();
+      currentTtsSegmentId = null;
       publishState(false);
       releaseWakeLock();
       set({ episode: null, playing: false, position: 0, pending: null, explanation: null, usingAudio: false });

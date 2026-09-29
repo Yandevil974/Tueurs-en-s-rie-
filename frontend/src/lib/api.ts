@@ -61,7 +61,6 @@ export const api = {
 };
 
 export const audioUrl = (file: string) => {
-  // En WebView Android Capacitor, l'URL est servie sous https://localhost/audio/...
   return `/audio/${encodeURIComponent(file)}`;
 };
 
