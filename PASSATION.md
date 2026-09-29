@@ -272,3 +272,37 @@ Par ordre de priorité. Rien de ce qui suit n'a été commencé.
   - Résolution du chemin audio sous forme d'URL absolue interne `/audio/...` reconnue nativement par Capacitor Android.
   - Bascule automatique et transparente vers la synthèse vocale TTS si un fichier physique n'est pas trouvé.
 - **Vérification** : La CI GitHub Actions a terminé avec succès et l'APK de 34 Mo contient l'ensemble des flux audio et le moteur de synthèse.
+
+---
+
+## 16. SYNTHÈSE DE PASSATION & CONSIGNES POUR LE PROCHAIN CHAT (Z FOLD 5 / ANDROID / AUDIO)
+
+### 📌 Contexte & Éléments en Place
+1. **Dépôt & Branche de travail :**
+   - Dépôt : `Yandevil974/Tueurs-en-s-rie-`
+   - Branche active obligatoire : `arena/01a0e7ec-tueurs-en-s-rie` (ne jamais changer de branche).
+   - Version actuelle livrée : **v1.7** (`versionCode 8`, APK de 34 Mo sur GitHub Release `app-preview`).
+
+2. **Architecture Audio Hybride Matérielle (Samsung One UI / Z Fold 5) :**
+   - Le système de son est branché directement sur le moteur matériel Android dans `frontend/android/app/src/main/java/app/yanisx/android/MainActivity.java` via `AndroidNativeAudio` (`android.media.MediaPlayer` + `android.speech.tts.TextToSpeech`).
+   - Méthodes Java disponibles et fonctionnelles : `playAudio(assetName)`, `pauseAudio()`, `resumeAudio()`, `stopAudio()`, `setSpeed(float)`, `seekTo(int)`, `speakText(text)`.
+   - Événement JavaScript d'auto-enchaînement : `window.__onNativeAudioEnded()`.
+   - Les fichiers physiques audio sont stockés dans `content/media/` et copiés dans `frontend/android/app/src/main/assets/public/audio/`.
+   - Décompression automatique dans le cache local Android (`getCacheDir()`) pour contourner les limitations de compression d'assets.
+
+3. **Interface & Ergonomie Fold 5 :**
+   - Barre de navigation latérale verticale ancrée sur le bord gauche pour les écrans larges / dépliés (`@media (min-width: 600px)`).
+   - Carte du monde interactive avec contours continentaux réels et pastilles cliquables sur l'accueil (`frontend/src/pages/Home.tsx`).
+   - Carrousel d'accès libre mis à l'échelle via `clamp(200px, 42vw, 260px)`.
+   - Onglets de filtrage des dossiers sur l'accueil : Tous, Accès libre, Non résolus, Résolus.
+   - Barre de lecture persistante au premier plan (`z-index: 100`) avec commandes Play/Pause/Vitesse/Progression.
+
+4. **Workflow CI/CD (GitHub Actions) :**
+   - Fichier : `.github/workflows/build-apk.yml`.
+   - Recompile automatiquement l'APK (`yanisx-debug.apk`) à chaque push sur la branche et met à jour la Release GitHub `app-preview`.
+   - Attention : incrémenter systématiquement `versionCode` et `versionName` dans `frontend/android/app/build.gradle` à chaque nouvelle mise à jour pour éviter le bug « Application non installée ».
+
+5. **Directives Éthiques & Méthodologiques Absolues :**
+   - Aucune glorification criminelle, priorité totale aux victimes et à leur mémoire.
+   - Fiabilité des sources obligatoire (CONFIRMED, PROBABLE, DISPUTED, UNKNOWN).
+   - Jamais de spéculation ni de fausse promesse technique.
