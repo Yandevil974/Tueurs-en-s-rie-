@@ -37,6 +37,10 @@ class TTSPlayer {
   }
 
   public speak(text: string, onEnd?: () => void) {
+    if (typeof window !== "undefined" && (window as any).AndroidNativeAudio && (window as any).AndroidNativeAudio.speakText) {
+      (window as any).AndroidNativeAudio.speakText(text);
+      return;
+    }
     if (!this.synth) return;
     this.stop();
 

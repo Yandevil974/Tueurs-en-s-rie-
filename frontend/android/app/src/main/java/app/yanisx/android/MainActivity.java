@@ -3,6 +3,8 @@ package app.yanisx.android;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.speech.tts.TextToSpeech;
+import java.util.Locale;
 import android.os.Bundle;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
@@ -10,6 +12,7 @@ import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
     private MediaPlayer mediaPlayer;
+    private TextToSpeech textToSpeech;
 
     public class NativeAudioInterface {
         @JavascriptInterface
@@ -104,6 +107,15 @@ public class MainActivity extends BridgeActivity {
         }
 
         @JavascriptInterface
+        public void speakText(String text) {
+            runOnUiThread(() -> {
+                if (textToSpeech != null) {
+                    textToSpeech.speak(text, TextToSpeech.QUEUE_FLUSH, null, "YANISX_TTS");
+                }
+            });
+        }
+
+        @JavascriptInterface
         public boolean isPlaying() {
             return mediaPlayer != null && mediaPlayer.isPlaying();
         }
@@ -112,6 +124,11 @@ public class MainActivity extends BridgeActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        textToSpeech = new TextToSpeech(this, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                textToSpeech.setLanguage(Locale.FRENCH);
+            }
+        });
         
         if (this.bridge != null && this.bridge.getWebView() != null) {
             WebSettings settings = this.bridge.getWebView().getSettings();
@@ -125,6 +142,10 @@ public class MainActivity extends BridgeActivity {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
+        }
+                if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
         }
         super.onDestroy();
     }
