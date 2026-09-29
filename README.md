@@ -139,6 +139,14 @@ npm test                    # tests unitaires
 
 Variables d'environnement / environment variables : `YANISX_DB`, `YANISX_MEDIA`, `YANISX_ORIGINS`.
 
+## Application Android
+
+L'APK de prévisualisation est publié dans la [release GitHub YANIS//X](https://github.com/Yandevil974/Tueurs-en-s-rie-/releases/tag/app-preview).
+Il embarque les données du catalogue, la carte du monde et les fichiers audio disponibles pour fonctionner sans serveur sur Android.
+Sur un téléphone, télécharge `yanisx-debug.apk`, autorise si nécessaire l'installation depuis le navigateur ou Fichiers, puis installe l'application. Il s'agit d'une build de test, pas d'une application du Play Store.
+
+Le workflow `.github/workflows/build-apk.yml` reconstruit l'APK et met à jour la release `app-preview` à chaque mise à jour de la branche Android active.
+
 ---
 
 ## Sources

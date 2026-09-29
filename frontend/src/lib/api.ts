@@ -3,6 +3,9 @@
  * backend, donc le navigateur n'appelle jamais localhost (§contraintes aperçu).
  */
 
+import { Capacitor } from "@capacitor/core";
+import { getEmbeddedPayload } from "./data";
+
 export class ApiError extends Error {
   status: number;
   detail: unknown;
@@ -14,6 +17,14 @@ export class ApiError extends Error {
 }
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
+  if (Capacitor.isNativePlatform()) {
+    const localPayload = await getEmbeddedPayload(path, init);
+    if (localPayload === undefined) {
+      throw new ApiError(404, null, `Ressource indisponible dans la version hors ligne / Offline resource unavailable: ${path}`);
+    }
+    return localPayload as T;
+  }
+
   const headers: Record<string, string> = { Accept: "application/json", ...(init.headers as object) };
   if (init.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
 
@@ -37,7 +48,9 @@ export const api = {
   post: <T,>(p: string, body?: unknown) => request<T>(p, { method: "POST", body: body === undefined ? undefined : JSON.stringify(body) }),
 };
 
-export const audioUrl = (file: string) => `/api/audio/${encodeURIComponent(file)}`;
+export const audioUrl = (file: string) => Capacitor.isNativePlatform()
+  ? `./audio/${encodeURIComponent(file)}`
+  : `/api/audio/${encodeURIComponent(file)}`;
 
 /** Types lâches : le contenu est bilingue et polymorphe par conception. */
 export type Bi = { fr?: string; en?: string } | string | null | undefined;
