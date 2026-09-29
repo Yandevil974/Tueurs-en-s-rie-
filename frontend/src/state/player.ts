@@ -4,6 +4,7 @@ declare global {
       playAudio: (assetName: string) => void;
       pauseAudio: () => void;
       resumeAudio: () => void;
+      resumeAudio: () => void;
       stopAudio: () => void;
       seekTo: (sec: number) => void;
       getCurrentPosition: () => number;
@@ -327,7 +328,11 @@ export const usePlayer = create<PlayerState>((set, get) => {
       if (duration > 0 && position >= duration - 0.5) set({ position: 0 });
       const currentEp = get().episode;
       if (window.AndroidNativeAudio && currentEp && currentEp.audio) {
-        window.AndroidNativeAudio.playAudio(currentEp.audio);
+        if (position > 0.5 && window.AndroidNativeAudio.resumeAudio) {
+          window.AndroidNativeAudio.resumeAudio();
+        } else {
+          window.AndroidNativeAudio.playAudio(currentEp.audio);
+        }
       } else if (audioEl && get().usingAudio) {
         audioEl.playbackRate = get().speed;
         audioEl.play().catch((err) => {

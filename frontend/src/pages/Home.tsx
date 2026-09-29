@@ -84,13 +84,18 @@ export default function Home() {
             </g>
             <line x1="0" y1={H / 2} x2={W} y2={H / 2} stroke="#2b3138" strokeWidth="1" strokeDasharray="4 4" />
             
-            {/* Continents stylisés */}
-            <path d="M 120 70 Q 180 50 250 80 Q 220 160 170 170 Z" fill="#14181f" />
-            <path d="M 210 190 Q 260 210 240 310 Q 190 280 200 210 Z" fill="#14181f" />
-            <path d="M 340 70 Q 420 60 410 130 Q 360 140 330 100 Z" fill="#14181f" />
-            <path d="M 330 140 Q 430 140 400 280 Q 350 270 330 180 Z" fill="#14181f" />
-            <path d="M 430 60 Q 640 40 620 180 Q 500 190 440 140 Z" fill="#14181f" />
-            <path d="M 540 220 Q 630 220 620 300 Q 530 300 540 220 Z" fill="#14181f" />
+            {/* Amérique du Nord */}
+            <path d="M 50 40 L 110 35 L 170 35 L 220 50 L 260 70 L 250 110 L 210 130 L 190 170 L 160 150 L 120 120 L 70 90 Z" fill="#181d24" stroke="#262e38" strokeWidth="1" />
+            {/* Amérique du Sud */}
+            <path d="M 180 180 L 230 190 L 260 230 L 240 310 L 200 330 L 180 270 L 170 210 Z" fill="#181d24" stroke="#262e38" strokeWidth="1" />
+            {/* Europe */}
+            <path d="M 340 50 L 400 45 L 430 70 L 410 110 L 360 115 L 340 85 Z" fill="#181d24" stroke="#262e38" strokeWidth="1" />
+            {/* Afrique */}
+            <path d="M 340 125 L 420 125 L 440 180 L 410 280 L 370 280 L 330 200 L 330 140 Z" fill="#181d24" stroke="#262e38" strokeWidth="1" />
+            {/* Asie & Moyen-Orient */}
+            <path d="M 430 45 L 610 40 L 640 110 L 580 180 L 510 170 L 470 140 L 425 105 Z" fill="#181d24" stroke="#262e38" strokeWidth="1" />
+            {/* Océanie / Australie */}
+            <path d="M 550 230 L 630 230 L 630 290 L 560 290 Z" fill="#181d24" stroke="#262e38" strokeWidth="1" />
 
             {points.map((p) => {
               const { x, y } = proj(p.lat, p.lon);
