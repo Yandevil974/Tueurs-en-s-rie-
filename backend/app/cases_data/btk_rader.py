@@ -1,169 +1,262 @@
 """
 DOSSIER 04 — DENNIS RADER, DIT « BTK » (États-Unis, Kansas, 1974-2005)
 
-Sources publiques vérifiées le 2026-09-24.
+Sources publiques vérifiées le 2026-09-30.
 """
 from ..case_template import (block, counterfactual, default_sections, fact, item,
                              merge_sections, question, source, txt)
 
 CASE_ID = "btk-rader"
-V = "2026-09-24"
+V = "2026-09-30"
 
 SOURCES = [
-    source("wiki-rader", CASE_ID, "Dennis Rader", "Dennis Rader",
-           "Wikipedia (English)", "Contributors", "https://en.wikipedia.org/wiki/Dennis_Rader",
-           "2026", "public_archive", "PROBABLE", V,
-           "Encyclopédie collaborative : données recoupées avec la presse ; niveau PROBABLE par prudence.",
-           "Collaborative encyclopaedia: data cross-checked with the press; PROBABLE level as a precaution."),
-    source("biography-rader", CASE_ID, "Dennis Rader — Who Is the BTK Killer?", "Dennis Rader — Who Is the BTK Killer?",
-           "Biography.com", "Redaction", "https://www.biography.com/crime/dennis-rader",
-           "2025-01-21", "press", "CONFIRMED", V,
-           "Éléments biographiques, découverte des corps, réémergence de 2004, aveux et condamnation.",
-           "Biographical elements, discovery of the bodies, 2004 re-emergence, guilty plea and sentence."),
-    source("creed-btk", CASE_ID, "The BTK Killer: How Dennis Rader Was Finally Caught",
-           "The BTK Killer: How Dennis Rader Was Finally Caught",
-           "Cassian Creed", "Cassian Creed", "https://cassiancreed.com/post/the-btk-killer-how-dennis-rader-was-finally-caught/",
-           "2026-05-20", "press", "PROBABLE", V,
-           "Blog de synthèse : dates d'arrestation, de plaidoyer et de condamnation recoupées avec Wikipedia.",
-           "Summary blog: arrest, plea and sentencing dates cross-checked with Wikipedia."),
+    source("wichita-eagle-profile", CASE_ID, "Who is Dennis Rader? Le dossier BTK du Wichita Eagle",
+           "Who is Dennis Rader? The Wichita Eagle BTK dossier",
+           "The Wichita Eagle", "Eagle staff",
+           "https://www.kansas.com/news/special-reports/btk/article225082655.html",
+           "2019-01-25 (mis à jour)", "press", "CONFIRMED", V,
+           "Dossier local avec chronologie, biographies des victimes, enquête et éléments judiciaires. Les dates de condamnation sont recoupées avec le compte rendu du 18 août.",
+           "Local dossier with chronology, victim biographies, investigation and court details. Sentencing date cross-checked against the 18 August report."),
+    source("court-transcript", CASE_ID, "Transcription du témoignage de Dennis Rader, 27 juin 2005",
+           "Transcript of Dennis Rader's testimony, 27 June 2005",
+           "The Wichita Eagle", "Eagle staff",
+           "https://www.kansas.com/news/special-reports/btk/article225087595.html",
+           "2005-06-27", "court_record", "CONFIRMED", V,
+           "Extraits de l'audience de plaidoyer publiés par le journal, et non l'intégralité du dossier judiciaire. Les propos de Rader sont rapportés comme ses propres déclarations.",
+           "Excerpts from the plea hearing published by the newspaper, not the full court record. Rader's words are presented as his own statements."),
+    source("fbi-kc", CASE_ID, "FBI Kansas City History — enquête BTK",
+           "FBI Kansas City History — the BTK investigation",
+           "Federal Bureau of Investigation", "FBI Kansas City",
+           "https://www.fbi.gov/history/field-office-histories/kansascity",
+           "undated", "government", "CONFIRMED", V,
+           "Source officielle sur la coopération entre Wichita PD, la division FBI de Kansas City et la Behavioral Analysis Unit. La formulation du FBI sur « au moins dix femmes » n'est pas reprise : les dix personnes condamnées sont listées d'après le dossier judiciaire et la presse locale.",
+           "Official source on cooperation between Wichita PD, the FBI Kansas City Division and the Behavioral Analysis Unit. The FBI page's wording 'at least 10 women' is not repeated: the ten people in the convictions are listed from court and local reporting."),
+    source("rcfl-fy2005", CASE_ID, "Rapport annuel du programme RCFL, exercice 2005",
+           "RCFL Program Annual Report, Fiscal Year 2005",
+           "FBI Regional Computer Forensics Laboratory Program", "RCFL National Program Office",
+           "https://www.rcfl.gov/file-repository/rcfl_nat_annual05.pdf",
+           "2005", "government", "CONFIRMED", V,
+           "Rapport officiel sur l'analyse de la disquette envoyée à une chaîne de télévision de Wichita le 16 février 2005 et les indices récupérés dans ses propriétés numériques.",
+           "Official report on the analysis of the floppy disk sent to a Wichita television station on 16 February 2005 and the clues recovered from its digital properties."),
+    source("rader-self-report", CASE_ID, "« Bored », Rader décide de refaire surface",
+           "'Bored,' Rader decided to resurface",
+           "The Wichita Eagle", "Eagle staff",
+           "https://www.kansas.com/news/special-reports/btk/article1003767.html",
+           "2005-08-13", "press", "CONFIRMED", V,
+           "Compte rendu d'un entretien enregistré avec le psychologue Robert Mendoza. Les motifs et souvenirs cités sont les propos rétrospectifs de Rader, pas une explication clinique indépendante.",
+           "Report on a recorded interview with psychologist Robert Mendoza. The motives and memories quoted are Rader's retrospective statements, not an independent clinical explanation."),
+    source("kevin-bright-account", CASE_ID, "Les lecteurs ont encore des questions sur BTK — le signalement de Kevin Bright",
+           "Readers still want answers on BTK — Kevin Bright's description",
+           "The Wichita Eagle", "Eagle staff",
+           "https://www.kansas.com/news/special-reports/btk/article1003731.html",
+           "2005-07-03", "press", "CONFIRMED", V,
+           "Réponse du journal fondée sur son enquête : Kevin Bright a donné un signalement, un portrait-robot a été réalisé, puis la police l'a écarté en jugeant le témoin peu fiable après ses blessures. Cette décision est attribuée aux enquêteurs, pas présentée comme une faute du survivant.",
+           "A newspaper answer based on its reporting: Kevin Bright gave a description, a composite was made, then police discounted it, judging the witness unreliable after his injuries. This is attributed to investigators, not presented as the survivor's fault."),
+    source("cbs-victims-gallery", CASE_ID, "BTK : les victimes",
+           "BTK victims",
+           "CBS News", "CBS News",
+           "https://www.cbsnews.com/pictures/btk-victims/",
+           "undated", "press", "CONFIRMED", V,
+           "Galerie d'archives de l'Associated Press et du Wichita Eagle. Indique 24 ans pour Shirley Vian, tandis que le dossier du Wichita Eagle indique 26 ans ; l'âge n'est donc pas affiché dans la fiche.",
+           "An Associated Press and Wichita Eagle archive gallery. It lists Shirley Vian as 24, while The Wichita Eagle dossier lists 26; her age is therefore omitted from the victim file."),
+    source("cnn-sentence", CASE_ID, "BTK condamné à dix peines de perpétuité",
+           "BTK sentenced to 10 life terms",
+           "CNN", "CNN staff",
+           "https://edition.cnn.com/2005/LAW/08/18/btk.killings/index.html",
+           "2005-08-18", "press", "CONFIRMED", V,
+           "Compte rendu contemporain du prononcé le 18 août 2005, des dix peines consécutives et des déclarations des familles.",
+           "Contemporary report of the 18 August 2005 sentence, ten consecutive life terms and the families' statements."),
+    source("osage-sheriff-2023", CASE_ID, "Enquête distincte sur la disparition de Cynthia Dawn Kinney",
+           "Separate inquiry into the disappearance of Cynthia Dawn Kinney",
+           "KAKE News", "Jocelyn Schifferdecker",
+           "https://www.kake.com/archive/stories/sheriff-dennis-rader-is-suspect-in-disappearance-of-oklahoma-teen-other-unsolved-cases/article_1e6a791b-452e-5b9c-b92b-bd3b242b6964.html",
+           "2023-08-23", "press", "CONFIRMED", V,
+           "Compte rendu de la position du shérif d'Osage County, qui présente Rader comme suspect. Une affirmation d'enquête ne constitue ni une inculpation ni une condamnation.",
+           "Report of the Osage County sheriff's position identifying Rader as a suspect. An investigative claim is not a charge or conviction."),
+    source("koco-kinney-status", CASE_ID, "Le parquet dit ne pas avoir assez d'éléments pour inculper Rader dans le dossier Kinney",
+           "DA says evidence is insufficient to charge Rader in the Kinney case",
+           "KOCO 5 News", "KOCO News",
+           "https://www.koco.com/article/oklahoma-btk-killer-dennis-rader-insufficient-evidence-cynthia-kinney-disappearance/45084473",
+           "2023-09-11; couverture consultée 2025-12-11", "press", "CONFIRMED", V,
+           "Le compte rendu de 2023 cite la position du parquet : éléments insuffisants pour inculper Rader et demande d'enquête de l'OSBI. La couverture consultée en décembre 2025 rapporte que l'examen se poursuivait, sans charge contre Rader établie ; elle mentionne aussi une autre piste. Cette disparition reste distincte des dix condamnations du Kansas.",
+           "The 2023 report records the DA's position: insufficient evidence to charge Rader and a request for an OSBI investigation. Coverage reviewed in December 2025 reports that the inquiry continued, with no charge against Rader established; it also mentions another lead. This disappearance remains separate from the ten Kansas convictions."),
 ]
 
+def _victim(order: int, first_name: str, last_name: str, age: str,
+            headline_fr: str, headline_en: str,
+            life_fr: str, life_en: str, date_fr: str, date_en: str,
+            record_fr: str, record_en: str,
+            source_id: str = "wichita-eagle-profile", note=None,
+            reliability: str = "CONFIRMED") -> dict:
+    return {
+        "order": order,
+        "first_name": first_name,
+        "last_name": last_name,
+        "age": age,
+        "reliability": reliability,
+        "source": source_id,
+        "life": {
+            "fr": {"headline": headline_fr, "items": [{"label": "Vie", "text": life_fr}]},
+            "en": {"headline": headline_en, "items": [{"label": "Life", "text": life_en}]},
+        },
+        "disappearance": {
+            "fr": {"items": [{"label": "Date", "text": date_fr}, {"label": "Éléments documentés", "text": record_fr}]},
+            "en": {"items": [{"label": "Date", "text": date_en}, {"label": "Documented record", "text": record_en}]},
+        },
+        "note": note,
+    }
+
+
+# Les dix personnes tuées dans les affaires pour lesquelles Rader a plaidé coupable.
+# Kevin Bright est conservé séparément comme survivant : il n'est pas compté comme victime d'un homicide.
 VICTIMS = [
-
-    {"order": 0, "first_name": "Joseph", "last_name": "Otero", "age": "38", "reliability": "PROBABLE", "source": "biography-rader",
-     "life": {"fr": {"headline": "Joseph Otero", "items": [
-         {"label": "Situation", "text": "Père de famille, tué à son domicile de Wichita avec son épouse et deux de leurs enfants le 15 janvier 1974."},
-         {"label": "Découverte", "text": "Les corps sont retrouvés le lendemain matin par leur fils Charlie, 15 ans, en rentrant."}]},
-        "en": {"headline": "Joseph Otero", "items": [
-         {"label": "Situation", "text": "A father, killed at his Wichita home with his wife and two of their children on 15 January 1974."},
-         {"label": "Discovery", "text": "The bodies were found the next morning by their son Charlie, 15, coming home."}]}},
-     "disappearance": {"fr": {"items": [{"label": "Date", "text": "15 janvier 1974 — premier fait de la série."}]},
-                       "en": {"items": [{"label": "Date", "text": "15 January 1974 — first offence of the series."}]}}},
-
-
-    {"order": 1, "first_name": "Josephine", "last_name": "Otero", "age": "34", "reliability": "PROBABLE", "source": "biography-rader",
-     "life": {"fr": {"headline": "Josephine Otero", "items": [{"label": "Situation", "text": "Épouse de Joseph Otero, mère de famille, tuée le 15 janvier 1974."}]},
-             "en": {"headline": "Josephine Otero", "items": [{"label": "Situation", "text": "Wife of Joseph Otero, a mother, killed on 15 January 1974."}]}},
-     "disappearance": {"fr": {"items": [{"label": "Date", "text": "15 janvier 1974."}]},
-                       "en": {"items": [{"label": "Date", "text": "15 January 1974."}]}}},
-
-
-    {"order": 2, "first_name": "Joseph", "last_name": "Otero Jr", "age": "9", "reliability": "PROBABLE", "source": "biography-rader",
-     "life": {"fr": {"headline": "Joseph Otero Jr", "items": [{"label": "Âge", "text": "9 ans."}, {"label": "Situation", "text": "Enfant de la famille Otero, tué au domicile familial."}]},
-             "en": {"headline": "Joseph Otero Jr", "items": [{"label": "Age", "text": "9."}, {"label": "Situation", "text": "Child of the Otero family, killed at the family home."}]}},
-     "disappearance": {"fr": {"items": [{"label": "Date", "text": "15 janvier 1974."}]},
-                       "en": {"items": [{"label": "Date", "text": "15 January 1974."}]}}},
-
-
-    {"order": 3, "first_name": "Josephine", "last_name": "Otero (Jo)", "age": "11", "reliability": "PROBABLE", "source": "biography-rader",
-     "life": {"fr": {"headline": "Josephine « Jo » Otero", "items": [{"label": "Âge", "text": "11 ans."}, {"label": "Situation", "text": "Enfant de la famille Otero."}]},
-             "en": {"headline": "Josephine 'Jo' Otero", "items": [{"label": "Age", "text": "11."}, {"label": "Situation", "text": "Child of the Otero family."}]}},
-     "disappearance": {"fr": {"items": [{"label": "Date", "text": "15 janvier 1974."}]},
-                       "en": {"items": [{"label": "Date", "text": "15 January 1974."}]}}},
-
-
-    {"order": 4, "first_name": "Kevin", "last_name": "Bright", "age": "—", "reliability": "CONFIRMED", "source": "wiki-rader",
-     "life": {"fr": {"headline": "Kevin Bright, survivant", "items": [
-         {"label": "Statut", "text": "Survivant. Il a décrit l'agresseur comme « un type de taille moyenne, moustache fournie, des yeux “psychotiques” », selon un article de TIME cité par Biography.com."}]},
-        "en": {"headline": "Kevin Bright, survivor", "items": [
-         {"label": "Status", "text": "Survivor. He described the attacker as 'an average-sized guy, bushy mustache, “psychotic” eyes', according to a TIME article cited by Biography.com."}]}},
-     "disappearance": {"fr": {"items": [{"label": "Élément", "text": "Son signalement n'a pas conduit à une identification à l'époque."}]},
-                       "en": {"items": [{"label": "Element", "text": "His description did not lead to an identification at the time."}]}}},
+    _victim(0, "Joseph", "Otero", "38", "Joseph Otero", "Joseph Otero",
+            "Né à Porto Rico, il émigre enfant aux États-Unis. Ancien boxeur, il a servi vingt ans dans l'Air Force avant d'installer sa famille à Wichita en 1973. Son fils Charlie le décrivait comme sociable, amateur d'aviation, de voitures et de musique.",
+            "Born in Puerto Rico, he immigrated to the United States as a boy. A former boxer, he served twenty years in the Air Force before moving his family to Wichita in 1973. His son Charlie remembered him as sociable, and interested in aviation, cars and music.",
+            "15 janvier 1974", "15 January 1974",
+            "Il a été tué avec Julie, Josephine et Joseph II. Leur fils aîné Charlie, âgé de quinze ans, a découvert la famille en rentrant.",
+            "He was killed with Julie, Josephine and Joseph II. Their eldest son Charlie, fifteen, discovered the family when he came home."),
+    _victim(1, "Julie", "Otero", "34", "Julie Otero", "Julie Otero",
+            "Mère de cinq enfants et épouse d'un militaire, elle suivait des cours de judo avec sa famille et avait obtenu une ceinture marron. Après l'installation à Wichita, elle a travaillé sur une chaîne d'assemblage de Coleman.",
+            "A mother of five and an Air Force wife, she took judo classes with her family and earned a brown belt. After moving to Wichita, she worked on an assembly line at Coleman.",
+            "15 janvier 1974", "15 January 1974",
+            "Elle a été tuée avec son époux Joseph et leurs enfants Josephine et Joseph II.",
+            "She was killed with her husband Joseph and their children Josephine and Joseph II."),
+    _victim(2, "Josephine", "Otero", "11", "Josephine « Josie » Otero", "Josephine 'Josie' Otero",
+            "Élève de sixième, elle venait d'arriver dans son école de Wichita. Sa famille et ses camarades se souvenaient d'une enfant qui aimait écrire des poèmes, dessiner, peindre et jouer avec ses poupées. Elle pratiquait aussi le judo.",
+            "A sixth-grade student, she had recently joined her Wichita school. Her family and classmates remembered a child who liked writing poems, drawing, painting and playing with her dolls. She also practised judo.",
+            "15 janvier 1974", "15 January 1974",
+            "Elle a été tuée avec trois membres de sa famille. Son prénom est Josephine ; Julie Otero, sa mère, est une personne distincte.",
+            "She was killed with three members of her family. Her name was Josephine; her mother, Julie Otero, was a different person."),
+    _victim(3, "Joseph", "Otero II", "9", "Joseph « Joey » Otero II", "Joseph 'Joey' Otero II",
+            "Surnommé Joey, il était le plus jeune des cinq enfants. Son frère Charlie le décrivait comme le chouchou de la famille, entouré par ses frères et sœurs.",
+            "Known as Joey, he was the youngest of five children. His brother Charlie remembered him as the family's darling, surrounded by his siblings.",
+            "15 janvier 1974", "15 January 1974",
+            "Il a été tué avec ses parents et sa sœur Josephine au domicile familial.",
+            "He was killed with his parents and sister Josephine at the family home."),
+    _victim(4, "Kathryn", "Bright", "21", "Kathryn Bright", "Kathryn Bright",
+            "Après une année à l'Université du Kansas, elle est revenue à Wichita et a travaillé chez Coleman. Ses proches la décrivaient comme drôle, joyeuse et très attachée à sa famille.",
+            "After a year at the University of Kansas, she returned to Wichita and worked at Coleman. Her relatives remembered her as funny, joyful and close to her family.",
+            "4 avril 1974", "4 April 1974",
+            "Elle a été tuée chez elle. Son frère Kevin, blessé, a survécu. Il a décrit l'agresseur à la police et un portrait-robot a été réalisé ; les enquêteurs ont ensuite jugé son signalement peu fiable après ses blessures à la tête. Cette appréciation appartient aux enquêteurs, pas à Kevin.",
+            "She was killed at home. Her brother Kevin survived, injured. He described the attacker to police and an artist made a composite; investigators later judged his description unreliable after his head injuries. That assessment belongs to investigators, not Kevin.",
+            source_id="kevin-bright-account"),
+    _victim(5, "Shirley", "Vian Relford", "", "Shirley Vian Relford", "Shirley Vian Relford",
+            "Mère de trois enfants, elle aimait chanter dans la chorale de son église. Son fils Steven se souvenait d'une mère aimante et heureuse.",
+            "A mother of three, she liked singing in her church choir. Her son Steven remembered a loving and happy mother.",
+            "17 mars 1977", "17 March 1977",
+            "Elle a été tuée à son domicile. L'âge n'est pas affiché : les articles consultés divergent entre 24 et 26 ans.",
+            "She was killed at home. Her age is not displayed because the reports consulted differ between 24 and 26.",
+            note=txt("Les sources de presse consultées ne concordent pas sur son âge (24 ou 26 ans) ; cette fiche ne choisit pas arbitrairement.",
+                     "The press sources consulted disagree about her age (24 or 26); this file does not choose arbitrarily.")),
+    _victim(6, "Nancy", "Fox", "25", "Nancy Fox", "Nancy Fox",
+            "Ancienne élève de South High School, elle travaillait à temps plein comme secrétaire pour une entreprise de construction et prenait aussi des horaires dans une bijouterie. Ses collègues se souvenaient de son humour et de son sérieux.",
+            "A South High School alumna, she worked full time as a secretary for a construction company and also took shifts at a jewellery store. Colleagues remembered her humour and professionalism.",
+            "8 décembre 1977", "8 December 1977",
+            "Elle a été tuée chez elle. Le lendemain, l'auteur a appelé les services d'urgence pour signaler le crime.",
+            "She was killed at home. The next day, the perpetrator called emergency services to report the crime."),
+    _victim(7, "Marine", "Hedge", "53", "Marine Hedge", "Marine Hedge",
+            "Originaire de l'Arkansas, elle a travaillé plus d'une douzaine d'années comme responsable d'équipe au café de Wesley Medical Center. Veuve, grand-mère, elle aimait le jardinage, le bingo et son église de Park City.",
+            "Originally from Arkansas, she worked for more than a dozen years as a shift supervisor at the Wesley Medical Center coffee shop. A widow and grandmother, she enjoyed gardening, bingo and her Park City church.",
+            "27 avril 1985", "27 April 1985",
+            "Elle a été tuée à Park City. Rader a plaidé coupable de ce meurtre.",
+            "She was killed in Park City. Rader pleaded guilty to her murder."),
+    _victim(8, "Vicki", "Wegerle", "28", "Vicki Wegerle", "Vicki Wegerle",
+            "Mère, elle aimait les enfants et faisait du bénévolat comme baby-sitter dans deux églises de son quartier. Son pasteur la décrivait comme douce et aimante.",
+            "A mother, she loved children and volunteered as a babysitter at two churches in her neighbourhood. Her pastor remembered her as gentle and loving.",
+            "16 septembre 1986", "16 September 1986",
+            "Elle a été tuée à son domicile. En 2004, une copie de son permis de conduire et des photographies ont aidé à relier son dossier à la série BTK.",
+            "She was killed at home. In 2004, a copy of her driver's licence and photographs helped link her case to the BTK series."),
+    _victim(9, "Dolores", "Davis", "62", "Dolores « Dee » Davis", "Dolores 'Dee' Davis",
+            "Née au Nebraska et élevée dans une ferme, elle a travaillé plus de vingt-cinq ans comme secrétaire pour Lario Oil & Gas. Retraitée en 1990, elle vendait aussi des cosmétiques et passait du temps avec ses petits-enfants.",
+            "Born in Nebraska and raised on a farm, she worked for more than twenty-five years as a secretary for Lario Oil & Gas. Retired in 1990, she also sold cosmetics and spent time with her grandchildren.",
+            "19 janvier 1991", "19 January 1991",
+            "Elle a disparu de son domicile à cette date ; son corps a été retrouvé le 1er février 1991. Elle est la dernière des dix personnes pour lesquelles Rader a été condamné.",
+            "She disappeared from her home on this date; her body was found on 1 February 1991. She is the last of the ten people for whose deaths Rader was convicted."),
 ]
 
 MEMORIAL = {
-    "title": txt("Dix victimes, Sedgwick County 1974-1991", "Ten victims, Sedgwick County 1974-1991"),
+    "title": txt("Dix personnes, dix vies", "Ten people, ten lives"),
     "biography": txt(
-        "Dix personnes ont été tuées dans le comté de Sedgwick entre le 15 janvier 1974 et le 19 janvier 1991. Quatre "
-        "d'entre elles appartenaient à la même famille, les Otero : un père, une mère et deux enfants de 9 et 11 ans. "
-        "Leur fils aîné, Charlie, 15 ans, a découvert les corps en rentrant. Une autre personne, Kevin Bright, a "
-        "survécu et a livré un signalement.",
-        "Ten people were killed in Sedgwick County between 15 January 1974 and 19 January 1991. Four of them belonged "
-        "to the same family, the Oteros: a father, a mother and two children aged 9 and 11. Their eldest son, Charlie, "
-        "15, found the bodies on coming home. Another person, Kevin Bright, survived and gave a description.",
-    ),
+        "Les dix homicides reconnus par les tribunaux concernent Joseph, Julie, Josephine et Joseph II Otero ; "
+        "Kathryn Bright ; Shirley Vian Relford ; Nancy Fox ; Marine Hedge ; Vicki Wegerle ; et Dolores « Dee » Davis. "
+        "Les quatre Otero formaient une même famille. Kevin Bright, frère de Kathryn, a survécu à l'agression : il "
+        "est présenté séparément et n'est pas compté parmi les dix homicides.",
+        "The ten homicides recognised by the courts concern Joseph, Julie, Josephine and Joseph II Otero; Kathryn "
+        "Bright; Shirley Vian Relford; Nancy Fox; Marine Hedge; Vicki Wegerle; and Dolores 'Dee' Davis. The four "
+        "Oteros were one family. Kathryn's brother, Kevin Bright, survived the attack: he is listed separately and "
+        "is not counted among the ten homicides."),
     "testimony": txt(
-        "À l'audience de condamnation du 18 août 2005, les familles des victimes se sont exprimées avant le prononcé "
-        "de la peine. Ces déclarations ont précédé le monologue de l'accusé, que le procureur a comparé à un discours "
-        "de remise de prix.",
-        "At the sentencing hearing of 18 August 2005, victims' families spoke before the sentence was pronounced. "
-        "Those statements preceded the accused's monologue, which the prosecutor compared to an awards acceptance "
-        "speech.",
-    ),
+        "À l'audience de condamnation, les proches ont pu parler avant le prononcé de la peine, le 18 août 2005. Leurs "
+        "paroles ne sont pas reproduites ici : cette page conserve les noms, quelques souvenirs transmis par leurs "
+        "familles et le fait qu'elles ont pris la parole.",
+        "At the sentencing hearing, relatives were able to speak before the sentence was pronounced on 18 August 2005. "
+        "Their statements are not reproduced here: this page preserves the names, a few memories shared by their "
+        "families, and the fact that they spoke."),
     "memory": txt(
-        "L'homme condamné occupait des fonctions sociales visibles : responsable de troupe scoute, président du "
-        "conseil de sa paroisse, employé municipal. Cette dissimulation sociale a duré trente ans. Elle n'efface pas "
-        "les dix personnes tuées, dont deux enfants.",
-        "The convicted man held visible social roles: scout troop leader, president of his church council, city "
-        "employee. That social concealment lasted thirty years. It does not erase the ten people killed, including "
-        "two children.",
-    ),
+        "Les portraits viennent principalement de récits de proches recueillis par le Wichita Eagle. Ils sont "
+        "partiels, mais rappellent que chacune de ces personnes avait une histoire, des relations et une vie qui ne "
+        "se résument pas au crime commis contre elle.",
+        "The portraits draw primarily on accounts from relatives collected by The Wichita Eagle. They are partial, "
+        "but remind us that every person had a history, relationships and a life that cannot be reduced to the crime "
+        "committed against them."),
 }
 
 TIMELINE = [
-    fact("Naissance de Dennis Lynn Rader à Pittsburg (Kansas). Il grandit à Wichita.",
-         "Dennis Lynn Rader is born in Pittsburg (Kansas). He grows up in Wichita.",
-         "CONFIRMED", "wiki-rader", "Naissance", "Birth", "1945-03-09"),
-    fact("Quatre membres de la famille Otero sont tués à leur domicile de Wichita. Le lendemain matin, leur fils "
-         "Charlie, 15 ans, découvre les corps.",
-         "Four members of the Otero family are killed at their Wichita home. The next morning, their son Charlie, 15, "
-         "discovers the bodies.",
-         "CONFIRMED", "biography-rader", "Premier fait", "First offence", "1974-01-15"),
-    fact("Une lettre revendiquant le meurtre des Otero est déposée dans un livre d'une bibliothèque publique.",
-         "A letter claiming the Otero murders is placed in a public library book.",
-         "CONFIRMED", "biography-rader", "Première revendication", "First claim", "1974-10"),
-    fact("Kevin Bright survit à une agression et décrit son agresseur : taille moyenne, moustache fournie, regard "
-         "décrit comme « psychotique ». Le signalement ne conduit pas à une identification.",
-         "Kevin Bright survives an attack and describes his attacker: average height, bushy moustache, gaze described "
-         "as 'psychotic'. The description does not lead to an identification.",
-         "CONFIRMED", "biography-rader", "Un survivant", "A survivor", "1974"),
-    fact("La série se poursuit jusqu'au 19 janvier 1991, date à laquelle Dolores Davis est enlevée à son domicile : "
-         "dernière victime connue.",
-         "The series continues until 19 January 1991, when Dolores Davis is taken from her home: the last known victim.",
-         "CONFIRMED", "biography-rader", "Dernier fait connu", "Last known offence", "1991-01-19"),
-    fact("Après treize ans de silence, l'auteur des lettres reprend contact avec les médias et les enquêteurs, à la "
-         "faveur de la couverture du trentième anniversaire des meurtres Otero.",
-         "After thirteen years of silence, the author of the letters resumes contact with media and investigators, in "
-         "the wake of coverage of the thirtieth anniversary of the Otero murders.",
-         "CONFIRMED", "wiki-rader", "Réémergence", "Re-emergence", "2004"),
-    fact("Il demande à la police si une disquette pouvait être tracée. Les enquêteurs répondent par voie de presse "
-         "que non. Cette réponse était fausse.",
-         "He asks the police whether a floppy disk could be traced. Investigators answer through the media that it "
-         "could not. That answer was false.",
-         "CONFIRMED", "creed-btk", "Le piège", "The trap", "2005-01"),
-    fact("Une disquette envoyée par courrier contient un document Word supprimé dont les métadonnées mentionnent "
-         "« Christ Lutheran Church » et un dernier modificateur nommé « Dennis ». Une recherche en ligne montre qu'un "
-         "« Dennis Rader » est président du conseil de cette paroisse.",
-         "A floppy disk sent by mail contains a deleted Word document whose metadata mention 'Christ Lutheran Church' "
-         "and a last modifier named 'Dennis'. An online search shows a 'Dennis Rader' is president of that "
-         "congregation's council.",
-         "CONFIRMED", "wiki-rader", "Métadonnées", "Metadata", "2005-02-16"),
-    fact("Un lien familial est confirmé par comparaison entre l'ADN de scènes et un échantillon obtenu à partir de "
-         "dossier médical concernant sa fille.",
-         "A family link is confirmed by comparing scene DNA with a sample obtained from medical records concerning "
-         "his daughter.",
-         "CONFIRMED", "creed-btk", "ADN familial", "Familial DNA", "2005-02"),
-    fact("Dennis Rader est arrêté au volant près de son domicile de Park City, peu après midi. Les perquisitions "
-         "concernent son domicile, son véhicule, sa paroisse, son bureau et la bibliothèque municipale.",
-         "Dennis Rader is arrested while driving near his Park City home, shortly after noon. Searches concern his "
-         "home, his vehicle, his church, his office and the municipal library.",
-         "CONFIRMED", "wiki-rader", "Arrestation", "Arrest", "2005-02-25"),
-    fact("Il est inculpé de dix meurtres au premier degré devant la district court du comté de Sedgwick.",
-         "He is charged with ten counts of first-degree murder before the Sedgwick County district court.",
-         "CONFIRMED", "wiki-rader", "Inculpation", "Indictment", "2005-02-28"),
-    fact("À la date prévue pour son procès, il plaide coupable des dix meurtres et décrit les faits devant la cour, "
-         "qu'il qualifie de « projets », sans exprimer d'excuses.",
-         "On the date set for his trial, he pleads guilty to the ten murders and describes the facts before the court, "
-         "calling them 'projects', without expressing apologies.",
-         "CONFIRMED", "wiki-rader", "Plaidoyer de culpabilité", "Guilty plea", "2005-06-27"),
-    fact("Condamnation à dix peines de réclusion à perpétuité consécutives, avec un minimum de 175 ans. La peine de "
-         "mort n'était pas applicable : le Kansas l'a rétablie en 1994, après les faits.",
-         "Sentenced to ten consecutive life terms, with a minimum of 175 years. The death penalty was not applicable: "
-         "Kansas reinstated it in 1994, after the facts.",
-         "CONFIRMED", "wiki-rader", "Condamnation", "Sentencing", "2005-08-18"),
-    fact("Il est incarcéré à l'El Dorado Correctional Facility.",
-         "He is imprisoned at El Dorado Correctional Facility.",
-         "CONFIRMED", "wiki-rader", "Détention", "Detention", "2005"),
+    fact("Naissance de Dennis Lynn Rader à Pittsburg, au Kansas ; il grandit à Wichita.",
+         "Dennis Lynn Rader is born in Pittsburg, Kansas; he grows up in Wichita.",
+         "CONFIRMED", "wichita-eagle-profile", "Naissance", "Birth", "1945-03-09"),
+    fact("Joseph, Julie, Josephine et Joseph II Otero sont tués à Wichita. Leur fils Charlie, quinze ans, découvre les siens en rentrant.",
+         "Joseph, Julie, Josephine and Joseph II Otero are killed in Wichita. Their son Charlie, fifteen, finds his family when he comes home.",
+         "CONFIRMED", "wichita-eagle-profile", "La famille Otero", "The Otero family", "1974-01-15"),
+    fact("Kathryn Bright, 21 ans, est tuée. Son frère Kevin survit à l'agression. Les autorités relieront plus tard cette affaire à Rader.",
+         "Kathryn Bright, 21, is killed. Her brother Kevin survives the attack. Authorities later link this case to Rader.",
+         "CONFIRMED", "wichita-eagle-profile", "Kathryn Bright et Kevin Bright", "Kathryn Bright and Kevin Bright", "1974-04-04"),
+    fact("Le Wichita Eagle-Beacon reçoit une lettre revendiquant les meurtres des Otero et contenant des détails de scène inconnus du public.",
+         "The Wichita Eagle-Beacon receives a letter claiming the Otero murders and containing crime-scene details not known to the public.",
+         "CONFIRMED", "wichita-eagle-profile", "Première revendication connue", "First known claim", "1974-10"),
+    fact("Shirley Vian Relford est tuée à son domicile. Son âge est omis car les sources consultées divergent.",
+         "Shirley Vian Relford is killed at home. Her age is omitted because the sources consulted disagree.",
+         "CONFIRMED", "wichita-eagle-profile", "Shirley Vian Relford", "Shirley Vian Relford", "1977-03-17"),
+    fact("Nancy Fox est tuée. Le lendemain, l'auteur appelle les services d'urgence pour signaler le crime.",
+         "Nancy Fox is killed. The next day, the perpetrator calls emergency services to report the crime.",
+         "CONFIRMED", "wichita-eagle-profile", "Nancy Fox", "Nancy Fox", "1977-12-08"),
+    fact("Après un poème reçu en janvier, une lettre revendiquant plusieurs meurtres arrive à KAKE. Le chef de la police annonce qu'un tueur en série est recherché.",
+         "After a poem received in January, a letter claiming several murders arrives at KAKE. The police chief announces that a serial killer is being sought.",
+         "CONFIRMED", "wichita-eagle-profile", "Les communications deviennent publiques", "The communications become public", "1978-02-10"),
+    fact("Une femme de 63 ans revient dans une maison où l'auteur l'a attendue ; il part avant son retour puis lui écrit. Aucun homicide n'a lieu dans cet épisode.",
+         "A 63-year-old woman returns to a home where the perpetrator had waited; he leaves before she returns and later writes to her. No homicide occurs in this episode.",
+         "CONFIRMED", "wichita-eagle-profile", "Une tentative qui n'aboutit pas", "An attempt that does not proceed", "1979-04-28"),
+    fact("Marine Hedge, 53 ans, est tuée à Park City.",
+         "Marine Hedge, 53, is killed in Park City.",
+         "CONFIRMED", "wichita-eagle-profile", "Marine Hedge", "Marine Hedge", "1985-04-27"),
+    fact("Vicki Wegerle, 28 ans, est tuée à Wichita.",
+         "Vicki Wegerle, 28, is killed in Wichita.",
+         "CONFIRMED", "wichita-eagle-profile", "Vicki Wegerle", "Vicki Wegerle", "1986-09-16"),
+    fact("Dolores « Dee » Davis disparaît de son domicile. Son corps sera retrouvé le 1er février. Rader sera condamné pour ce meurtre.",
+         "Dolores 'Dee' Davis disappears from her home. Her body will be found on 1 February. Rader will be convicted of her murder.",
+         "CONFIRMED", "wichita-eagle-profile", "Dolores Davis", "Dolores Davis", "1991-01-19"),
+    fact("La police de Wichita réouvre l'enquête non résolue sur le meurtre de Vicki Wegerle.",
+         "Wichita police reopen the unsolved investigation into Vicki Wegerle's murder.",
+         "CONFIRMED", "wichita-eagle-profile", "Réexamen du dossier Wegerle", "Wegerle case reopened", "2000"),
+    fact("Le profil ADN prélevé dans le dossier Wegerle est inscrit dans une base nationale, sans correspondance à ce stade.",
+         "The DNA profile from the Wegerle case is entered into a national database, with no match at this stage.",
+         "CONFIRMED", "wichita-eagle-profile", "Profil ADN sans correspondance", "DNA profile yields no match", "2003"),
+    fact("Une lettre reçue par le Wichita Eagle contient une copie du permis de conduire manquant de Vicki Wegerle et des photographies. L'affaire est reliée à la série BTK.",
+         "A letter received by The Wichita Eagle contains a copy of Vicki Wegerle's missing driver's licence and photographs. The case is linked to the BTK series.",
+         "CONFIRMED", "wichita-eagle-profile", "Retour des communications", "Communications resume", "2004-03-19"),
+    fact("Une disquette envoyée à une station de télévision de Wichita est analysée. Les propriétés d'un document Word supprimé livrent les indications « Dennis » et « Christ Lutheran Church ».",
+         "A floppy disk sent to a Wichita television station is examined. The properties of a deleted Word document yield the clues 'Dennis' and 'Christ Lutheran Church'.",
+         "CONFIRMED", "rcfl-fy2005", "La piste numérique", "The digital lead", "2005-02-16"),
+    fact("Une comparaison d'ADN familial renforce l'identification. Dennis Rader est arrêté à Park City.",
+         "A familial DNA comparison strengthens the identification. Dennis Rader is arrested in Park City.",
+         "CONFIRMED", "wichita-eagle-profile", "Confirmation et arrestation", "Confirmation and arrest", "2005-02-25"),
+    fact("Rader plaide coupable des dix meurtres au premier degré et décrit ses actes devant le tribunal.",
+         "Rader pleads guilty to ten counts of first-degree murder and describes his actions in court.",
+         "CONFIRMED", "court-transcript", "Plaidoyer de culpabilité", "Guilty plea", "2005-06-27"),
+    fact("La peine est prononcée : dix peines de réclusion à perpétuité consécutives, avec un minimum de 175 ans. Le Kansas n'appliquait pas la peine capitale à ces faits.",
+         "Sentence is pronounced: ten consecutive life terms, with a minimum of 175 years. Kansas did not apply the death penalty to these offences.",
+         "CONFIRMED", "cnn-sentence", "Condamnation", "Sentencing", "2005-08-18"),
 ]
 
 LOCATIONS = [
@@ -172,226 +265,199 @@ LOCATIONS = [
      "precision": "city", "date": "1974-1991",
      "note": txt("Secteur des faits et domicile de l'auteur. Aucune adresse privée n'est affichée.",
                  "Area of the facts and the author's home. No private address is displayed."),
-     "reliability": "CONFIRMED", "source": "wiki-rader"},
+     "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
     {"kind": "court", "names": txt("District Court du comté de Sedgwick", "Sedgwick County District Court"),
      "city": "Wichita", "region": "Kansas", "country": "US", "lat": 37.69, "lon": -97.34, "precision": "city",
      "date": "2005-08-18", "note": txt("Juridiction de jugement.", "Trial court."),
-     "reliability": "CONFIRMED", "source": "wiki-rader"},
+     "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
 ]
 
 EVIDENCE = [
-    {"kind": "digital", "weight": "decisive", "reliability": "CONFIRMED", "source": "wiki-rader",
-     "title": txt("Métadonnées d'un document supprimé", "Metadata of a deleted document"),
+    {"kind": "digital", "weight": "decisive", "reliability": "CONFIRMED", "source": "rcfl-fy2005",
+     "title": txt("Propriétés d'un document sur une disquette", "Properties of a document on a floppy disk"),
      "description": txt(
-         "Une disquette envoyée en 2005 contenait un document Word supprimé mais encore présent. Ses métadonnées "
-         "indiquaient « Christ Lutheran Church » et un dernier modificateur nommé « Dennis ». Une recherche sur le "
-         "site de la paroisse a fait apparaître un Dennis Rader, président du conseil paroissial.",
-         "A floppy disk sent in 2005 contained a deleted but still present Word document. Its metadata indicated "
-         "'Christ Lutheran Church' and a last modifier named 'Dennis'. A search on the church website revealed a "
-         "Dennis Rader, president of the congregation council.")},
-    {"kind": "dna", "weight": "decisive", "reliability": "CONFIRMED", "source": "creed-btk",
-     "title": txt("Comparaison ADN familiale", "Familial DNA comparison"),
+         "Le rapport officiel du programme RCFL indique que la disquette envoyée à une station de télévision de Wichita le 16 février 2005 contenait un document Word supprimé, dont les propriétés faisaient apparaître « Dennis » et « Christ Lutheran Church ». Ces données ont fourni une piste vers l'auteur de l'envoi ; elles ne suffisaient pas, à elles seules, à établir sa culpabilité.",
+         "The official RCFL Program report says the floppy disk sent to a Wichita television station on 16 February 2005 contained a deleted Word document whose properties showed 'Dennis' and 'Christ Lutheran Church'. These data provided a lead to the sender; by themselves, they did not establish guilt.")},
+    {"kind": "dna", "weight": "decisive", "reliability": "CONFIRMED", "source": "wichita-eagle-profile",
+     "title": txt("Comparaison d'ADN familial", "Familial DNA comparison"),
      "description": txt(
-         "Un échantillon obtenu à partir de matériel médical concernant sa fille a permis d'établir un lien familial "
-         "avec l'ADN conservé des scènes. Ce lien a confirmé l'identification suggérée par les métadonnées.",
-         "A sample obtained from medical material concerning his daughter established a family link with DNA kept from "
-         "the scenes. That link confirmed the identification suggested by the metadata.")},
-    {"kind": "documentary", "weight": "documented", "reliability": "CONFIRMED", "source": "biography-rader",
-     "title": txt("Les lettres et revendications", "The letters and claims"),
+         "Selon le dossier du Wichita Eagle, un échantillon obtenu par subpoena à partir de dossiers médicaux concernant la fille de Rader a montré un lien familial avec l'ADN conservé dans des dossiers de scène de crime. Il s'agissait d'une comparaison familiale, pas d'une correspondance directe à partir de l'échantillon de sa fille ; elle a renforcé les autres éléments de l'enquête.",
+         "According to The Wichita Eagle dossier, a sample obtained by subpoena from medical records concerning Rader's daughter showed a family link to DNA preserved from crime-scene evidence. This was a familial comparison, not a direct match from his daughter's sample; it reinforced the other investigative evidence.")},
+    {"kind": "documentary", "weight": "documented", "reliability": "CONFIRMED", "source": "wichita-eagle-profile",
+     "title": txt("Lettres et documents envoyés aux médias", "Letters and material sent to the media"),
      "description": txt(
-         "Dès octobre 1974, des communications sont déposées ou envoyées, dont une lettre glissée dans un livre de "
-         "bibliothèque publique revendiquant les meurtres des Otero. La réémergence de 2004 a produit une nouvelle "
-         "série de courriers.",
-         "From October 1974, communications were deposited or sent, including a letter slipped into a public library "
-         "book claiming the Otero murders. The 2004 re-emergence produced a new series of letters.")},
-    {"kind": "testimony", "weight": "documented", "reliability": "CONFIRMED", "source": "biography-rader",
-     "title": txt("Le signalement d'un survivant", "A survivor's description"),
+         "Des communications revendiquant des crimes sont documentées dès 1974. En mars 2004, un envoi au Wichita Eagle comprenait une copie du permis de conduire manquant de Vicki Wegerle et des photographies qui ont aidé à relier son homicide non résolu à la série.",
+         "Communications claiming crimes are documented from 1974. In March 2004, a mailing to The Wichita Eagle included a copy of Vicki Wegerle's missing driver's licence and photographs that helped link her unsolved homicide to the series.")},
+    {"kind": "testimony", "weight": "documented", "reliability": "CONFIRMED", "source": "kevin-bright-account",
+     "title": txt("Kevin Bright, survivant", "Kevin Bright, survivor"),
      "description": txt(
-         "Kevin Bright a décrit un homme de taille moyenne, à moustache fournie, au regard qualifié de « psychotique ». "
-         "Ce signalement, rapporté par TIME, n'a pas permis d'identification à l'époque.",
-         "Kevin Bright described an average-sized man with a bushy moustache and a gaze called 'psychotic'. That "
-         "description, reported by TIME, did not allow identification at the time.")},
-    {"kind": "physical", "weight": "documented", "reliability": "CONFIRMED", "source": "wiki-rader",
-     "title": txt("Objets saisis lors des perquisitions", "Items seized during searches"),
+         "Kevin Bright a survécu à l'agression durant laquelle sa sœur Kathryn a été tuée. Il a donné un signalement et un portrait-robot a été réalisé ; la police l'a ensuite écarté, estimant son témoignage peu fiable après ses blessures. Cette appréciation est attribuée aux enquêteurs.",
+         "Kevin Bright survived the attack in which his sister Kathryn was killed. He gave a description and a composite was made; police later discounted it, judging his testimony unreliable after his injuries. That assessment is attributed to investigators.")},
+
+    {"kind": "investigation", "weight": "documented", "reliability": "CONFIRMED", "source": "fbi-kc",
+     "title": txt("Coopération entre services", "Inter-agency cooperation"),
      "description": txt(
-         "Les perquisitions ont porté sur le domicile, le véhicule, la paroisse, le bureau de l'intéressé et la "
-         "bibliothèque municipale de Park City ; du matériel informatique et des objets ont été saisis.",
-         "Searches covered the home, the vehicle, the church, the person's office and the Park City municipal library; "
-         "computer equipment and objects were seized.")},
+         "Le FBI rapporte que sa division de Kansas City et sa Behavioral Analysis Unit ont apporté leur concours à la police de Wichita. Les sources consultées décrivent une enquête collective mêlant rapprochement d'affaires, témoignages, communications, informatique légale et ADN.",
+         "The FBI reports that its Kansas City Division and Behavioral Analysis Unit assisted Wichita police. The sources consulted describe a joint investigation combining case linkage, witness accounts, communications, digital forensics and DNA.")},
 ]
 
 INVESTIGATION = {
     "steps": [
-        {"n": 1, "date": "1974-01-15", "title": txt("Quatre morts dans une maison", "Four dead in a house"),
-         "body": txt("Quatre membres de la famille Otero sont retrouvés morts le lendemain matin par leur fils de 15 "
-                     "ans. L'enquête porte sur un quadruple homicide au domicile.",
-                     "Four members of the Otero family are found dead the next morning by their 15-year-old son. The "
-                     "investigation concerns a quadruple homicide at the home."),
-         "reliability": "CONFIRMED", "source": "biography-rader"},
-        {"n": 2, "date": "1974-10", "title": txt("Une revendication dans un livre", "A claim inside a book"),
-         "body": txt("Une lettre revendiquant les faits est déposée dans un livre de bibliothèque publique. C'est le "
-                     "début d'une relation épistolaire avec la police et les médias.",
-                     "A letter claiming the facts is placed in a public library book. It is the start of an "
-                     "epistolary relationship with police and media."),
-         "reliability": "CONFIRMED", "source": "biography-rader"},
-        {"n": 3, "date": "1974-1991", "title": txt("Une série et un survivant", "A series and a survivor"),
-         "body": txt("Les faits s'échelonnent jusqu'en janvier 1991. Un signalement est fourni par Kevin Bright, "
-                     "survivant d'une agression, sans conduire à une identification.",
-                     "The offences run until January 1991. A description is given by Kevin Bright, survivor of an "
-                     "attack, without leading to an identification."),
-         "reliability": "CONFIRMED", "source": "biography-rader"},
-        {"n": 4, "date": "1991-2004", "title": txt("Treize ans de silence", "Thirteen years of silence"),
-         "body": txt("Plus aucune communication. L'homme occupe des fonctions sociales visibles : responsable de "
-                     "troupe scoute, président du conseil paroissial, agent de conformité municipale.",
-                     "No further communication. The man holds visible social roles: scout troop leader, president of "
-                     "the church council, municipal compliance officer."),
-         "reliability": "CONFIRMED", "source": "biography-rader"},
-        {"n": 5, "date": "2004", "title": txt("La réémergence", "The re-emergence"),
-         "body": txt("La couverture médiatique du trentième anniversaire des meurtres Otero est suivie d'une reprise "
-                     "des envois de lettres, avec des allusions à d'autres faits.",
-                     "Media coverage of the thirtieth anniversary of the Otero murders is followed by a resumption of "
-                     "letters, with allusions to other facts."),
-         "reliability": "CONFIRMED", "source": "wiki-rader"},
-        {"n": 6, "date": "2005-01", "title": txt("Une question posée à la police", "A question put to the police"),
-         "body": txt("Il demande si une disquette peut être tracée. Les enquêteurs font répondre par voie de presse "
-                     "que non. La réponse est fausse, et il y croit.",
-                     "He asks whether a floppy disk can be traced. Investigators have it answered through the media "
-                     "that it cannot. The answer is false, and he believes it."),
-         "reliability": "CONFIRMED", "source": "creed-btk"},
-        {"n": 7, "date": "2005-02-16", "title": txt("Deux mots dans des métadonnées", "Two words in metadata"),
-         "body": txt("« Christ Lutheran Church » et « Dennis ». Une recherche en ligne donne un nom : Dennis Rader, "
-                     "président du conseil paroissial.",
-                     "'Christ Lutheran Church' and 'Dennis'. An online search yields a name: Dennis Rader, president "
-                     "of the congregation council."),
-         "reliability": "CONFIRMED", "source": "wiki-rader"},
-        {"n": 8, "date": "2005-02", "title": txt("La confirmation biologique", "The biological confirmation"),
-         "body": txt("Un échantillon obtenu à partir de matériel médical concernant sa fille établit un lien familial "
-                     "avec l'ADN des scènes. La piste devient une identification.",
-                     "A sample obtained from medical material concerning his daughter establishes a family link with "
-                     "scene DNA. The lead becomes an identification."),
-         "reliability": "CONFIRMED", "source": "creed-btk"},
-        {"n": 9, "date": "2005-02-25", "title": txt("Arrestation", "Arrest"),
-         "body": txt("Il est arrêté au volant près de son domicile de Park City. Le chef de la police de Wichita "
-                     "déclare le lendemain : « The bottom line: BTK is arrested. »",
-                     "He is arrested while driving near his Park City home. The Wichita police chief declares the next "
-                     "day: 'The bottom line: BTK is arrested.'"),
-         "reliability": "CONFIRMED", "source": "wiki-rader"},
-        {"n": 10, "date": "2005-08-18", "title": txt("Dix peines consécutives", "Ten consecutive sentences"),
-         "body": txt("Après un plaidoyer de culpabilité le 27 juin 2005, il est condamné à dix peines de réclusion à "
-                     "perpétuité consécutives, avec un minimum de 175 ans. La peine de mort n'était pas applicable aux "
-                     "faits, antérieurs au rétablissement de 1994 au Kansas.",
-                     "After a guilty plea on 27 June 2005, he is sentenced to ten consecutive life terms with a "
-                     "minimum of 175 years. The death penalty was not applicable to the facts, which predate Kansas's "
-                     "1994 reinstatement."),
-         "reliability": "CONFIRMED", "source": "wiki-rader"},
+        {"n": 1, "date": "1974-01-15", "title": txt("Quatre membres d'une famille", "Four members of one family"),
+         "body": txt("Joseph, Julie, Josephine et Joseph II Otero sont tués à Wichita. Leur fils Charlie, quinze ans, découvre les siens en rentrant. L'enquête commence comme un quadruple homicide ; aucun coupable n'est alors identifié.",
+                     "Joseph, Julie, Josephine and Joseph II Otero are killed in Wichita. Their son Charlie, fifteen, finds his family when he comes home. The investigation begins as a quadruple homicide; no perpetrator is identified then."),
+         "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
+        {"n": 2, "date": "1974-04-04", "title": txt("Kathryn Bright et Kevin Bright", "Kathryn Bright and Kevin Bright"),
+         "body": txt("Kathryn Bright est tuée et son frère Kevin survit à l'agression. Il donne un signalement qui mène à un portrait-robot ensuite écarté par la police. Les enquêteurs jugeaient son témoignage peu fiable après ses blessures à la tête ; cette décision est rapportée comme leur appréciation, non comme une faute de Kevin.",
+                     "Kathryn Bright is killed and her brother Kevin survives the attack. His description leads to a composite that police later discount. Investigators judged his account unreliable after his head injuries; this is reported as their assessment, not as a failing by Kevin."),
+         "reliability": "CONFIRMED", "source": "kevin-bright-account"},
+        {"n": 3, "date": "1974-10", "title": txt("Une première revendication connue", "A first known claim"),
+         "body": txt("Une lettre revendiquant le meurtre des Otero contient des détails non rendus publics. Cette communication aide les enquêteurs à comprendre qu'un auteur cherche à leur parler ; elle ne révèle pas encore son identité.",
+                     "A letter claiming the Otero murders contains details that had not been made public. This communication helps investigators understand that a perpetrator is trying to communicate with them; it does not yet reveal his identity."),
+         "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
+        {"n": 4, "date": "1977-1978", "title": txt("Les meurtres de Vian et Fox, puis l'alerte publique", "The Vian and Fox murders, then a public warning"),
+         "body": txt("Après la mort de Shirley Vian et de Nancy Fox, des lettres et un poème conduisent la police à annoncer publiquement qu'un tueur en série est recherché. La chronologie décrit ce que les autorités savent alors, sans attribuer rétrospectivement chaque affaire au même auteur avant qu'elle soit reliée.",
+                     "After the deaths of Shirley Vian and Nancy Fox, letters and a poem lead police to announce publicly that a serial killer is being sought. The chronology distinguishes what authorities knew at the time from cases linked to the same perpetrator later."),
+         "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
+        {"n": 5, "date": "1985-1991", "title": txt("Trois autres homicides reconnus", "Three more recognised homicides"),
+         "body": txt("Marine Hedge, Vicki Wegerle et Dolores Davis sont tuées entre 1985 et 1991. Les dix décès ne sont pas tous liés en temps réel : Rader plaidera coupable de ces dix homicides en 2005.",
+                     "Marine Hedge, Vicki Wegerle and Dolores Davis are killed between 1985 and 1991. The ten deaths are not all linked in real time: Rader will plead guilty to these ten homicides in 2005."),
+         "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
+        {"n": 6, "date": "2000-2003", "title": txt("Réexamen et profil ADN sans correspondance", "Review and DNA profile without a match"),
+         "body": txt("En 2000, des enquêteurs réouvrent le dossier de Vicki Wegerle. Un profil ADN de scène est inscrit dans une base nationale en 2003, mais ne produit alors aucune correspondance.",
+                     "In 2000, investigators reopen Vicki Wegerle's case. A crime-scene DNA profile is entered into a national database in 2003 but produces no match then."),
+         "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
+        {"n": 7, "date": "2004-03-19", "title": txt("Une lettre relie Wegerle à BTK", "A letter links Wegerle to BTK"),
+         "body": txt("Un envoi au Wichita Eagle comprend des éléments provenant du dossier de Vicki Wegerle. Les enquêteurs peuvent alors relier son homicide, jusque-là non attribué publiquement, à l'auteur des communications BTK.",
+                     "A mailing to The Wichita Eagle includes material from Vicki Wegerle's case. Investigators can then link her homicide, not previously attributed publicly, to the author of the BTK communications."),
+         "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
+        {"n": 8, "date": "2005-01", "title": txt("La question de la disquette", "The floppy-disk question"),
+         "body": txt("Selon l'entretien ultérieur de Rader avec Robert Mendoza, il a demandé si une disquette pouvait être tracée et a cru la réponse négative rapportée dans les médias. C'est son récit rétrospectif, pas une preuve indépendante de son état d'esprit.",
+                     "According to Rader's later interview with Robert Mendoza, he asked whether a floppy disk could be traced and believed the negative answer reported in the media. This is his retrospective account, not independent proof of his state of mind."),
+         "reliability": "PROBABLE", "source": "rader-self-report"},
+        {"n": 9, "date": "2005-02-16", "title": txt("La disquette est analysée", "The disk is examined"),
+         "body": txt("Le rapport annuel du programme RCFL situe l'envoi au 16 février. L'analyse retrouve, dans les propriétés d'un document Word supprimé, « Dennis » et « Christ Lutheran Church ». Les enquêteurs vérifient ensuite qui utilise cet ordinateur et cette paroisse.",
+                     "The RCFL Program annual report dates the mailing to 16 February. Analysis recovers 'Dennis' and 'Christ Lutheran Church' in the properties of a deleted Word document. Investigators then verify who uses that computer and church."),
+         "reliability": "CONFIRMED", "source": "rcfl-fy2005"},
+        {"n": 10, "date": "2005-02", "title": txt("Une comparaison familiale et d'autres vérifications", "A familial comparison and further checks"),
+         "body": txt("Un échantillon obtenu par subpoena dans des dossiers médicaux concernant la fille de Rader indique un lien familial avec l'ADN conservé des scènes. Cette comparaison vient compléter les autres éléments, elle n'est pas une correspondance directe entre sa fille et l'auteur.",
+                     "A sample obtained by subpoena from medical records concerning Rader's daughter indicates a family link to DNA preserved from the scenes. This comparison complements other evidence; it is not a direct match between his daughter and the perpetrator."),
+         "reliability": "CONFIRMED", "source": "wichita-eagle-profile"},
+        {"n": 11, "date": "2005-02-25", "title": txt("Arrestation à Park City", "Arrest in Park City"),
+         "body": txt("Dennis Rader est arrêté au volant près de son domicile. La police de Wichita, le FBI et d'autres enquêteurs ont participé au travail qui mène à cette identification.",
+                     "Dennis Rader is arrested while driving near his home. Wichita police, the FBI and other investigators contributed to the work that led to this identification."),
+         "reliability": "CONFIRMED", "source": "fbi-kc"},
+        {"n": 12, "date": "2005-06-27", "title": txt("Plaidoyer de culpabilité", "Guilty plea"),
+         "body": txt("Rader plaide coupable sur dix chefs de meurtre au premier degré. Le compte rendu de l'audience reprend ses déclarations sur les crimes ; ce sont ses mots, non une expertise psychologique.",
+                     "Rader pleads guilty to ten counts of first-degree murder. The hearing transcript records his statements about the crimes; these are his words, not a psychological evaluation."),
+         "reliability": "CONFIRMED", "source": "court-transcript"},
+        {"n": 13, "date": "2005-08-18", "title": txt("Peine prononcée", "Sentence imposed"),
+         "body": txt("Après les déclarations de proches, le juge prononce dix peines de réclusion à perpétuité consécutives, avec un minimum de 175 ans. Les faits étant antérieurs au rétablissement de la peine capitale au Kansas, Rader ne pouvait pas être condamné à mort.",
+                     "After relatives' statements, the judge imposes ten consecutive life terms, with a minimum of 175 years. Because the offences predated the reinstatement of capital punishment in Kansas, Rader could not be sentenced to death."),
+         "reliability": "CONFIRMED", "source": "cnn-sentence"},
     ],
     "reality": txt(
-        "L'affaire ne s'est pas résolue par le profilage ni par le signalement d'un survivant, mais par une erreur de "
-        "l'auteur : une question posée à la police, une réponse fausse donnée volontairement, puis deux mots retrouvés "
-        "dans les métadonnées d'un fichier supprimé, confirmés par une comparaison ADN familiale.",
-        "The case was not solved by profiling or by a survivor's description, but by the author's mistake: a question "
-        "put to the police, a deliberately false answer, then two words found in the metadata of a deleted file, "
-        "confirmed by a familial DNA comparison."),
+        "L'identification résulte d'un travail collectif sur plusieurs décennies : rapprochement de dossiers, communications et détails connus seulement de l'auteur, expertise numérique, vérification des pistes et comparaison d'ADN familial. Le FBI confirme le concours de sa Behavioral Analysis Unit, mais les sources ne permettent pas de réduire l'arrestation à un profilage, à une seule erreur de Rader ou à une seule technologie.",
+        "Identification resulted from collective work over several decades: case linkage, communications and details known only to the perpetrator, digital forensics, verification of leads and familial DNA comparison. The FBI confirms assistance from its Behavioral Analysis Unit, but the sources do not support reducing the arrest to profiling, one mistake by Rader or one technology."),
     "errors": [
-        item("Le signalement fourni par un survivant en 1974 n'a conduit à aucune identification : il n'a pas été "
-             "rapproché utilement des autres éléments.",
-             "The description given by a survivor in 1974 led to no identification: it was not usefully linked to "
-             "other elements.", "CONFIRMED", "biography-rader", "Exploitation d'un témoignage", "Use of testimony"),
-        item("Les communications de l'auteur ont été reçues pendant des années sans que le support permette une "
-             "identification technique : il a fallu attendre le support numérique de 2005.",
-             "The author's communications were received for years without the medium allowing technical "
-             "identification: it took the 2005 digital medium.",
-             "CONFIRMED", "creed-btk", "Limites techniques", "Technical limits"),
+        item("Kevin Bright a donné un signalement à la police, à partir duquel un portrait-robot a été réalisé. Les enquêteurs l'ont ensuite écarté, jugeant son témoignage peu fiable après ses blessures à la tête. Cette décision ne constitue pas une faute du survivant et ne suffit pas, à elle seule, à établir une négligence policière.",
+             "Kevin Bright gave police a description, from which a composite was made. Investigators later discounted it, judging his account unreliable after his head injuries. That decision is not a failing by the survivor and does not, by itself, establish police negligence.",
+             "CONFIRMED", "kevin-bright-account", "Un témoignage n'est pas un identifiant", "A witness account is not an identity"),
+        item("Le fait que des lettres aient précédé l'identification ne signifie pas qu'elles n'ont rien apporté : elles ont aidé les autorités à reconnaître une série et à vérifier des revendications. La disquette de 2005 a ajouté une piste numérique.",
+             "The fact that letters preceded identification does not mean they yielded nothing: they helped authorities recognise a series and check claims. The 2005 floppy disk added a digital lead.",
+             "CONFIRMED", "wichita-eagle-profile", "Ne pas effacer les premiers indices", "Do not erase the early clues"),
+        item("La version selon laquelle Rader croyait la réponse des enquêteurs sur les disquettes provient de son entretien rétrospectif. Elle doit rester attribuée à Rader.",
+             "The account that Rader believed investigators' answer about floppy disks comes from his retrospective interview. It must remain attributed to him.",
+             "PROBABLE", "rader-self-report", "Attribuer l'auto-récit", "Attribute the self-report"),
     ],
     "cold_case": {
         "what_we_know": [
-            item("Dix meurtres entre le 15 janvier 1974 et le 19 janvier 1991 dans le comté de Sedgwick.",
-                 "Ten murders between 15 January 1974 and 19 January 1991 in Sedgwick County.", "CONFIRMED", "wiki-rader"),
-            item("Identification par métadonnées puis confirmation par ADN familial.",
-                 "Identification through metadata then confirmation by familial DNA.", "CONFIRMED", "creed-btk"),
+            item("Rader a plaidé coupable des dix homicides commis au Kansas entre 1974 et 1991 ; la liste nominative de ce dossier reprend uniquement ces dix personnes.",
+                 "Rader pleaded guilty to ten homicides committed in Kansas between 1974 and 1991; this dossier's named list contains only those ten people.",
+                 "CONFIRMED", "court-transcript"),
+            item("La disquette et la comparaison d'ADN familial ont contribué à l'identification, avec d'autres démarches d'enquête.",
+                 "The floppy disk and familial DNA comparison contributed to identification alongside other investigative work.",
+                 "CONFIRMED", "rcfl-fy2005"),
         ],
-        "what_is_probable": [
-            item("Après son arrestation, une source anonyme citée par l'Associated Press a évoqué des aveux portant sur "
-                 "d'autres meurtres ; le procureur du comté de Sedgwick a démenti et n'a pas confirmé l'existence de "
-                 "telles déclarations.",
-                 "After his arrest, an anonymous source cited by the Associated Press mentioned confessions to other "
-                 "murders; the Sedgwick County district attorney denied it and did not confirm such statements.",
-                 "PROBABLE", "wiki-rader"),
-        ],
+        "what_is_probable": [],
         "what_is_disputed": [
-            item("L'existence de faits non jugés : démentie par le parquet, elle n'est ni établie ni définitivement "
-                 "écartée dans les sources consultées.",
-                 "The existence of untried offences: denied by the prosecution, it is neither established nor "
-                 "definitively ruled out in the sources consulted.", "DISPUTED", "wiki-rader"),
+            item("Dans le dossier de Cynthia Dawn Kinney, disparue en Oklahoma en 1976, le shérif d'Osage County a publiquement présenté Rader comme suspect ; le parquet a déclaré les éléments insuffisants pour l'inculper et a demandé l'intervention de l'OSBI. Aucune condamnation de Rader dans cette affaire n'est rapportée. Cette disparition ne fait pas partie des dix homicides du Kansas.",
+                 "In the case of Cynthia Dawn Kinney, who disappeared in Oklahoma in 1976, the Osage County sheriff publicly described Rader as a suspect; the district attorney said evidence was insufficient to charge him and requested an OSBI investigation. No conviction of Rader in this case is reported. This disappearance is not among the ten Kansas homicides.",
+                 "DISPUTED", "osage-sheriff-2023"),
         ],
         "what_is_unknown": [
-            item("Les raisons de l'interruption de treize ans entre 1991 et 2004.",
-                 "The reasons for the thirteen-year interruption between 1991 and 2004.", "UNKNOWN", "wiki-rader"),
+            item("La raison exacte du silence de Rader entre 1991 et la reprise de communications en 2004.",
+                 "The exact reason for Rader's silence between 1991 and the resumption of communications in 2004.",
+                 "UNKNOWN", "rader-self-report"),
+            item("L'existence d'autres homicides commis par Rader n'est pas établie par les dix condamnations. Les pistes non jugées ne sont pas ajoutées au décompte.",
+                 "The existence of other homicides by Rader is not established by the ten convictions. Untried leads are not added to the count.",
+                 "UNKNOWN", "koco-kinney-status"),
+            item("L'application ne pose pas de diagnostic. Les propos publics de Rader ne remplacent pas le rapport complet d'une expertise clinique.",
+                 "The application makes no diagnosis. Rader's public statements do not replace a full clinical evaluation report.",
+                 "UNKNOWN", "rader-self-report"),
         ],
-        "latest_progress": [],
-        "leads": [], "limits": [],
+        "latest_progress": [
+            item("Les comptes rendus consultés décrivent un désaccord entre le shérif et le parquet sur la piste Kinney ; en l'absence d'inculpation, elle reste une piste et non un fait établi contre Rader.",
+                 "The reports consulted describe disagreement between the sheriff and the district attorney over the Kinney lead; without a charge, it remains a lead and not an established fact against Rader.",
+                 "DISPUTED", "koco-kinney-status"),
+        ],
+        "leads": [],
+        "limits": [
+            item("La date de la lettre d'octobre 1974 n'est connue que par mois dans le récapitulatif local consulté ; aucune journée précise n'est affichée.",
+                 "The October 1974 letter is dated only to the month in the local summary consulted; no exact day is displayed.",
+                 "CONFIRMED", "wichita-eagle-profile"),
+        ],
     },
 }
 
 PSYCHOLOGY = {
-    "disclaimer": txt("Aucun diagnostic n'est posé par l'application. Une expertise psychologique a été réalisée à la "
-                      "demande de la défense après le plaidoyer de culpabilité ; ses conclusions ne sont pas "
-                      "reproduites ici faute de publication accessible dans les sources consultées.",
-                      "No diagnosis is made by the application. A psychological evaluation was carried out at the "
-                      "defence's request after the guilty plea; its conclusions are not reproduced here for lack of "
-                      "accessible publication in the sources consulted."),
+    "disclaimer": txt(
+        "Aucun diagnostic n'est posé ici. La défense a mandaté le psychologue Robert Mendoza après le plaidoyer ; des extraits de son entretien avec Rader ont été diffusés, mais le dossier clinique complet et sa méthode ne font pas partie des sources utilisées. Nous distinguons les actes observables, les propos rétrospectifs de Rader et les interprétations.",
+        "No diagnosis is made here. The defence instructed psychologist Robert Mendoza after the guilty plea; excerpts from his interview with Rader were broadcast, but the complete clinical report and its method are not among the sources used. We distinguish observable acts, Rader's retrospective statements and interpretations."),
     "blocks": [
-        block("fact", "Une double vie sociale documentée", "A documented double social life",
-              "Pendant la période des faits puis après, l'intéressé a occupé des fonctions sociales visibles : "
-              "responsable de troupe scoute, président du conseil de sa paroisse, employé municipal. Ce sont des faits "
-              "rapportés par plusieurs sources concordantes.",
-              "During and after the offences, the person held visible social roles: scout troop leader, president of "
-              "his church council, municipal employee. These are facts reported by several concordant sources.",
-              "CONFIRMED", "biography-rader"),
-        block("behaviour", "Le besoin de nommer", "The need to name",
-              "L'auteur a produit des lettres, des revendications, un auto-surnom et, en 2004, une reprise des envois. "
-              "Le comportement documenté est celui d'une recherche de reconnaissance publique de ses actes. Son "
-              "interprétation relève de l'analyse, pas du fait.",
-              "The author produced letters, claims, a self-given nickname and, in 2004, a resumption of mailings. The "
-              "documented behaviour is one of seeking public recognition of his acts. Its interpretation belongs to "
-              "analysis, not to fact.",
-              "CONFIRMED", "wiki-rader"),
-        block("behaviour", "La mise en scène de la procédure", "Staging of the proceedings",
-              "Devant la cour, il a décrit les faits en les qualifiant de « projets », sans excuses, puis a prononcé "
-              "un monologue d'une trentaine de minutes à l'audience de condamnation, comparé par le procureur à un "
-              "discours de remise de prix.",
-              "Before the court, he described the facts calling them 'projects', without apologies, then delivered a "
-              "thirty-minute monologue at the sentencing hearing, compared by the prosecutor to an awards acceptance "
-              "speech.",
-              "CONFIRMED", "wiki-rader"),
-        block("unknown", "L'expertise de la défense", "The defence evaluation",
-              "Un psychologue du Massachusetts, Robert Mendoza, a été mandaté par la défense après le plaidoyer de "
-              "culpabilité du 27 juin 2005 pour examiner l'opportunité d'une défense fondée sur la démence. Le "
-              "contenu de cette évaluation n'est pas accessible dans les sources consultées.",
-              "A Massachusetts psychologist, Robert Mendoza, was instructed by the defence after the guilty plea of "
-              "27 June 2005 to examine whether an insanity-based defence was viable. The content of that evaluation "
-              "is not accessible in the sources consulted.",
-              "UNKNOWN", "wiki-rader"),
+        block("fact", "Des rôles sociaux établis", "Documented social roles",
+              "Pendant la période des crimes, Rader a aussi servi dans l'Air Force, travaillé dans le privé, occupé un poste municipal, dirigé une troupe scoute et présidé le conseil de sa paroisse. Ces faits décrivent des rôles qui coexistaient ; ils ne révèlent pas la cause des crimes et ne diminuent pas leur gravité.",
+              "During the period of the crimes, Rader also served in the Air Force, worked in the private sector, held a municipal post, led a scout troop and chaired his church council. These facts describe roles that coexisted; they do not reveal the cause of the crimes or lessen their seriousness.",
+              "CONFIRMED", "wichita-eagle-profile"),
+        block("fact", "Les mots prononcés au tribunal", "Words spoken in court",
+              "Lors de son plaidoyer du 27 juin 2005, Rader a qualifié les crimes de « projects » — rendus ici par « projets » — et les a rattachés à ses fantasmes sexuels. C'est une déclaration de l'auteur dans le cadre judiciaire, pas un diagnostic ni une explication indépendante.",
+              "At his 27 June 2005 plea, Rader called the crimes 'projects' and linked them to sexual fantasies. This is the perpetrator's statement in court, not a diagnosis or an independent explanation.",
+              "CONFIRMED", "court-transcript"),
+        block("analysis", "Communications et recherche de contrôle du récit", "Communications and control of the narrative",
+              "Les lettres, le surnom choisi par Rader et la reprise de contact en 2004 montrent qu'il a cherché à orienter les échanges avec les médias et la police. Dans son entretien avec Mendoza, il dit vouloir raconter les faits « à sa façon ». Lire cela comme une recherche de reconnaissance ou de contrôle du récit est une interprétation appuyée sur son comportement et ses propres paroles ; ce n'est pas une certitude clinique sur son monde intérieur.",
+              "The letters, the name Rader chose for himself and the resumption of contact in 2004 show that he sought to steer exchanges with media and police. In his interview with Mendoza, he said he wanted to tell the story 'in his terms'. Reading this as a search for recognition or control of the narrative is an interpretation based on his behaviour and his own words, not a clinical certainty about his inner life.",
+              "PROBABLE", "rader-self-report"),
+        block("unknown", "Ce que son auto-récit ne permet pas d'établir", "What self-report cannot establish",
+              "Lorsqu'il dit qu'il s'ennuyait ou qu'un article l'a poussé à reprendre contact, ce sont des souvenirs rapportés après son arrestation. Ils ne prouvent pas une cause unique, ne permettent pas d'expliquer toute la période des crimes et ne doivent pas être confondus avec des faits indépendamment vérifiés.",
+              "When he said he was bored or that an article prompted him to resume contact, those were memories reported after his arrest. They do not prove a single cause, explain the entire period of the crimes or become independently verified facts.",
+              "UNKNOWN", "rader-self-report"),
+        block("unknown", "Pas de diagnostic à distance", "No remote diagnosis",
+              "Le dossier public consulté ne permet pas de conclure à un trouble précis ni d'attribuer les meurtres à une maladie mentale, à une expérience d'enfance, à une perte d'emploi ou à la religion. Le comportement criminel décrit ici relève d'actes et de choix établis par l'enquête et le tribunal ; aucune causalité simple n'est démontrée.",
+              "The public record consulted does not establish a particular disorder or attribute the murders to mental illness, a childhood experience, job loss or religion. The criminal behaviour described here consists of acts and choices established by investigators and the court; no simple causal explanation is demonstrated.",
+              "UNKNOWN", "court-transcript"),
     ],
 }
 
 VICTIMOLOGY = {
-    "ethics_note": txt("Aucune caractéristique des victimes n'explique moralement les crimes.",
-                       "No characteristic of the victims morally explains the crimes."),
+    "ethics_note": txt("Aucune caractéristique des victimes n'explique les crimes. Les survivants sont distingués des personnes tuées et ne sont jamais intégrés au décompte des homicides.",
+                       "No characteristic of the victims explains the crimes. Survivors are distinguished from people who were killed and are never included in the homicide count."),
     "blocks": [
-        block("context", "Des victimes à domicile", "Victims at home",
-              "La première série de faits concerne une famille entière à son domicile. Dolores Davis, dernière victime "
-              "connue, a été enlevée chez elle en janvier 1991. Le domicile est un lieu récurrent.",
-              "The first series of offences concerns an entire family at its home. Dolores Davis, the last known "
-              "victim, was taken from her home in January 1991. The home is a recurring place.",
-              "CONFIRMED", "biography-rader"),
-        block("analysis", "Un périmètre géographique restreint", "A restricted geographic perimeter",
-              "Les faits sont concentrés dans le comté de Sedgwick, autour de Wichita et Park City, sur dix-sept ans. "
-              "Cette concentration spatiale est un fait de dossier ; elle n'a pas conduit à une identification à "
-              "l'époque.",
-              "The offences are concentrated in Sedgwick County, around Wichita and Park City, over seventeen years. "
-              "This spatial concentration is a case fact; it did not lead to identification at the time.",
-              "CONFIRMED", "wiki-rader"),
+        block("family", "Quatre membres de la famille Otero", "Four members of the Otero family",
+              "Joseph et Julie Otero, leur fille Josephine et leur fils Joseph II ont été tués le même jour. Leur fils Charlie, quinze ans, a découvert sa famille. La présentation conserve leur lien familial sans réduire leurs quatre vies à un chiffre.",
+              "Joseph and Julie Otero, their daughter Josephine and their son Joseph II were killed on the same day. Their son Charlie, fifteen, found his family. This account preserves their family relationship without reducing four lives to a number.",
+              "CONFIRMED", "wichita-eagle-profile"),
+        block("survivor", "Kevin Bright, survivant", "Kevin Bright, survivor",
+              "Le frère de Kathryn Bright a survécu à l'agression du 4 avril 1974. Un portrait-robot a été réalisé à partir de son signalement, puis écarté par la police, qui jugeait son témoignage peu fiable après ses blessures à la tête. Cette appréciation des enquêteurs est rapportée sans faire porter de responsabilité à Kevin, présenté séparément des dix homicides.",
+              "Kathryn Bright's brother survived the 4 April 1974 attack. Police made a composite from his description, then discounted it, judging his account unreliable after his head injuries. This investigators' assessment is reported without placing responsibility on Kevin, who is listed separately from the ten homicides.",
+              "CONFIRMED", "kevin-bright-account"),
+        block("memory", "Des vies au-delà du dossier pénal", "Lives beyond the criminal case",
+              "Les témoignages familiaux évoquent le travail de Nancy Fox, les chansons de Shirley Vian, le bénévolat de Vicki Wegerle, le jardin de Marine Hedge et les souvenirs de Dolores Davis avec ses petits-enfants. Ces souvenirs restent partiels, mais déplacent le regard du criminel vers les personnes dont la vie a été interrompue.",
+              "Family accounts recall Nancy Fox's work, Shirley Vian's singing, Vicki Wegerle's volunteering, Marine Hedge's garden and Dolores Davis's memories with her grandchildren. These accounts are partial, but shift attention from the offender to the people whose lives were interrupted.",
+              "CONFIRMED", "wichita-eagle-profile"),
+        block("accuracy", "Précision des âges", "Accuracy about ages",
+              "Les âges sont affichés seulement quand les sources consultées concordent. Shirley Vian Relford est présentée sans âge : des articles donnent 24 ans et d'autres 26 ans. La divergence est signalée au lieu d'être tranchée sans preuve supplémentaire.",
+              "Ages are shown only where the sources consulted agree. Shirley Vian Relford is shown without an age: some reports say 24 and others 26. The difference is flagged rather than decided without further evidence.",
+              "DISPUTED", "wichita-eagle-profile"),
     ],
 }
 
@@ -399,337 +465,296 @@ COURT = {
     "jurisdiction": txt("États-Unis — District Court du comté de Sedgwick, Kansas",
                         "United States — Sedgwick County District Court, Kansas"),
     "verdict": txt("Plaidoyer de culpabilité sur dix chefs de meurtre au premier degré, le 27 juin 2005.",
-                   "Guilty plea to ten counts of first-degree murder, on 27 June 2005."),
+                   "Guilty plea to ten counts of first-degree murder on 27 June 2005."),
     "sentence": {
-        "label": txt("Dix peines de réclusion à perpétuité consécutives, minimum 175 ans",
-                     "Ten consecutive life sentences, minimum 175 years"),
+        "label": txt("Dix peines de réclusion à perpétuité consécutives ; minimum de 175 ans",
+                     "Ten consecutive life sentences; 175-year minimum"),
         "pronounced": "2005-08-18",
-        "requested": txt("La peine de mort n'était pas applicable : le Kansas l'a rétablie en 1994, après la "
-                         "commission des faits.",
-                         "The death penalty was not applicable: Kansas reinstated it in 1994, after the offences were "
-                         "committed."),
-        "cumul": txt("Les dix peines sont consécutives, avec un minimum cumulé de 175 ans avant toute possibilité "
-                     "d'examen.",
-                     "The ten sentences are consecutive, with a cumulative minimum of 175 years before any possibility "
-                     "of review."),
-        "reasoning": txt("Les familles des victimes se sont exprimées avant le prononcé. L'accusé a ensuite prononcé "
-                         "un long monologue.",
-                         "Victims' families spoke before sentencing. The accused then delivered a long monologue."),
-        "appeal": txt("Pas de procès : le plaidoyer de culpabilité a mis fin à la procédure contradictoire.",
-                      "No trial: the guilty plea ended the adversarial proceedings."),
-        "reliability": "CONFIRMED", "source": "wiki-rader",
+        "requested": txt("La peine capitale n'était pas applicable : les faits se sont produits avant le rétablissement de la peine de mort au Kansas, en 1994.",
+                         "The death penalty did not apply: the offences occurred before Kansas reinstated capital punishment in 1994."),
+        "cumul": txt("Le juge a prononcé dix peines consécutives, pour un minimum cumulé de 175 ans.",
+                     "The judge imposed ten consecutive sentences, for a cumulative minimum of 175 years."),
+        "reasoning": txt("Les proches ont fait des déclarations avant le prononcé de la peine. Rader a ensuite présenté des excuses et parlé longuement ; aucune interprétation psychologique n'est tirée de sa prestation.",
+                         "Relatives made statements before sentencing. Rader then apologised and spoke at length; no psychological interpretation is drawn from his performance."),
+        "appeal": txt("Rader a plaidé coupable et renoncé à un procès devant jury ; les faits ont été exposés lors de l'audience de plaidoyer.",
+                      "Rader pleaded guilty and waived a jury trial; the facts were described at the plea hearing."),
+        "reliability": "CONFIRMED", "source": "cnn-sentence",
     },
     "consequences": [
-        item("L'affaire est devenue une référence en matière d'exploitation des métadonnées et d'ADN familial.",
-             "The case became a reference for the exploitation of metadata and familial DNA.",
-             "CONFIRMED", "creed-btk"),
+        item("L'affaire illustre la place que peuvent prendre les supports numériques et les comparaisons d'ADN familial dans une enquête. Cette description n'en fait pas une première absolue ni une méthode suffisante à elle seule.",
+             "The case illustrates how digital media and familial DNA comparisons can contribute to an investigation. This description does not make it an absolute first or a sufficient method on its own.",
+             "CONFIRMED", "rcfl-fy2005"),
     ],
 }
 
 EXPERTS = [
-    {"label": txt("Lecture technique — la trace numérique", "Technical reading — the digital trace"),
+    {"label": txt("Concours fédéral — Behavioral Analysis Unit", "Federal assistance — Behavioral Analysis Unit"),
+     "field": "behavioral_analysis",
+     "position": txt("Le FBI indique que sa division de Kansas City et sa Behavioral Analysis Unit ont aidé la police de Wichita à démasquer Rader. La source confirme la participation de ces services ; elle ne publie pas un diagnostic clinique de l'auteur.",
+                     "The FBI says its Kansas City Division and Behavioral Analysis Unit helped Wichita police unmask Rader. This source confirms those units' participation; it does not publish a clinical diagnosis of the offender."),
+     "reliability": "CONFIRMED", "source": "fbi-kc"},
+    {"label": txt("Expertise numérique — programme RCFL", "Digital forensics — RCFL Program"),
      "field": "digital_forensics",
-     "position": txt("Un fichier supprimé reste présent sur son support ; ses métadonnées ont fourni un nom et une "
-                     "institution. La confirmation est venue d'une comparaison ADN familiale.",
-                     "A deleted file remains present on its medium; its metadata provided a name and an institution. "
-                     "Confirmation came from a familial DNA comparison."),
-     "reliability": "CONFIRMED", "source": "wiki-rader"},
-    {"label": txt("Lecture comportementale — la reprise de contact", "Behavioural reading — the resumption of contact"),
-     "field": "behavioural_analysis",
-     "position": txt("Le silence de treize ans a pris fin avec la couverture médiatique d'un anniversaire. La reprise "
-                     "des envois a fourni le support qui a permis l'identification.",
-                     "The thirteen-year silence ended with media coverage of an anniversary. The resumption of "
-                     "mailings provided the medium that allowed identification."),
-     "reliability": "CONFIRMED", "source": "wiki-rader"},
+     "position": txt("Le rapport annuel officiel du programme RCFL décrit l'analyse de la disquette et les indications numériques qui ont fourni une piste. Il ne faut pas confondre cette piste avec la confirmation biologique et judiciaire ultérieure.",
+                     "The RCFL Program's official annual report describes the disk analysis and digital clues that provided a lead. This lead should not be conflated with the later biological and judicial confirmation."),
+     "reliability": "CONFIRMED", "source": "rcfl-fy2005"},
 ]
-EXPERTS_AGREEMENT = txt("Les deux lectures convergent : c'est l'auteur qui a produit l'élément décisif.",
-                        "Both readings converge: it is the author who produced the decisive element.")
-EXPERTS_DISAGREEMENT = txt("Elles divergent sur la part de chance et celle de méthode dans l'exploitation de la disquette.",
-                           "They differ on the share of luck and of method in exploiting the floppy disk.")
-EXPERTS_UNCERTAIN = txt("Ce qui reste incertain : l'existence éventuelle d'autres faits, démentie par le parquet.",
-                        "What remains uncertain: the possible existence of other offences, denied by the prosecution.")
+
+EXPERTS_AGREEMENT = txt("Les sources confirment un concours fédéral et une analyse numérique ; elles ne réduisent pas l'enquête à un seul indice.",
+                        "The sources confirm federal assistance and digital analysis; they do not reduce the investigation to a single clue.")
+EXPERTS_DISAGREEMENT = txt("Les sources publiques ne permettent pas de chiffrer la part respective de chaque service ou élément de preuve.",
+                           "The public sources do not quantify the respective contribution of each agency or item of evidence.")
+EXPERTS_UNCERTAIN = txt("Les pistes relatives à d'autres disparitions restent non jugées et ne sont pas ajoutées aux dix homicides établis.",
+                        "Leads concerning other disappearances remain untried and are not added to the ten established homicides.")
 
 COUNTERFACTUALS = [
     counterfactual(
         "communication",
-        "Et si les communications de 1974 avaient pu être tracées ?",
-        "What if the 1974 communications had been traceable?",
-        "L'auteur a communiqué par lettres papier dès octobre 1974. L'identification n'est intervenue qu'en février "
-        "2005, grâce aux métadonnées d'un fichier numérique. Entre ces deux dates, six victimes documentées ont été "
-        "tuées après la première lettre.",
-        "The author communicated by paper letters from October 1974. Identification came only in February 2005, "
-        "through the metadata of a digital file. Between those two dates, six documented victims were killed after "
-        "the first letter.",
+        "Et si une autre technologie avait été disponible en 1974 ?",
+        "What if different technology had been available in 1974?",
+        "Une première revendication connue date d'octobre 1974 ; le jour exact n'est pas précisé dans les sources locales consultées. L'identification a lieu en février 2005 après l'analyse d'une disquette et d'autres vérifications. Cinq personnes sont tuées après cette lettre : Shirley Vian Relford, Nancy Fox, Marine Hedge, Vicki Wegerle et Dolores Davis. Ce calcul décrit un écart de dates ; il ne prouve pas qu'une technologie différente aurait empêché ces crimes.",
+        "A first known claim dates to October 1974; the exact day is not specified in the local sources consulted. Identification takes place in February 2005 after examination of a floppy disk and further checks. Five people are killed after that letter: Shirley Vian Relford, Nancy Fox, Marine Hedge, Vicki Wegerle and Dolores Davis. This calculation describes a date gap; it does not prove that different technology would have prevented these crimes.",
         {
             "unit": "years",
-            "reference_event": {"label": txt("Première lettre revendiquée", "First claiming letter"), "date": "1974-10-01"},
-            "hypothesis": {"label": txt("Support papier non traçable", "Paper medium not traceable"), "date": "1974-10-01"},
-            "scenario_event": {"label": txt("Identification par métadonnées", "Identification through metadata"), "date": "2005-02-16"},
+            "reference_event": {"label": txt("Première revendication (octobre 1974)", "First claim (October 1974)"), "date": "1974-10"},
+            "hypothesis": {"label": txt("Support papier ; technologie non disponible", "Paper medium; technology not available"), "date": "1974-10"},
+            "scenario_event": {"label": txt("Analyse de la disquette", "Floppy-disk analysis"), "date": "2005-02-16"},
             "outcome_event": {"label": txt("Arrestation", "Arrest"), "date": "2005-02-25"},
             "documented_offences_after": [
-                {"date": "1977-01-01", "label": txt("Victimes ultérieures documentées (dates précises non établies dans les sources consultées)", "Later documented victims (precise dates not established in the sources consulted)"), "reliability": "PROBABLE"},
-                {"date": "1991-01-19", "label": txt("Dolores Davis, dernière victime connue", "Dolores Davis, last known victim"), "reliability": "CONFIRMED"},
+                {"date": "1977-03-17", "label": txt("Shirley Vian Relford", "Shirley Vian Relford"), "reliability": "CONFIRMED"},
+                {"date": "1977-12-08", "label": txt("Nancy Fox", "Nancy Fox"), "reliability": "CONFIRMED"},
+                {"date": "1985-04-27", "label": txt("Marine Hedge", "Marine Hedge"), "reliability": "CONFIRMED"},
+                {"date": "1986-09-16", "label": txt("Vicki Wegerle", "Vicki Wegerle"), "reliability": "CONFIRMED"},
+                {"date": "1991-01-19", "label": txt("Dolores Davis", "Dolores Davis"), "reliability": "CONFIRMED"},
             ],
             "jurisdiction_note": txt(
-                "En 1974, aucune technique d'exploitation des métadonnées numériques n'existait, et l'ADN n'était pas "
-                "utilisé en criminalistique. Le scénario étudié porte donc sur une technologie inexistante à "
-                "l'époque : l'application peut mesurer l'écart de temps, elle ne peut pas établir ce qui se serait "
-                "produit.",
-                "In 1974, no technique for exploiting digital metadata existed, and DNA was not used in forensic "
-                "science. The scenario studied therefore concerns a technology that did not exist at the time: the "
-                "application can measure the time gap, it cannot establish what would have happened."),
+                "La technologie numérique de 2005 n'était pas disponible en 1974. Le scénario est hypothétique : il mesure le délai entre des événements documentés, mais ne permet pas d'affirmer qu'une intervention plus précoce aurait empêché une mort.",
+                "The digital technology used in 2005 was not available in 1974. This is a hypothetical scenario: it measures the interval between documented events but cannot establish that earlier intervention would have prevented a death."),
         },
         [
-            {"date": "1974-01-15", "kind": "offence", "label": txt("Famille Otero (4 victimes)", "Otero family (4 victims)")},
-            {"date": "1974-10-01", "kind": "reference", "label": txt("Première lettre", "First letter")},
+            {"date": "1974-01-15", "kind": "offence", "label": txt("Famille Otero (quatre personnes)", "Otero family (four people)")},
+            {"date": "1974-04-04", "kind": "offence", "label": txt("Kathryn Bright", "Kathryn Bright")},
+            {"date": "1974-10", "kind": "reference", "label": txt("Première revendication connue", "First known claim")},
+            {"date": "1977-03-17", "kind": "offence", "label": txt("Shirley Vian Relford", "Shirley Vian Relford")},
+            {"date": "1977-12-08", "kind": "offence", "label": txt("Nancy Fox", "Nancy Fox")},
+            {"date": "1985-04-27", "kind": "offence", "label": txt("Marine Hedge", "Marine Hedge")},
+            {"date": "1986-09-16", "kind": "offence", "label": txt("Vicki Wegerle", "Vicki Wegerle")},
             {"date": "1991-01-19", "kind": "offence", "label": txt("Dolores Davis", "Dolores Davis")},
-            {"date": "2004-01-01", "kind": "fact", "label": txt("Réémergence", "Re-emergence")},
-            {"date": "2005-02-16", "kind": "scenario", "label": txt("Métadonnées exploitées", "Metadata exploited")},
+            {"date": "2005-02-16", "kind": "scenario", "label": txt("Disquette analysée", "Disk examined")},
             {"date": "2005-02-25", "kind": "outcome", "label": txt("Arrestation", "Arrest")},
         ],
-        True, "creed-btk"),
+        True, "rcfl-fy2005"),
 ]
 
 LESSONS = [
-    item("Un support change ce qu'une enquête peut faire : le papier n'a rien livré pendant trente ans, le fichier "
-         "numérique a livré un nom en quelques jours.",
-         "A medium changes what an investigation can do: paper yielded nothing for thirty years, the digital file "
-         "yielded a name in days.",
-         "CONFIRMED", "wiki-rader", "Support et trace", "Medium and trace"),
-    item("Une métadonnée oriente, elle n'identifie pas : la confirmation est venue d'une comparaison ADN familiale.",
-         "Metadata orientates, it does not identify: confirmation came from a familial DNA comparison.",
-         "CONFIRMED", "creed-btk", "Chaîne probatoire", "Evidential chain"),
-    item("Un signalement de survivant peut être exact et rester inexploité : la description de 1974 correspondait à "
-         "l'homme arrêté en 2005.",
-         "A survivor's description can be accurate and remain unexploited: the 1974 description matched the man "
-         "arrested in 2005.",
-         "CONFIRMED", "biography-rader", "Témoignage", "Testimony"),
-    item("Une apparence sociale ordinaire n'est pas un indice d'innocence, et n'est pas non plus une preuve : elle "
-         "explique seulement pourquoi la suspicion ne s'est pas portée sur lui.",
-         "An ordinary social appearance is not an indication of innocence, and is not evidence either: it only "
-         "explains why suspicion did not fall on him.",
-         "CONFIRMED", "biography-rader", "Représentations", "Representations"),
-    item("Une réponse volontairement fausse donnée par les enquêteurs a produit un comportement exploitable. C'est "
-         "une technique documentée, qui interroge sur ses conditions d'emploi.",
-         "A deliberately false answer given by investigators produced exploitable behaviour. This is a documented "
-         "technique, which raises questions about its conditions of use.",
-         "CONFIRMED", "creed-btk", "Stratégie d'enquête", "Investigative strategy"),
+    item("Une lettre peut aider à reconnaître une série sans donner l'identité de son auteur. Les premiers courriers ont compté dans l'enquête ; la disquette de 2005 a fourni une piste numérique supplémentaire.",
+         "A letter can help investigators recognise a series without identifying its author. The early letters mattered to the investigation; the 2005 disk added a digital lead.",
+         "CONFIRMED", "wichita-eagle-profile", "Relier n'est pas identifier", "Linking is not identifying"),
+    item("Une métadonnée oriente l'enquête, mais ne prouve pas à elle seule qui a commis un crime. Ici, elle a été vérifiée avec d'autres éléments, dont une comparaison d'ADN familial.",
+         "Metadata can orient an investigation, but cannot by itself prove who committed a crime. Here it was checked against other evidence, including a familial DNA comparison.",
+         "CONFIRMED", "rcfl-fy2005", "Une piste doit être vérifiée", "A lead must be verified"),
+    item("Kevin Bright a survécu et a donné un signalement à la police. Un portrait-robot a été réalisé puis écarté par les enquêteurs, qui jugeaient son témoignage peu fiable après ses blessures à la tête. Ce jugement d'enquête ne doit ni devenir un blâme du survivant ni être réécrit comme une faute personnelle.",
+         "Kevin Bright survived and gave police a description. Investigators made a composite, then discounted it, judging his account unreliable after his head injuries. That investigative judgment should neither become blame of the survivor nor be rewritten as a personal failing.",
+         "CONFIRMED", "kevin-bright-account", "Respecter le témoignage", "Respect the witness"),
+    item("Les rôles professionnels, religieux et sociaux de Rader sont documentés. Ils contextualisent l'enquête, mais ne sont ni des indices d'innocence ni une explication causale des crimes.",
+         "Rader's professional, religious and social roles are documented. They contextualise the investigation but are neither evidence of innocence nor a causal explanation for the crimes.",
+         "CONFIRMED", "wichita-eagle-profile", "Contexte sans causalité", "Context without causation"),
+    item("Les déclarations de Rader sur ses motifs sont des auto-récits. Elles peuvent être étudiées comme des propos documentés, sans les transformer en diagnostic ou en vérité exhaustive.",
+         "Rader's statements about his motives are self-reports. They can be studied as documented statements without turning them into a diagnosis or a complete truth.",
+         "CONFIRMED", "rader-self-report", "Distinguer récit et expertise", "Distinguish self-report from assessment"),
 ]
 
 UNKNOWNS = [
-    item("Les raisons exactes de l'interruption de treize ans.", "The exact reasons for the thirteen-year interruption.",
-         "UNKNOWN", "wiki-rader"),
-    item("L'existence d'autres faits : évoquée par une source anonyme, démentie par le parquet.",
-         "The existence of other offences: mentioned by an anonymous source, denied by the prosecution.",
-         "DISPUTED", "wiki-rader"),
-    item("Le contenu de l'expertise psychologique demandée par la défense.",
-         "The content of the psychological evaluation requested by the defence.", "UNKNOWN", "wiki-rader"),
+    item("Les raisons exactes du silence entre le dernier homicide reconnu en 1991 et la reprise des communications en 2004.",
+         "The exact reason for the silence between the last recognised homicide in 1991 and the resumption of communications in 2004.",
+         "UNKNOWN", "rader-self-report"),
+    item("L'existence d'autres homicides commis par Rader n'est pas établie par les dix condamnations. Les pistes non jugées, dont la disparition de Cynthia Kinney, restent séparées du décompte.",
+         "The existence of other homicides by Rader is not established by the ten convictions. Untried leads, including Cynthia Kinney's disappearance, remain separate from the count.",
+         "UNKNOWN", "koco-kinney-status"),
+    item("Dans l'affaire Kinney, le shérif a présenté Rader comme suspect en 2023, tandis que le parquet a déclaré les éléments insuffisants pour l'inculper et demandé une enquête de l'OSBI. Une couverture de décembre 2025 rapporte que l'examen se poursuivait sans charge établie contre Rader et qu'une autre piste était discutée. Aucune culpabilité de Rader dans ce dossier n'est établie.",
+         "In the Kinney case, the sheriff identified Rader as a suspect in 2023, while the district attorney said the evidence was insufficient to charge him and requested an OSBI investigation. December 2025 coverage reports that the inquiry continued without a charge established against Rader and that another lead was being considered. Rader's guilt in this case is not established.",
+         "DISPUTED", "osage-sheriff-2023"),
+    item("Le diagnostic ou la cause psychologique des crimes ne peut être établi à partir des seuls comptes rendus et déclarations publiques consultés.",
+         "A diagnosis or psychological cause for the crimes cannot be established from the reports and public statements consulted alone.",
+         "UNKNOWN", "court-transcript"),
 ]
 
 SECTIONS = merge_sections(default_sections(), [
     {"key": "introduction", "blocks": [block(
-        "paragraph", "Trente ans, dix victimes, une disquette", "Thirty years, ten victims, a floppy disk",
-        "Entre 1974 et 1991, dix personnes sont tuées dans le comté de Sedgwick, au Kansas. L'auteur écrit à la police "
-        "et aux médias, se donne un surnom, puis se tait pendant treize ans. Son identification viendra d'un support "
-        "qu'il a lui-même choisi d'envoyer.",
-        "Between 1974 and 1991, ten people are killed in Sedgwick County, Kansas. The author writes to police and "
-        "media, gives himself a nickname, then falls silent for thirteen years. His identification would come from a "
-        "medium he chose to send himself.",
-        "CONFIRMED", "wiki-rader")]},
+        "paragraph", "Dix homicides, dix noms", "Ten homicides, ten names",
+        "Entre 1974 et 1991, dix personnes sont tuées dans le comté de Sedgwick, au Kansas. Leurs noms, les récits de leurs proches et les éléments judiciaires restent le point de départ. L'enquête conduit à Dennis Rader en 2005, après des années de communications, de vérifications et de travail collectif.",
+        "Between 1974 and 1991, ten people are killed in Sedgwick County, Kansas. Their names, their relatives' accounts and the court record remain the starting point. The investigation identifies Dennis Rader in 2005 after years of communications, verification and joint work.",
+        "CONFIRMED", "wichita-eagle-profile")]},
     {"key": "context", "blocks": [block(
-        "paragraph", "Wichita et Park City", "Wichita and Park City",
-        "Les faits se déroulent dans une agglomération du Kansas, sur un périmètre restreint, pendant une période où "
-        "ni les fichiers génétiques ni l'exploitation des supports numériques n'existaient en criminalistique.",
-        "The offences take place in a Kansas metropolitan area, over a restricted perimeter, during a period when "
-        "neither genetic databases nor the exploitation of digital media existed in forensic science.",
-        "CONFIRMED", "creed-btk")]},
+        "paragraph", "Wichita, Park City et une enquête de longue durée", "Wichita, Park City and a long investigation",
+        "Les homicides reconnus se déroulent dans le comté de Sedgwick, autour de Wichita et Park City. Les méthodes d'enquête évoluent entre 1974 et 2005 : les bases ADN et l'analyse judiciaire des supports numériques sont utilisées plus tard, au fil du réexamen des dossiers.",
+        "The recognised homicides take place in Sedgwick County, around Wichita and Park City. Investigative methods evolve between 1974 and 2005: DNA databases and digital forensic analysis are used later as cases are reviewed.",
+        "CONFIRMED", "wichita-eagle-profile")]},
     {"key": "offender", "blocks": [block(
-        "paragraph", "Dennis Lynn Rader (né en 1945)", "Dennis Lynn Rader (born 1945)",
-        "Né le 9 mars 1945 à Pittsburg (Kansas), grandi à Wichita. Études au Butler County Community College puis à "
-        "Wichita State University. Responsable de troupe scoute, président du conseil de sa paroisse, employé "
-        "municipal. Arrêté le 25 février 2005.",
-        "Born 9 March 1945 in Pittsburg (Kansas), raised in Wichita. Studied at Butler County Community College then "
-        "Wichita State University. Scout troop leader, president of his church council, municipal employee. Arrested "
-        "on 25 February 2005.",
-        "CONFIRMED", "wiki-rader")]},
+        "paragraph", "Dennis Lynn Rader : parcours documenté", "Dennis Lynn Rader: documented background",
+        "Né le 9 mars 1945 à Pittsburg, au Kansas, Rader grandit à Wichita. Ancien militaire de l'Air Force, il obtient un diplôme à Wichita State University en 1979. Il travaille pour ADT de novembre 1974 à juillet 1988, puis devient responsable municipal du respect des règlements à Park City en 1991. Il est aussi président du conseil de Christ Lutheran Church et responsable scout. Ces jalons situent son parcours ; aucun ne fournit, à lui seul, une explication des crimes.",
+        "Born on 9 March 1945 in Pittsburg, Kansas, Rader grew up in Wichita. A former Air Force serviceman, he earned a degree from Wichita State University in 1979. He worked for ADT from November 1974 to July 1988, then became a municipal compliance supervisor in Park City in 1991. He was also president of the Christ Lutheran Church council and a scout leader. These milestones situate his background; none, by itself, explains the crimes.",
+        "CONFIRMED", "wichita-eagle-profile")]},
+    {"key": "investigation", "blocks": [block(
+        "paragraph", "Une enquête collective", "A joint investigation",
+        "Les affaires sont rapprochées au fil du temps par les communications, des éléments non publics, les dossiers ADN et la réouverture du meurtre de Vicki Wegerle. En 2005, la disquette fournit une piste numérique ; une comparaison d'ADN familial et d'autres vérifications contribuent à l'arrestation. Le FBI confirme le concours de sa division de Kansas City et de la Behavioral Analysis Unit auprès de Wichita.",
+        "The cases are linked over time through communications, non-public details, DNA records and the reopening of Vicki Wegerle's murder. In 2005, the floppy disk provides a digital lead; a familial DNA comparison and further checks contribute to the arrest. The FBI confirms assistance to Wichita from its Kansas City Division and Behavioral Analysis Unit.",
+        "CONFIRMED", "fbi-kc")]},
     {"key": "behaviour", "blocks": [block(
-        "behaviour", "Écrire pour exister", "Writing to exist",
-        "Le comportement central documenté est la production de communications : lettres, revendications, envois "
-        "renouvelés en 2004. Cette production a été, en définitive, le vecteur de son identification.",
-        "The central documented behaviour is the production of communications: letters, claims, mailings renewed in "
-        "2004. That production was, ultimately, the vector of his identification.",
-        "CONFIRMED", "wiki-rader")]},
+        "behaviour", "Des actes et des communications", "Actions and communications",
+        "Les lettres, revendications et reprises de contact sont observables dans les archives. Rader a décrit certains crimes au tribunal comme des « projects » et a cherché à contrôler ses échanges avec les médias. La recherche de reconnaissance est une lecture possible de ces actes et de ses propres déclarations, pas une certitude clinique.",
+        "Letters, claims and renewed contact are observable in the record. Rader described some crimes in court as 'projects' and sought to steer his exchanges with the media. A search for recognition is one possible reading of these acts and his own statements, not a clinical certainty.",
+        "PROBABLE", "court-transcript")]},
+    {"key": "psychology", "blocks": [block(
+        "analysis", "Ce que les sources permettent — et ne permettent pas — de dire", "What the sources do — and do not — allow us to say",
+        "Le dossier public contient des déclarations de Rader et la trace de rôles sociaux ordinaires. Il ne démontre pas qu'une expérience unique, une maladie mentale ou un statut social a causé les meurtres. Aucun diagnostic n'est posé ici ; les auto-récits restent attribués à leur auteur.",
+        "The public record contains Rader's statements and evidence of ordinary social roles. It does not demonstrate that a single experience, mental illness or social status caused the murders. No diagnosis is made here; self-reports remain attributed to their author.",
+        "UNKNOWN", "rader-self-report")]},
+    {"key": "victims", "blocks": [block(
+        "memory", "Les personnes avant les crimes", "People before the crimes",
+        "Les portraits de Joseph et Julie Otero, Josephine et Joseph II, Kathryn Bright, Shirley Vian Relford, Nancy Fox, Marine Hedge, Vicki Wegerle et Dolores Davis s'appuient sur des souvenirs de proches publiés par le Wichita Eagle. Kevin Bright est mentionné séparément comme survivant.",
+        "The portraits of Joseph and Julie Otero, Josephine and Joseph II, Kathryn Bright, Shirley Vian Relford, Nancy Fox, Marine Hedge, Vicki Wegerle and Dolores Davis draw on relatives' memories published by The Wichita Eagle. Kevin Bright is listed separately as a survivor.",
+        "CONFIRMED", "wichita-eagle-profile")]},
+    {"key": "unknowns", "blocks": [block(
+        "paragraph", "Les limites du dossier", "Limits of the record",
+        "Dix homicides ont été jugés au Kansas. D'autres pistes, dont la disparition de Cynthia Dawn Kinney en Oklahoma, restent distinctes et non établies contre Rader : le shérif l'a présenté comme suspect en 2023 ; le parquet a déclaré les éléments insuffisants pour l'inculper. La couverture examinée en décembre 2025 rapporte que l'enquête de l'OSBI se poursuivait sans charge établie contre Rader et qu'une autre piste était discutée. Le portrait psychologique s'arrête également là où les sources s'arrêtent.",
+        "Ten homicides were adjudicated in Kansas. Other leads, including Cynthia Dawn Kinney's disappearance in Oklahoma, remain separate and unproven against Rader: the sheriff identified him as a suspect in 2023; the district attorney said the evidence was insufficient to charge him. Coverage reviewed in December 2025 reports that the OSBI inquiry continued without a charge established against Rader and that another lead was being considered. The psychological portrait also stops where the sources stop.",
+        "DISPUTED", "koco-kinney-status")]},
     {"key": "consequences", "blocks": [block(
-        "paragraph", "Un précédent technique", "A technical precedent",
-        "L'affaire est citée comme l'un des premiers exemples d'identification par métadonnées numériques couplée à "
-        "une comparaison ADN familiale. Elle pose aussi la question des techniques d'enquête impliquant une réponse "
-        "fausse délibérée.",
-        "The case is cited as one of the first examples of identification through digital metadata coupled with a "
-        "familial DNA comparison. It also raises the question of investigative techniques involving a deliberate "
-        "false answer.",
-        "CONFIRMED", "creed-btk")]},
+        "paragraph", "Une chaîne de preuves, pas un indice magique", "An evidentiary chain, not a magic clue",
+        "Les propriétés numériques de la disquette ont fourni une piste ; les comparaisons d'ADN familial et les autres éléments ont contribué à la confirmer. Le rapport RCFL documente le volet numérique, tandis que l'audience judiciaire établit les dix plaidoyers de culpabilité.",
+        "The disk's digital properties provided a lead; familial DNA comparisons and other evidence helped confirm it. The RCFL report documents the digital component, while the court hearing records the ten guilty pleas.",
+        "CONFIRMED", "rcfl-fy2005")]},
 ])
 
 EPISODES = [
     {
         "number": 1,
-        "title": txt("Le fichier supprimé", "The deleted file"),
-        "description": txt("Kansas, 1974-2005. Trente ans de lettres, treize ans de silence, et deux mots retrouvés "
-                           "dans les métadonnées d'un document effacé.",
-                           "Kansas, 1974-2005. Thirty years of letters, thirteen years of silence, and two words found "
-                           "in the metadata of an erased document."),
+        "title": txt("Dix noms, une enquête", "Ten names, one investigation"),
+        "description": txt(
+            "Kansas, 1974-2005. Les vies des dix personnes tuées, le parcours documenté de Dennis Rader, et une enquête qui aboutit par plusieurs éléments vérifiés. Sans détails graphiques ni diagnostic à distance.",
+            "Kansas, 1974-2005. The lives of the ten people killed, Dennis Rader's documented background and an investigation resolved through several verified elements. No graphic detail or remote diagnosis."),
         "modes": ["documentary", "investigation", "chronology", "express", "expert", "psychology", "victims"],
-        "audio_status": "script_only", "voice_profile": "yanis-real",
+        "duration_sec": 477, "audio": "episode-10-btk-rader.wav",
+        "audio_status": "produced", "voice_profile": "temporary-synthetic-fr-feminine",
         "chapters": [
-            {"at": 0, "title": txt("Ouverture", "Opening")},
-            {"at": 60, "title": txt("15 janvier 1974", "15 January 1974")},
-            {"at": 220, "title": txt("Les lettres", "The letters")},
-            {"at": 380, "title": txt("Treize ans de silence", "Thirteen years of silence")},
-            {"at": 520, "title": txt("La question posée à la police", "The question put to the police")},
-            {"at": 640, "title": txt("Et maintenant, une question", "And now, a question")},
+            {"at": 0, "title": txt("Ouverture : les dix noms", "Opening: the ten names")},
+            {"at": 49, "title": txt("La famille Otero", "The Otero family")},
+            {"at": 98, "title": txt("Kathryn Bright et Kevin Bright", "Kathryn Bright and Kevin Bright")},
+            {"at": 141, "title": txt("Les vies des autres victimes", "The lives of the other victims")},
+            {"at": 184, "title": txt("Le parcours de Rader", "Rader's background")},
+            {"at": 228, "title": txt("Comportement et limites", "Behaviour and its limits")},
+            {"at": 273, "title": txt("La chronologie des crimes", "The chronology of the crimes")},
+            {"at": 324, "title": txt("Le dossier Wegerle", "The Wegerle case")},
+            {"at": 369, "title": txt("La disquette et l'identification", "The floppy disk and identification")},
+            {"at": 417, "title": txt("Justice et questions ouvertes", "Justice and open questions")},
         ],
         "transcript": {"segments": [
-            {"id": "b1", "t": 0, "speaker": "yanis",
-             "text": "Vous êtes sur YANIS//X, à travers mon regard. Aujourd'hui, une affaire américaine qui s'est "
-                     "terminée par un détail technique : un fichier que l'on croyait effacé.",
-             "text_en": "You are on YANIS//X, through my eyes. Today, an American case that ended with a technical "
-                        "detail: a file believed to be erased."},
-            {"id": "b2", "t": 60, "speaker": "yanis",
-             "text": "15 janvier 1974, Wichita, Kansas. Quatre membres de la famille Otero sont tués à leur domicile. "
-                     "Le lendemain matin, leur fils Charlie, quinze ans, rentre et découvre les corps. C'est le "
-                     "premier fait d'une série qui comptera dix victimes, jusqu'au 19 janvier 1991.",
-             "text_en": "15 January 1974, Wichita, Kansas. Four members of the Otero family are killed at their home. "
-                        "The next morning, their son Charlie, fifteen, comes home and finds the bodies. It is the "
-                        "first offence of a series that would count ten victims, until 19 January 1991."},
-            {"id": "b3", "t": 220, "speaker": "yanis",
-             "text": "En octobre 1974, une lettre revendiquant ces meurtres est déposée dans un livre d'une "
-                     "bibliothèque publique. Un survivant, Kevin Bright, décrit son agresseur : taille moyenne, "
-                     "moustache fournie, un regard qu'il qualifie de psychotique. Le signalement ne donnera rien.",
-             "text_en": "In October 1974, a letter claiming these murders is placed in a public library book. A "
-                        "survivor, Kevin Bright, describes his attacker: average height, bushy moustache, a gaze he "
-                        "calls psychotic. The description yields nothing."},
-            {"id": "b4", "t": 380, "speaker": "yanis",
-             "text": "Puis treize ans de silence. Pendant ce temps, l'homme est responsable d'une troupe scoute, "
-                     "président du conseil de sa paroisse, employé municipal. Rien, dans sa vie sociale visible, ne le "
-                     "désigne.",
-             "text_en": "Then thirteen years of silence. During that time, the man leads a scout troop, presides over "
-                        "his church council, works for the city. Nothing in his visible social life points to him."},
-            {"id": "b5", "t": 520, "speaker": "yanis",
-             "text": "En 2004, la couverture du trentième anniversaire des meurtres Otero est suivie d'une reprise "
-                     "des envois. En janvier 2005, il pose une question à la police : une disquette peut-elle être "
-                     "tracée ? Les enquêteurs font répondre par voie de presse que non. Cette réponse était fausse. Il "
-                     "y a cru.",
-             "text_en": "In 2004, coverage of the thirtieth anniversary of the Otero murders is followed by a "
-                        "resumption of mailings. In January 2005, he puts a question to the police: can a floppy disk "
-                        "be traced? Investigators have it answered through the media that it cannot. That answer was "
-                        "false. He believed it."},
-            {"id": "b6", "t": 640, "speaker": "yanis",
-             "text": "Et maintenant, une question. Pas un jugement. Une réflexion.",
-             "text_en": "And now, a question. Not a judgement. A reflection."},
-            {"id": "b7", "t": 680, "speaker": "yanis",
-             "text": "Le 16 février 2005, dans une disquette reçue par courrier, un document Word supprimé est encore "
-                     "présent. Ses métadonnées contiennent deux indications : « Christ Lutheran Church », et un "
-                     "dernier modificateur nommé « Dennis ». Une recherche en ligne montre qu'un Dennis Rader est "
-                     "président du conseil de cette paroisse. Un échantillon obtenu à partir d'un dossier médical "
-                     "concernant sa fille confirme un lien familial avec l'ADN des scènes. Le 25 février, il est "
-                     "arrêté au volant près de chez lui.",
-             "text_en": "On 16 February 2005, in a floppy disk received by mail, a deleted Word document is still "
-                        "present. Its metadata contain two indications: 'Christ Lutheran Church', and a last modifier "
-                        "named 'Dennis'. An online search shows a Dennis Rader is president of that congregation's "
-                        "council. A sample obtained from medical records concerning his daughter confirms a family "
-                        "link with the scene DNA. On 25 February, he is arrested while driving near his home."},
-            {"id": "b8", "t": 860, "speaker": "yanis",
-             "text": "Le 27 juin 2005, il plaide coupable de dix meurtres. Le 18 août, il est condamné à dix peines "
-                     "de réclusion à perpétuité consécutives, avec un minimum de cent soixante-quinze ans. La peine "
-                     "de mort n'était pas applicable : le Kansas ne l'avait rétablie qu'en 1994, après les faits.",
-             "text_en": "On 27 June 2005, he pleads guilty to ten murders. On 18 August, he is sentenced to ten "
-                        "consecutive life terms, with a minimum of one hundred and seventy-five years. The death "
-                        "penalty was not applicable: Kansas had reinstated it only in 1994, after the facts."},
-            {"id": "b9", "t": 980, "speaker": "yanis",
-             "text": "Dix personnes ont été tuées. Quatre d'entre elles portaient le même nom : Otero. Deux étaient "
-                     "des enfants de neuf et onze ans. Écouter les histoires. Comprendre les affaires. Ne jamais "
-                     "oublier les victimes.",
-             "text_en": "Ten people were killed. Four of them bore the same name: Otero. Two were children of nine and "
-                        "eleven. Listen to the stories. Understand the cases. Never forget the victims."},
+            {"id": "b1", "t": 0, "speaker": "narration",
+             "text": "On ouvre ce dossier par les noms, pas par le surnom. Joseph, Julie, Josephine et Joseph Otero II ; Kathryn Bright ; Shirley Vian Relford ; Nancy Fox ; Marine Hedge ; Vicki Wegerle ; Dolores, dite Dee, Davis. Dix personnes tuées dans le comté de Sedgwick, au Kansas, entre janvier 1974 et janvier 1991. Le dossier s'appuie sur l'audience de culpabilité, un rapport fédéral de criminalistique numérique et les archives locales du Wichita Eagle. Il distingue les faits confirmés, les paroles rétrospectives de Rader et les questions non résolues. Nous ne racontons pas les violences en détails graphiques. Nous commençons par la vie des personnes, puis par le travail qui a fini par établir les dix homicides.",
+             "text_en": "We begin this case with the names, not the nickname. Joseph, Julie, Josephine and Joseph Otero the Second; Kathryn Bright; Shirley Vian Relford; Nancy Fox; Marine Hedge; Vicki Wegerle; and Dolores, known as Dee, Davis. Ten people were killed in Sedgwick County, Kansas, between January 1974 and January 1991. This account draws on the guilty-plea hearing, a federal digital-forensics report and local Wichita Eagle archives. It distinguishes confirmed facts, Rader's retrospective statements and unresolved questions. We will not describe the violence graphically. We begin with the lives of the people, then turn to the work that established the ten homicides."},
+            {"id": "b2", "t": 49, "speaker": "narration",
+             "text": "Joseph Otero avait trente-huit ans. Né à Porto Rico, il était arrivé enfant aux États-Unis, avait servi vingt ans dans l'Air Force et avait installé sa famille à Wichita en 1973. Son fils Charlie le décrivait comme sociable, passionné d'aviation, de voitures et de musique. Julie Otero, trente-quatre ans, était son épouse et la mère de cinq enfants. Elle suivait des cours de judo avec sa famille et avait obtenu une ceinture marron. Josephine, onze ans, appelée Josie, était une élève qui aimait les poèmes, le dessin et la peinture. Joseph, neuf ans, surnommé Joey, était le plus jeune, entouré de ses frères et sœurs. Le quinze janvier 1974, les quatre ont été tués. Leur fils aîné Charlie, âgé de quinze ans, les a découverts en rentrant.",
+             "text_en": "Joseph Otero was thirty-eight. Born in Puerto Rico, he came to the United States as a child, served twenty years in the Air Force and moved his family to Wichita in 1973. His son Charlie remembered him as sociable, with interests in aviation, cars and music. Julie Otero, thirty-four, was his wife and the mother of five children. She took judo classes with her family and earned a brown belt. Eleven-year-old Josephine, called Josie, was a student who liked poetry, drawing and painting. Joseph, nine, known as Joey, was the youngest, surrounded by his siblings. On January fifteenth, 1974, all four were killed. Their eldest son Charlie, fifteen, found them when he came home."},
+            {"id": "b3", "t": 98, "speaker": "narration",
+             "text": "Trois mois plus tard, Kathryn Bright, vingt et un ans, était tuée. Son frère Kevin, dix-neuf ans, a survécu, blessé, à la même agression. Il a donné un signalement à la police ; un portrait-robot a été réalisé, puis écarté par les enquêteurs qui jugeaient son témoignage peu fiable après ses blessures à la tête. C'est l'appréciation de l'enquête de l'époque, pas une faute de Kevin. Shirley Vian Relford était mère de trois enfants et aimait chanter dans la chorale de son église. Les sources consultées divergent sur son âge, alors nous ne l'affichons pas. Nancy Fox, vingt-cinq ans, travaillait comme secrétaire et prenait aussi des horaires dans une bijouterie. Ses collègues se souvenaient de son humour et de son sérieux.",
+             "text_en": "Three months later, twenty-one-year-old Kathryn Bright was killed. Her brother Kevin, nineteen, survived the same attack, injured. He gave police a description; an artist made a composite, which investigators later discarded after judging his account unreliable following his head injuries. That was the investigators' assessment at the time, not a failing by Kevin. Shirley Vian Relford was a mother of three who liked singing in her church choir. The sources consulted disagree about her age, so we do not display one. Twenty-five-year-old Nancy Fox worked as a secretary and also took shifts at a jewellery store. Her colleagues remembered her humour and professionalism."},
+            {"id": "b4", "t": 141, "speaker": "narration",
+             "text": "Marine Hedge, cinquante-trois ans, avait travaillé plus d'une douzaine d'années au café du Wesley Medical Center. Veuve et grand-mère, elle aimait son jardin, le bingo et son église de Park City. Vicki Wegerle, vingt-huit ans, était mère et faisait du bénévolat comme baby-sitter dans des églises de son quartier. Dolores, dite Dee, Davis, avait soixante-deux ans. Née au Nebraska, elle avait travaillé plus de vingt-cinq ans comme secrétaire avant de prendre sa retraite en 1990. Ses proches se rappelaient son humour et le temps passé avec ses petits-enfants. Ces détails viennent de récits de proches recueillis par la presse locale : ils sont partiels, mais ils nous rappellent que ces personnes avaient des vies qui ne se résument pas aux crimes.",
+             "text_en": "Fifty-three-year-old Marine Hedge had worked for more than a dozen years at the Wesley Medical Center coffee shop. A widow and grandmother, she enjoyed her garden, bingo and her Park City church. Twenty-eight-year-old Vicki Wegerle was a mother who volunteered as a babysitter at churches in her neighbourhood. Dolores, known as Dee, Davis, was sixty-two. Born in Nebraska, she had worked for more than twenty-five years as a secretary before retiring in 1990. Her relatives remembered her humour and the time she spent with her grandchildren. These details come from family accounts collected by local reporters. They are partial, but remind us that these people had lives beyond the crimes."},
+            {"id": "b5", "t": 184, "speaker": "narration",
+             "text": "Dennis Rader est né le neuf mars 1945 à Pittsburg, au Kansas, et a grandi à Wichita. Ancien militaire de l'Air Force, il a obtenu un diplôme à Wichita State University en 1979. Il a travaillé pour ADT de novembre 1974 à juillet 1988, puis comme responsable municipal du respect des règlements à Park City à partir de 1991. Il a aussi présidé le conseil de Christ Lutheran Church et dirigé une troupe scoute. Ces fonctions sont documentées et coexistaient avec les crimes. Elles ne les expliquent pas. Une biographie peut situer un parcours sans transformer une perte d'emploi, une religion ou une vie sociale en cause démontrée.",
+             "text_en": "Dennis Rader was born on March ninth, 1945, in Pittsburg, Kansas, and grew up in Wichita. A former Air Force serviceman, he earned a degree from Wichita State University in 1979. He worked for ADT from November 1974 to July 1988, then as a municipal compliance supervisor in Park City from 1991. He also chaired the Christ Lutheran Church council and led a scout troop. These roles are documented and coexisted with the crimes. They do not explain them. A biography can place a life in context without turning a job loss, religion or social role into a proven cause."},
+            {"id": "b6", "t": 228, "speaker": "narration",
+             "text": "Pour parler de son comportement, distinguons les actes et les interprétations. Au tribunal, Rader a appelé les meurtres des « projets » et les a rattachés à des fantasmes sexuels. Ce sont ses mots, enregistrés à l'audience. Dans un entretien avec le psychologue Robert Mendoza, il a dit vouloir raconter l'affaire à sa façon et a expliqué sa reprise de contact par la couverture médiatique d'un anniversaire. Là encore, ce sont ses propos rétrospectifs. Les lettres répétées et le contrôle des échanges avec la presse rendent plausible une recherche de reconnaissance ou de contrôle du récit, mais ce n'est pas une certitude clinique. Les sources publiques ne démontrent ni diagnostic précis, ni cause unique, ni lien causal avec son enfance, son travail ou sa religion.",
+             "text_en": "To discuss his behaviour, we must distinguish actions from interpretations. In court, Rader called the murders 'projects' and linked them to sexual fantasies. Those are his words, recorded at the hearing. In an interview with psychologist Robert Mendoza, he said he wanted to tell the case in his own way and explained his renewed contact by referring to media coverage of an anniversary. Again, these are his retrospective statements. Repeated letters and his efforts to steer exchanges with the press make a search for recognition or control of the narrative plausible, but not a clinical certainty. Public sources establish neither a specific diagnosis nor a single cause, nor a causal link to his childhood, job or religion."},
+            {"id": "b7", "t": 273, "speaker": "narration",
+             "text": "La chronologie des dix homicides est établie, mais les enquêteurs ne les ont pas tous reliés en temps réel. Après les quatre Otero, Kathryn Bright est tuée le quatre avril 1974. Shirley Vian Relford est tuée en mars 1977, puis Nancy Fox en décembre. Viennent ensuite Marine Hedge en avril 1985, Vicki Wegerle en septembre 1986 et Dolores Davis en janvier 1991. Une lettre d'octobre 1974 revendique les meurtres Otero ; les archives consultées n'en précisent pas le jour. Après l'affaire Fox, les communications et un poème amènent la police à annoncer publiquement qu'un tueur en série est recherché. La série s'étend sur dix-sept ans. Elle ne dit pas, à elle seule, pourquoi l'auteur a commencé ou cessé.",
+             "text_en": "The chronology of the ten homicides is established, but investigators did not link every case in real time. After the four Oteros, Kathryn Bright was killed on April fourth, 1974. Shirley Vian Relford was killed in March 1977, then Nancy Fox in December. Next came Marine Hedge in April 1985, Vicki Wegerle in September 1986, and Dolores Davis in January 1991. An October 1974 letter claimed the Otero murders; the archives consulted do not give its exact day. After the Fox case, communications and a poem led police to announce publicly that a serial killer was being sought. The series spans seventeen years. That fact alone does not explain why the perpetrator began or stopped."},
+            {"id": "b8", "t": 324, "speaker": "narration",
+             "text": "Après le dernier homicide reconnu, les lettres s'arrêtent. La raison de ce silence n'est pas établie. En 2000, la police de Wichita rouvre le dossier non résolu de Vicki Wegerle. Un profil masculin prélevé sur la scène est inscrit dans une base nationale en 2003, sans correspondance. Le dix-neuf mars 2004, une lettre envoyée au Wichita Eagle contient une copie du permis de conduire manquant de Vicki et des photographies. Les enquêteurs relient alors son dossier à la série BTK. Plus tard, Rader dira à Mendoza qu'un article sur le trentième anniversaire des meurtres Otero l'a poussé à reprendre contact. C'est son explication, rapportée après son arrestation, pas une preuve indépendante de ce qu'il pensait au moment des faits.",
+             "text_en": "After the last recognised homicide, the letters stop. The reason for that silence has not been established. In 2000, Wichita police reopen Vicki Wegerle's unsolved case. A male profile from the scene is entered into a national database in 2003, without a match. On March nineteenth, 2004, a letter sent to The Wichita Eagle contains a copy of Vicki's missing driver's licence and photographs. Investigators then link her case to the BTK series. Later, Rader told Mendoza that an article about the thirtieth anniversary of the Otero murders prompted him to resume contact. That is his explanation, reported after his arrest, not independent proof of what he thought at the time."},
+            {"id": "b9", "t": 369, "speaker": "narration",
+             "text": "En janvier 2005, selon le récit ultérieur de Rader, il demande si une disquette peut être tracée et croit une réponse négative rapportée dans les médias. Le rapport fédéral RCFL confirme qu'une disquette arrive à une station de télévision de Wichita le seize février. Les propriétés d'un document Word supprimé livrent deux indices : « Dennis » et « Christ Lutheran Church ». Les enquêteurs vérifient ensuite le lien avec Dennis Rader. Un échantillon obtenu par subpoena à partir de dossiers médicaux concernant sa fille indique une correspondance familiale avec l'ADN conservé des scènes. Ce n'est pas une identification par un seul élément : les lettres, l'analyse numérique, les vérifications et l'ADN se renforcent. Rader est arrêté le vingt-cinq février.",
+             "text_en": "In January 2005, according to Rader's later account, he asked whether a floppy disk could be traced and believed a negative answer reported in the media. The federal RCFL report confirms that a disk reached a Wichita television station on February sixteenth. The properties of a deleted Word document yielded two clues: 'Dennis' and 'Christ Lutheran Church'. Investigators then checked the connection to Dennis Rader. A sample obtained by subpoena from medical records concerning his daughter indicated a familial match with DNA preserved from the scenes. Identification did not rest on one item alone: the letters, digital analysis, verification and DNA reinforced one another. Rader was arrested on February twenty-fifth."},
+            {"id": "b10", "t": 417, "speaker": "narration",
+             "text": "Le vingt-sept juin 2005, Rader plaide coupable des dix meurtres au premier degré. Il n'y a pas de procès devant jury. Le dix-huit août, après les déclarations de proches, le juge prononce dix peines de réclusion à perpétuité consécutives, avec un minimum de cent soixante-quinze ans. La peine de mort n'était pas applicable aux faits, antérieurs à son rétablissement au Kansas en 1994. Une autre question reste distincte : la disparition de Cynthia Dawn Kinney, seize ans, en Oklahoma, en 1976. En 2023, le shérif l'a présenté comme suspect tandis que le parquet disait les éléments insuffisants pour l'inculper et demandait une enquête de l'OSBI. La couverture consultée en décembre 2025 rapporte que l'examen se poursuivait sans charge établie contre Rader, et qu'une autre piste était discutée. Aucune culpabilité de Rader dans ce dossier n'est établie. Nous nous arrêtons là où les sources s'arrêtent, et revenons aux dix noms et aux vies qui ne se résument pas à leurs homicides.",
+             "text_en": "On June twenty-seventh, 2005, Rader pleads guilty to ten counts of first-degree murder. There is no jury trial. On August eighteenth, after relatives' statements, the judge imposes ten consecutive life terms, with a minimum of one hundred and seventy-five years. The death penalty did not apply to offences committed before Kansas reinstated it in 1994. One separate question remains: the 1976 disappearance in Oklahoma of sixteen-year-old Cynthia Dawn Kinney. In 2023, the sheriff identified Rader as a suspect while the district attorney said the evidence was insufficient to charge him and requested an OSBI investigation. Coverage reviewed in December 2025 reports that the inquiry continued without a charge established against Rader, and that another lead was being considered. Rader's guilt in this case is not established. We stop where the sources stop, and return to the ten names and the lives that cannot be reduced to their homicides."},
         ]},
     },
 ]
 
 QUESTIONS = [
-    question("1", 640, "evidence",
-             "Une disquette contient un document supprimé dont les métadonnées donnent un prénom et une institution. Que peut-on en déduire à ce stade ?",
-             "A floppy disk contains a deleted document whose metadata give a first name and an institution. What can be deduced at this stage?",
-             [("a", "L'identité de l'auteur des faits", "The identity of the author of the offences"),
-              ("b", "Une piste nominative à vérifier par un élément indépendant", "A named lead to be verified by an independent element"),
-              ("c", "Une preuve suffisante pour condamner", "Evidence sufficient to convict"),
-              ("d", "Rien : les métadonnées sont modifiables", "Nothing: metadata can be modified")],
-             {"fr": {"whatInvestigatorsKnew": "Les métadonnées indiquaient « Christ Lutheran Church » et un dernier modificateur nommé « Dennis ». Une recherche en ligne a fait apparaître un Dennis Rader, président du conseil paroissial.",
-                     "whatExpertsProposed": "Une métadonnée est une déclaration technique enregistrée par un logiciel : elle oriente, mais elle doit être confirmée. Ici, la confirmation est venue d'une comparaison ADN familiale.",
-                     "documented": "La chaîne est documentée : métadonnées, recherche en ligne, prélèvement familial, arrestation le 25 février 2005.",
-                     "hypothetical": "Ce que l'affaire aurait donné sans la confirmation biologique.",
-                     "whatYouCouldNotKnow": "Vous ne pouviez pas savoir que les enquêteurs avaient volontairement donné une réponse fausse sur la traçabilité des disquettes.",
-                     "answer_note": "La réponse attendue est B. Les métadonnées ne sont pas une preuve d'identité, elles sont une piste — ici confirmée."},
-              "en": {"whatInvestigatorsKnew": "The metadata indicated 'Christ Lutheran Church' and a last modifier named 'Dennis'. An online search revealed a Dennis Rader, president of the congregation council.",
-                     "whatExpertsProposed": "Metadata is a technical statement recorded by software: it orientates but must be confirmed. Here, confirmation came from a familial DNA comparison.",
-                     "documented": "The chain is documented: metadata, online search, family sample, arrest on 25 February 2005.",
-                     "hypothetical": "What the case would have produced without biological confirmation.",
-                     "whatYouCouldNotKnow": "You could not know that investigators had deliberately given a false answer about the traceability of floppy disks.",
-                     "answer_note": "The expected answer is B. Metadata is not proof of identity; it is a lead — confirmed here."}},
-             "wiki-rader"),
-    question("1", 300, "bias",
-             "Un survivant décrit l'agresseur en 1974 : taille moyenne, moustache fournie. Trente et un ans plus tard, l'homme arrêté correspond à ce signalement. Que révèle cet écart ?",
-             "A survivor describes the attacker in 1974: average height, bushy moustache. Thirty-one years later, the arrested man matches that description. What does that gap reveal?",
-             [("a", "Que les témoignages sont inutiles", "That testimonies are useless"),
-              ("b", "Qu'un témoignage exact peut rester inexploité faute de support de comparaison", "That an accurate testimony can remain unexploited for lack of a comparison medium"),
-              ("c", "Que l'auteur n'a pas changé d'apparence", "That the author did not change appearance"),
-              ("d", "Que la police a négligé le survivant", "That the police neglected the survivor")],
-             {"fr": {"whatInvestigatorsKnew": "Le signalement de Kevin Bright est documenté et correspond à l'homme arrêté en 2005.",
-                     "whatExpertsProposed": "Un signalement ne vaut que s'il peut être confronté à un ensemble de candidats. Sans fichier, sans rapprochement possible, il reste une description.",
-                     "documented": "Le signalement figure dans la presse de l'époque citée par Biography.com.",
-                     "hypothetical": "Ce qu'un rapprochement systématique aurait produit à l'époque.",
-                     "whatYouCouldNotKnow": "Vous ne pouvez pas connaître l'ensemble des signalements recueillis par la police de Wichita entre 1974 et 1991.",
-                     "answer_note": "La réponse attendue est B. Les options A et D sont des jugements non documentés."},
-              "en": {"whatInvestigatorsKnew": "Kevin Bright's description is documented and matches the man arrested in 2005.",
-                     "whatExpertsProposed": "A description is worth something only if it can be matched against a set of candidates. Without a database, without possible linkage, it remains a description.",
-                     "documented": "The description appears in the press of the time cited by Biography.com.",
-                     "hypothetical": "What systematic matching would have produced at the time.",
-                     "whatYouCouldNotKnow": "You cannot know the full set of descriptions collected by Wichita police between 1974 and 1991.",
-                     "answer_note": "The expected answer is B. Options A and D are undocumented judgements."}},
-             "biography-rader"),
+    question("1", 273, "psychology",
+             "Que permet d'affirmer le dossier sur le profil psychologique de Rader ?",
+             "What does the record allow us to say about Rader's psychological profile?",
+             [("a", "Un diagnostic précis explique les dix meurtres", "A specific diagnosis explains the ten murders"),
+              ("b", "Des actes et des auto-récits sont documentés, mais pas une cause clinique certaine", "Actions and self-reports are documented, but no certain clinical cause"),
+              ("c", "Son rôle religieux prouve un conflit intérieur", "His religious role proves an inner conflict"),
+              ("d", "L'entretien postérieur établit tout son état d'esprit", "The later interview establishes his entire state of mind")],
+             {"fr": {"whatInvestigatorsKnew": "Le tribunal a enregistré les termes employés par Rader ; la presse a ensuite rapporté ses propos à Robert Mendoza.",
+                     "whatExpertsProposed": "Un comportement répété peut soutenir une interprétation prudente, mais une interprétation n'est pas un diagnostic.",
+                     "documented": "Les lettres, les plaidoyers et l'entretien sont des éléments documentés ; les motifs restent attribués à Rader.",
+                     "hypothetical": "Ce qu'une expertise clinique complète aurait conclu n'est pas établi par ce dossier public.",
+                     "whatYouCouldNotKnow": "Vous ne pouvez pas déduire une cause à partir d'un rôle social, religieux ou d'une déclaration isolée.",
+                     "answer_note": "La réponse attendue est B : faits et auto-récits sont documentés, mais aucune cause psychologique certaine n'est établie ici."},
+              "en": {"whatInvestigatorsKnew": "The court recorded the terms Rader used; the press later reported his statements to Robert Mendoza.",
+                     "whatExpertsProposed": "Repeated behaviour can support a cautious interpretation, but an interpretation is not a diagnosis.",
+                     "documented": "The letters, pleas and interview are documented; motives remain attributed to Rader.",
+                     "hypothetical": "What a complete clinical evaluation concluded is not established by this public record.",
+                     "whatYouCouldNotKnow": "You cannot infer a cause from a social or religious role or one isolated statement.",
+                     "answer_note": "The expected answer is B: actions and self-reports are documented, but no certain psychological cause is established here."}},
+             "court-transcript"),
+    question("1", 417, "evidence",
+             "Les mots « Dennis » et « Christ Lutheran Church » dans les propriétés du document suffisaient-ils, seuls, à prouver l'identité ?",
+             "Were the words 'Dennis' and 'Christ Lutheran Church' in the document properties, by themselves, enough to prove identity?",
+             [("a", "Oui, les métadonnées sont une preuve définitive", "Yes, metadata is definitive proof"),
+              ("b", "Non, elles fournissaient une piste à vérifier avec d'autres éléments", "No, they provided a lead to check against other evidence"),
+              ("c", "Non, car les données numériques n'ont aucune valeur", "No, because digital data have no value"),
+              ("d", "Oui, le nom de la paroisse identifiait automatiquement son auteur", "Yes, the church name automatically identified its sender")],
+             {"fr": {"whatInvestigatorsKnew": "Le rapport RCFL rapporte des propriétés qui mentionnaient un prénom et une église ; les enquêteurs devaient encore vérifier le lien avec une personne.",
+                     "whatExpertsProposed": "Une propriété numérique oriente une enquête, mais son contexte et sa corroboration comptent.",
+                     "documented": "L'identification a reposé sur plusieurs démarches, notamment la vérification de la piste et une comparaison d'ADN familial.",
+                     "hypothetical": "Sans vérification indépendante, l'indication seule n'aurait pas établi la culpabilité.",
+                     "whatYouCouldNotKnow": "Vous ne pouviez pas déduire la culpabilité d'un nom ou d'une institution pris isolément.",
+                     "answer_note": "La réponse attendue est B : une métadonnée est une piste, pas une condamnation."},
+              "en": {"whatInvestigatorsKnew": "The RCFL report describes properties containing a first name and a church; investigators still had to verify the link to a person.",
+                     "whatExpertsProposed": "A digital property can orient an investigation, but context and corroboration matter.",
+                     "documented": "Identification involved several steps, including checking the lead and a familial DNA comparison.",
+                     "hypothetical": "Without independent verification, the clue alone would not have established guilt.",
+                     "whatYouCouldNotKnow": "You could not infer guilt from a name or institution taken in isolation.",
+                     "answer_note": "The expected answer is B: metadata is a lead, not a conviction."}},
+             "rcfl-fy2005"),
 ]
 
 CASE = {
     "id": CASE_ID,
     "title": txt("Dennis Rader, dit « BTK »", "Dennis Rader, known as 'BTK'"),
-    "subtitle": txt("Comté de Sedgwick, Kansas, 1974-1991. Dix victimes, treize ans de silence, et un fichier que l'on croyait effacé.",
-                    "Sedgwick County, Kansas, 1974-1991. Ten victims, thirteen years of silence, and a file believed erased."),
+    "subtitle": txt("Comté de Sedgwick, Kansas, 1974-1991. Dix homicides jugés, un survivant et une enquête résolue en 2005.",
+                    "Sedgwick County, Kansas, 1974-1991. Ten adjudicated homicides, one survivor and an investigation resolved in 2005."),
     "country": "US", "region": "Kansas / Sedgwick County", "city": "Wichita",
     "year_start": 1974, "year_end": 2005, "period_label": txt("1974 – 2005", "1974 – 2005"),
     "status": "RESOLVED", "type": "serial",
-    "tags": ["serial_killer", "metadata", "familial_dna", "usa", "survivors", "digital_forensics"], "editorial": "yanis", "published_at": "2026-09-24", "sensitive": True,
-    "triggers": txt("Meurtres dont ceux de deux enfants ; violences décrites sans détail graphique.",
-                    "Murders including those of two children; violence described without graphic detail."),
+    "tags": ["serial_killer", "metadata", "familial_dna", "usa", "survivors", "digital_forensics"],
+    "editorial": "yanis", "published_at": "2026-09-30", "sensitive": True,
+    "triggers": txt("Meurtres, dont ceux de deux enfants ; récit non graphique et centré sur les victimes.",
+                    "Murders, including those of two children; non-graphic, victim-centred account."),
     "lat": 37.69, "lon": -97.34, "cover": "cover-btk",
-    "stats": {"victims_documented": 10, "survivors_documented": 1, "duration_years": 31},
+    "stats": {"victims_documented": 10, "survivors_documented": 1, "duration_years": 17},
+    "survivors": [
+        {
+            "name": txt("Kevin Bright", "Kevin Bright"),
+            "role": txt("Survivant de l'agression du 4 avril 1974 ; frère de Kathryn Bright.",
+                         "Survivor of the 4 April 1974 attack; Kathryn Bright's brother."),
+            "summary": txt("Kevin Bright a survécu, blessé, à l'agression durant laquelle sa sœur Kathryn a été tuée. Son signalement et le portrait-robot réalisé ensuite font partie de l'histoire de l'enquête ; la police a écarté ce signalement. Il est présenté séparément des dix homicides.",
+                            "Kevin Bright survived, injured, the attack in which his sister Kathryn was killed. His description and the composite made afterward are part of the investigation's history; police discounted the description. He is listed separately from the ten homicides."),
+            "source_title": "The Wichita Eagle — Readers still want answers on BTK",
+            "source_url": "https://www.kansas.com/news/special-reports/btk/article1003731.html",
+        },
+    ],
     "summary": txt(
-        "Entre le 15 janvier 1974 et le 19 janvier 1991, dix personnes sont tuées dans le comté de Sedgwick, au "
-        "Kansas. Quatre membres de la famille Otero comptent parmi les premières victimes ; leur fils de 15 ans "
-        "découvre les corps. L'auteur communique par lettres avec la police et les médias, puis observe treize ans de "
-        "silence. En 2004, il reprend contact. En janvier 2005, il demande si une disquette peut être tracée ; les "
-        "enquêteurs font répondre que non. Le 16 février 2005, les métadonnées d'un document supprimé sur une "
-        "disquette reçue livrent deux indications — « Christ Lutheran Church » et un modificateur nommé « Dennis » — "
-        "qui conduisent à Dennis Rader, président du conseil paroissial. Un lien familial est confirmé par comparaison "
-        "ADN. Il est arrêté le 25 février 2005, plaide coupable le 27 juin, et est condamné le 18 août à dix peines "
-        "consécutives de réclusion à perpétuité, avec un minimum de 175 ans.",
-        "Between 15 January 1974 and 19 January 1991, ten people were killed in Sedgwick County, Kansas. Four members "
-        "of the Otero family are among the first victims; their 15-year-old son found the bodies. The author "
-        "communicated by letter with police and media, then observed thirteen years of silence. In 2004, he resumed "
-        "contact. In January 2005, he asked whether a floppy disk could be traced; investigators had it answered that "
-        "it could not. On 16 February 2005, the metadata of a deleted document on a received floppy disk yielded two "
-        "indications — 'Christ Lutheran Church' and a modifier named 'Dennis' — leading to Dennis Rader, president of "
-        "the congregation council. A family link was confirmed by DNA comparison. He was arrested on 25 February 2005, "
-        "pleaded guilty on 27 June, and was sentenced on 18 August to ten consecutive life terms with a minimum of "
-        "175 years."),
+        "Entre 1974 et 1991, dix personnes sont tuées dans le comté de Sedgwick : quatre membres de la famille Otero, Kathryn Bright, Shirley Vian Relford, Nancy Fox, Marine Hedge, Vicki Wegerle et Dolores Davis. Kevin Bright survit à l'agression durant laquelle sa sœur Kathryn est tuée. Dennis Rader, ancien militaire et employé municipal, envoie des lettres aux médias et à la police ; après plusieurs années de silence, une lettre de 2004 relie l'affaire Wegerle à la série. En février 2005, l'analyse d'une disquette fournit une piste, puis une comparaison d'ADN familial et d'autres vérifications contribuent à l'identification. Rader est arrêté, plaide coupable des dix homicides et reçoit dix peines consécutives de réclusion à perpétuité, avec un minimum de 175 ans. Les autres pistes non jugées restent séparées de ces dix condamnations.",
+        "Between 1974 and 1991, ten people are killed in Sedgwick County: four members of the Otero family, Kathryn Bright, Shirley Vian Relford, Nancy Fox, Marine Hedge, Vicki Wegerle and Dolores Davis. Kevin Bright survives the attack in which his sister Kathryn is killed. Dennis Rader, a former serviceman and municipal employee, sends letters to media and police; after years of silence, a 2004 letter links the Wegerle case to the series. In February 2005, analysis of a floppy disk provides a lead, then a familial DNA comparison and further checks contribute to identification. Rader is arrested, pleads guilty to the ten homicides and receives ten consecutive life sentences, with a minimum of 175 years. Other untried leads remain separate from these ten convictions."),
     "sources": SOURCES, "victims": VICTIMS, "memorial": MEMORIAL, "timeline": TIMELINE, "locations": LOCATIONS,
     "evidence": EVIDENCE, "investigation": INVESTIGATION, "psychology": PSYCHOLOGY, "victimology": VICTIMOLOGY,
     "court": COURT, "experts": EXPERTS, "experts_agreement": EXPERTS_AGREEMENT,

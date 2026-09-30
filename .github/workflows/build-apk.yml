@@ -46,15 +46,12 @@ jobs:
           python -m app.seed
           python -m app.export_embedded
 
-      - name: Copy audio assets from the Android media catalogue
+      - name: Copy offline audio assets from this branch
         run: |
-          git fetch --depth=1 origin arena/01a0e7ec-tueurs-en-s-rie
           mkdir -p frontend/public/audio
-          for file in \
-            episode-01-estelle-mouzin.wav \
-            episode-03-estelle-mouzin-memoire.wav \
-            episode-05-guy-georges.wav; do
-            git show "FETCH_HEAD:content/media/$file" > "frontend/public/audio/$file"
+          for file in content/media/*.wav content/media/*.mp3; do
+            [ -f "$file" ] || continue
+            cp -v "$file" frontend/public/audio/
           done
           ls -lh frontend/public/audio
 
@@ -87,7 +84,7 @@ jobs:
         run: |
           gh release upload app-preview yanisx-debug.apk --repo "$GITHUB_REPOSITORY" --clobber
           cat > "$RUNNER_TEMP/release-notes.md" <<EOF
-          Version Android de prévisualisation avec la nouvelle carte du monde et les dossiers embarqués pour un usage hors ligne.
+          Version Android hors ligne avec le dossier pilote BTK révisé, les dix victimes reconnues, un survivant présenté séparément et un nouvel épisode audio documenté.
 
           Build commit: $GITHUB_SHA. APK de développement à installer manuellement sur Android ; non distribué par le Play Store.
           EOF

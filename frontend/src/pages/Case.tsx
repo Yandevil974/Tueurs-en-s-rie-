@@ -247,6 +247,7 @@ export function VictimsPage() {
   if (loading) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return <Empty />;
+  const survivors: Any[] = Array.isArray(data.extra?.survivors) ? data.extra.survivors : [];
   return (
     <>
       <BackLink to={`/dossiers/${slug}`} />
@@ -268,13 +269,22 @@ export function VictimsPage() {
             {isOpen && <div style={{ padding: 14 }}>
               {v.anonymised && <div className="note warn" style={{ marginBottom: 11 }}>{tr(lang, "victim.anonymised")}</div>}
               {items.length ? <dl className="kv" style={{ marginBottom: 12 }}>{items.map((it: Any, i: number) => <div style={{ display: "contents" }} key={i}><dt><Bi_ v={it.label} /></dt><dd>{typeof it.text === "object" ? <Bi_ v={it.text} /> : String(it.text ?? "")}</dd></div>)}</dl> : <Missing />}
-              {disappearance.length > 0 && <><div className="h3" style={{ margin: "12px 0 6px" }}>{lang === "fr" ? "Ce que l'on sait de la disparition" : "What is known about the disappearance"}</div><dl className="kv">{disappearance.map((it: Any, i: number) => <div style={{ display: "contents" }} key={i}><dt><Bi_ v={it.label} /></dt><dd>{typeof it.text === "object" ? <Bi_ v={it.text} /> : String(it.text ?? "")}</dd></div>)}</dl></>}
+              {disappearance.length > 0 && <><div className="h3" style={{ margin: "12px 0 6px" }}>{lang === "fr" ? "Éléments documentés" : "Documented details"}</div><dl className="kv">{disappearance.map((it: Any, i: number) => <div style={{ display: "contents" }} key={i}><dt><Bi_ v={it.label} /></dt><dd>{typeof it.text === "object" ? <Bi_ v={it.text} /> : String(it.text ?? "")}</dd></div>)}</dl></>}
               {v.note && <div className="note neutral" style={{ marginTop: 12 }}><Bi_ v={v.note} /></div>}
               <SourceLine source={v.source} />
             </div>}
           </article>;
         })}
       </div>
+      {survivors.length > 0 && <section className="stack" aria-label={lang === "fr" ? "Survivants documentés" : "Documented survivors"} style={{ marginTop: 18 }}>
+        <h2 className="h2" style={{ fontSize: 16, margin: 0 }}>{lang === "fr" ? "Survivants — distincts du décompte des homicides" : "Survivors — separate from the homicide count"}</h2>
+        {survivors.map((s: Any, i: number) => <article key={`${s.name?.fr || s.name || "survivor"}-${i}`} className="card">
+          <div className="h3" style={{ marginTop: 0 }}><Bi_ v={s.name || (lang === "fr" ? "Survivant" : "Survivor")} /></div>
+          {s.role && <div className="tiny"><Bi_ v={s.role} /></div>}
+          {s.summary && <p style={{ margin: "9px 0 0", color: "var(--bone-dim)", fontSize: 14.5 }}><Bi_ v={s.summary} /></p>}
+          {s.source_url && <a className="small" style={{ display: "inline-block", marginTop: 10 }} href={s.source_url} target="_blank" rel="noopener noreferrer">{lang === "fr" ? `Source : ${s.source_title || "ouvrir la référence"}` : `Source: ${s.source_title || "open reference"}`} ↗</a>}
+        </article>)}
+      </section>}
       <div className="disclaimer" style={{ marginTop: 16 }}>{lang === "fr" ? "La victimologie décrit un contexte ; elle ne cherche jamais une cause dans les caractéristiques de la victime." : "Victimology describes context; it never looks for a cause in a victim's characteristics."}</div>
     </>
   );

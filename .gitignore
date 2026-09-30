@@ -22,6 +22,7 @@ data/*.sqlite3-journal
 data/*.db
 content/media/*.mp3
 content/media/*.wav
+!content/media/episode-10-btk-rader.wav
 content/media/*.m4a
 content/media/*.ogg
 
