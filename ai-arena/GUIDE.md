@@ -279,6 +279,31 @@ state.style = "collab"                 state.style = "solo"
 
 ---
 
+## 5 ter. Sauvegarde GitHub en direct (API Contents)
+
+L'app écrit dans un dépôt sans serveur : trois appels suffisent.
+
+```
+GET  /repos/{repo}/contents/{path}?ref={branch}   → { content (base64), sha }
+PUT  /repos/{repo}/contents/{path}                → { message, content (base64), branch, sha? }
+```
+
+- **Le `sha` est obligatoire pour une mise à jour**, absent pour une création : on relit donc
+  systématiquement le fichier avant d'écrire (`ghGetFile()` → `ghPutFile()`). Un 404 est
+  traité comme « fichier absent », pas comme une erreur.
+- **Encodage** : l'API exige du base64 sur de l'UTF-8. `TextEncoder` → `btoa` par tranches de
+  32 Ko (sinon `String.fromCharCode.apply` explose sur les grosses sauvegardes), et
+  `atob` → `TextDecoder` pour la lecture. Les accents français survivent.
+- **Jeton** : *fine-grained*, portée limitée à un dépôt, permission `Contents: write`.
+  Il vit dans une clé de stockage **séparée** (`arenax.github.v3`) et n'entre jamais dans
+  `backupPayload()` : une sauvegarde partagée ne fuit pas le jeton.
+- **Erreurs traduites** : 401 jeton invalide, 403 droit manquant, 404 dépôt/branche introuvable,
+  409 conflit — au lieu d'un « HTTP 4xx » opaque.
+- **Sauvegarde auto** : `maybeAutoBackup()` télécharge le fichier local **et** pousse sur GitHub
+  si la configuration est complète, donc les deux copies restent alignées.
+
+---
+
 ## 6. Passer en production (site public)
 
 Un fichier statique ne peut pas cacher une clé. Le schéma minimal :

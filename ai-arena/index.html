@@ -605,6 +605,17 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 .backup-option .icon { color: var(--mint); margin-top: 2px; }
 .backup-option strong { display: block; font-size: 12px; font-weight: 650; }
 .backup-option small { display: block; margin-top: 2px; color: var(--faint); font-size: 10.5px; line-height: 1.45; }
+.gh-box {
+  margin: 14px 0; padding: 12px 13px;
+  border: 1px solid var(--line); border-radius: 14px;
+  background: var(--panel);
+}
+.gh-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.gh-title { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; font-weight: 700; }
+.gh-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
+@media (max-width: 560px) { .gh-grid { grid-template-columns: 1fr; } }
+.gh-box .field { margin-top: 10px; }
+.gh-box .btn-row { margin-top: 12px; }
 .backup-status { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 11px 12px; border: 1px solid var(--line); border-radius: 11px; background: var(--panel); color: var(--muted); font-size: 11.5px; }
 .backup-status .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); }
 .backup-status.on .dot { background: var(--free); box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.12); }
@@ -788,6 +799,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   <symbol id="i-thumb-up" viewBox="0 0 24 24"><path d="M7 10v10H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3Zm0 0 4.2-6.3a1.6 1.6 0 0 1 2.9 1V9h4.3a2 2 0 0 1 2 2.4l-1.3 6.6a2 2 0 0 1-2 1.6H7"/></symbol>
   <symbol id="i-thumb-down" viewBox="0 0 24 24"><path d="M17 14V4h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3Zm0 0-4.2 6.3a1.6 1.6 0 0 1-2.9-1V15H5.6a2 2 0 0 1-2-2.4l1.3-6.6a2 2 0 0 1 2-1.6H17"/></symbol>
   <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19 3.6a4.9 4.9 0 0 0-.1-3.6s-1.1-.3-3.7 1.4a12.7 12.7 0 0 0-6.4 0C6.2-.3 5.1 0 5.1 0A4.9 4.9 0 0 0 5 3.6 5.2 5.2 0 0 0 3.7 7.2c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V21"/></symbol>
   <symbol id="i-google-drive" viewBox="0 0 24 24"><path d="m8 3 8 0 5 9-4 7H7l-4-7 5-9Z"/><path d="M8 3 12 10l8 2M16 3l-4 7 5 9M3 12h18"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 6-15 16-16 0 10-5 16-13 16"/><path d="M4 20c3-5 7-8 12-10"/></symbol>
   <symbol id="i-gem" viewBox="0 0 24 24"><path d="M6 3h12l3 6-9 12L3 9l3-6Z"/><path d="M3 9h18M9 3l3 18 3-18"/></symbol>
@@ -1167,6 +1179,39 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         <p class="help">Chrome Android peut demander « Autoriser les téléchargements multiples » : accepte pour laisser tourner la sauvegarde auto. L'historique reste aussi enregistré dans le navigateur, même sans fichier.</p>
       </div>
 
+      <div class="gh-box" id="ghBox">
+        <div class="gh-head">
+          <span class="gh-title"><svg class="icon" aria-hidden="true"><use href="#i-github"></use></svg> Mon GitHub</span>
+          <span class="key-state" id="ghState"><span class="dot" aria-hidden="true"></span><span>Non connecté</span></span>
+        </div>
+        <p class="help" style="margin-top:6px">Sauvegarde directe dans un dépôt à toi : un fichier JSON versionné, accessible depuis n'importe quel appareil. Le jeton reste sur ce téléphone et n'est jamais inclus dans les sauvegardes.</p>
+        <div class="gh-grid">
+          <div class="field">
+            <label for="ghRepo">Dépôt</label>
+            <input class="mono" id="ghRepo" type="text" placeholder="utilisateur/depot" spellcheck="false" autocapitalize="off" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="ghBranch">Branche</label>
+            <input class="mono" id="ghBranch" type="text" placeholder="main" spellcheck="false" autocapitalize="off" autocomplete="off">
+          </div>
+        </div>
+        <div class="field">
+          <label for="ghPath">Chemin du fichier</label>
+          <input class="mono" id="ghPath" type="text" placeholder="arena-x/sauvegarde.json" spellcheck="false" autocapitalize="off" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="ghToken">Jeton GitHub (fine-grained)</label>
+          <input class="mono" id="ghToken" type="password" placeholder="github_pat_…" spellcheck="false" autocomplete="off" autocapitalize="off">
+          <p class="help">Droits nécessaires : <b>Contents → Read and write</b> sur ce dépôt uniquement. <a class="link" href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener noreferrer">Créer un jeton ↗</a></p>
+        </div>
+        <div class="btn-row">
+          <button class="btn sm accent" id="ghPush" type="button"><svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg> Envoyer sur GitHub</button>
+          <button class="btn sm" id="ghPull" type="button"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg> Récupérer</button>
+          <button class="btn sm ghost" id="ghTest" type="button">Tester</button>
+        </div>
+        <p class="help" id="ghDetail" style="margin-top:8px"></p>
+      </div>
+
       <div class="btn-row">
         <button class="btn sm accent" id="backupNow" type="button"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg> Sauvegarder</button>
         <button class="btn sm" id="shareBackup" type="button"><svg class="icon" aria-hidden="true"><use href="#i-share"></use></svg> Partager</button>
@@ -1213,7 +1258,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     keys: "arenax.keys.v3",
     chat: "arenax.chat.v3",
     catalog: "arenax.catalog.v3",
-    credits: "arenax.credits.v3"
+    credits: "arenax.credits.v3",
+    github: "arenax.github.v3"
   };
 
   var DEFAULT_SYSTEM = "Tu es le synthétiseur d'une arène d'IA. À partir de plusieurs brouillons, tu produis LA meilleure réponse finale : tu vérifies les faits, corriges les erreurs, élimines les redites, gardes les points forts de chaque brouillon et tu rédiges une réponse claire, complète et bien structurée en Markdown. Réponds dans la langue de la question. Ne mentionne jamais les brouillons, les modèles ni le processus : donne directement la réponse.";
@@ -1303,6 +1349,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     controllers: new Map(),
     stick: true,
     pending: { drafts: [], synth: null, solo: null, style: "collab", tab: "drafts", query: "" },
+    github: { repo: "Yandevil974/Tueurs-en-s-rie-", branch: "main", path: "arena-x/sauvegarde.json", token: "", last: 0 },
     ui: { openDrafts: new Set() }
   };
 
@@ -2348,6 +2395,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var interval = state.settings.backup.minutes * 60000;
     if (Date.now() - state.lastBackup < interval) return;
     downloadBackup("auto");
+    /* Si GitHub est configuré, on pousse aussi le JSON dans le dépôt. */
+    if (githubReady()) pushToGithub(true);
   }
 
   async function shareBackup() {
@@ -4348,8 +4397,194 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     refreshCredits(false);
   }
 
+  /* 11 bis. GitHub : sauvegarde et restauration directes dans un dépôt ------ */
+  function b64encodeUtf8(str) {
+    var bytes = new TextEncoder().encode(str);
+    var bin = "";
+    for (var i = 0; i < bytes.length; i += 0x8000) {
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    }
+    return btoa(bin);
+  }
+
+  function b64decodeUtf8(b64) {
+    var bin = atob(String(b64 || "").replace(/\s+/g, ""));
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+
+  function loadGithub() {
+    var raw = storageGet(localStorage, LS.github, null) || {};
+    state.github.repo = typeof raw.repo === "string" && raw.repo ? raw.repo : "Yandevil974/Tueurs-en-s-rie-";
+    state.github.branch = typeof raw.branch === "string" && raw.branch ? raw.branch : "main";
+    state.github.path = typeof raw.path === "string" && raw.path ? raw.path : "arena-x/sauvegarde.json";
+    state.github.token = typeof raw.token === "string" ? raw.token : "";
+    state.github.last = Number(raw.last) || 0;
+  }
+
+  function persistGithub() {
+    storageSet(localStorage, LS.github, state.github);
+  }
+
+  function githubReady() {
+    return !!(state.github.repo.trim() && state.github.token.trim() && state.github.path.trim());
+  }
+
+  function ghApi(pathSuffix, opts) {
+    opts = opts || {};
+    var url = "https://api.github.com" + pathSuffix;
+    var headers = {
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "Authorization": "Bearer " + state.github.token.trim()
+    };
+    if (opts.body) headers["Content-Type"] = "application/json";
+    return fetchTimeout(url, {
+      method: opts.method || "GET",
+      headers: headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined
+    }, 20000).then(function (res) {
+      return res.text().then(function (text) {
+        var data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { /* ignore */ }
+        if (!res.ok) {
+          var msg = data && data.message ? data.message : "HTTP " + res.status;
+          var hint = "";
+          if (res.status === 401) hint = "Jeton invalide ou expiré.";
+          else if (res.status === 403) hint = "Jeton sans droit Contents (Read and write).";
+          else if (res.status === 404) hint = "Dépôt, branche ou fichier introuvable.";
+          else if (res.status === 409) hint = "Conflit : le fichier a changé entre-temps.";
+          throw new ApiError(hint || msg, msg, res.status);
+        }
+        return data;
+      });
+    });
+  }
+
+  function ghFileUrl() {
+    var repo = state.github.repo.trim().replace(/^\/+|\/+$/g, "");
+    var path = state.github.path.trim().replace(/^\/+/, "");
+    return "/repos/" + repo + "/contents/" + path.split("/").map(encodeURIComponent).join("/");
+  }
+
+  function ghGetFile() {
+    return ghApi(ghFileUrl() + "?ref=" + encodeURIComponent(state.github.branch.trim() || "main"))
+      .catch(function (e) {
+        if (e && e.status === 404) return null;
+        throw e;
+      });
+  }
+
+  function ghPutFile(content, message) {
+    return ghGetFile().then(function (existing) {
+      var body = {
+        message: message,
+        content: b64encodeUtf8(content),
+        branch: state.github.branch.trim() || "main"
+      };
+      if (existing && existing.sha) body.sha = existing.sha;
+      return ghApi(ghFileUrl(), { method: "PUT", body: body }).then(function (res) {
+        return { created: !existing, commit: res && res.commit ? res.commit.sha : null, url: res && res.content ? res.content.html_url : null };
+      });
+    });
+  }
+
+  function renderGithubUI() {
+    if (!el.ghRepo) return;
+    el.ghRepo.value = state.github.repo;
+    el.ghBranch.value = state.github.branch;
+    el.ghPath.value = state.github.path;
+    el.ghToken.value = state.github.token;
+    var on = githubReady();
+    if (el.ghState) {
+      el.ghState.classList.toggle("on", on);
+      var label = el.ghState.querySelector("span:last-child");
+      if (label) label.textContent = !on ? "Non connecté" :
+        (state.github.last ? "Connecté · " + fmtTime(state.github.last) : "Connecté");
+    }
+    if (el.ghDetail) {
+      el.ghDetail.textContent = !on ?
+        "Renseigne le dépôt, le chemin et le jeton pour activer la sauvegarde GitHub." :
+        "Fichier : " + state.github.repo.trim() + " · " + state.github.branch.trim() + " · " + state.github.path.trim();
+    }
+    if (el.ghPush) el.ghPush.disabled = !on || state.streaming;
+    if (el.ghPull) el.ghPull.disabled = !on || state.streaming;
+    if (el.ghTest) el.ghTest.disabled = !on;
+  }
+
+  function readGithubForm() {
+    state.github.repo = (el.ghRepo.value || "").trim();
+    state.github.branch = (el.ghBranch.value || "").trim() || "main";
+    state.github.path = (el.ghPath.value || "").trim() || "arena-x/sauvegarde.json";
+    state.github.token = (el.ghToken.value || "").trim();
+    persistGithub();
+    renderGithubUI();
+  }
+
+  function testGithub() {
+    readGithubForm();
+    if (!githubReady()) { showToast("Dépôt et jeton requis.", "err"); return; }
+    if (el.ghDetail) el.ghDetail.textContent = "Test en cours…";
+    ghGetFile().then(function (file) {
+      showToast(file ? "GitHub ok : fichier existant trouvé." : "GitHub ok : le fichier sera créé au premier envoi.", "ok");
+      if (el.ghDetail) {
+        el.ghDetail.textContent = file ?
+          "Fichier trouvé (" + (file.size ? Math.round(file.size / 1024) + " Ko" : "présent") + ") — Envoyer le remplacera." :
+          "Dépôt accessible, fichier absent : il sera créé au premier envoi.";
+      }
+    }).catch(function (e) {
+      showToast("GitHub : " + e.message, "err");
+      if (el.ghDetail) el.ghDetail.textContent = "Échec : " + e.message;
+    });
+  }
+
+  function pushToGithub(silent) {
+    readGithubForm();
+    if (!githubReady()) { showToast("Renseigne le dépôt et le jeton GitHub.", "err"); return; }
+    var json = backupJSON();
+    if (!silent) showToast("Envoi vers GitHub…");
+    ghPutFile(json, "arena-x : sauvegarde automatique du " + new Date().toLocaleString("fr-FR")).then(function (r) {
+      state.github.last = Date.now();
+      persistGithub();
+      renderGithubUI();
+      state.lastBackup = Date.now();
+      persistSettings();
+      renderBackupUI();
+      if (!silent) showToast(r.created ? "Sauvegarde créée sur GitHub." : "Sauvegarde mise à jour sur GitHub.", "ok");
+      if (el.ghDetail) {
+        el.ghDetail.textContent = (r.created ? "Créé" : "Mis à jour") + " · commit " + String(r.commit || "").slice(0, 7) +
+          " · " + state.github.repo.trim() + " / " + state.github.path.trim();
+      }
+    }).catch(function (e) {
+      showToast("Envoi GitHub impossible : " + e.message, "err");
+      if (el.ghDetail) el.ghDetail.textContent = "Échec : " + e.message;
+    });
+  }
+
+  function pullFromGithub() {
+    readGithubForm();
+    if (!githubReady()) { showToast("Renseigne le dépôt et le jeton GitHub.", "err"); return; }
+    if (el.ghDetail) el.ghDetail.textContent = "Lecture du fichier…";
+    ghGetFile().then(function (file) {
+      if (!file || !file.content) {
+        showToast("Aucune sauvegarde dans ce dépôt.", "err");
+        if (el.ghDetail) el.ghDetail.textContent = "Aucun fichier à " + state.github.path.trim() + ".";
+        return;
+      }
+      var text = b64decodeUtf8(file.content);
+      if (restoreFromText(text) === false) return;
+      el.backupDlg.close();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }).catch(function (e) {
+      showToast("Récupération impossible : " + e.message, "err");
+      if (el.ghDetail) el.ghDetail.textContent = "Échec : " + e.message;
+    });
+  }
+
   function openBackup() {
     renderBackupUI();
+    renderGithubUI();
     openDialog(el.backupDlg);
   }
 
@@ -4359,6 +4594,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       Object.keys(localStorage).forEach(function (k) {
         if (k.indexOf("arenax.") === 0) localStorage.removeItem(k);
       });
+      state.github = { repo: "", branch: "main", path: "arena-x/sauvegarde.json", token: "", last: 0 };
       sessionStorage.clear();
     } catch (e) { /* ignore */ }
     location.reload();
@@ -4469,6 +4705,15 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.autoBackup = $("#autoBackup");
     el.backupInterval = $("#backupInterval");
     el.backupNow = $("#backupNow");
+    el.ghRepo = $("#ghRepo");
+    el.ghBranch = $("#ghBranch");
+    el.ghPath = $("#ghPath");
+    el.ghToken = $("#ghToken");
+    el.ghState = $("#ghState");
+    el.ghDetail = $("#ghDetail");
+    el.ghPush = $("#ghPush");
+    el.ghPull = $("#ghPull");
+    el.ghTest = $("#ghTest");
     el.shareBackup = $("#shareBackup");
     el.restoreBtn = $("#restoreBtn");
     el.restoreInput = $("#restoreInput");
@@ -4616,6 +4861,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       renderBackupUI();
     });
     el.backupNow.addEventListener("click", function () { downloadBackup("manual"); });
+    if (el.ghPush) el.ghPush.addEventListener("click", function () { pushToGithub(false); });
+    if (el.ghPull) el.ghPull.addEventListener("click", pullFromGithub);
+    if (el.ghTest) el.ghTest.addEventListener("click", testGithub);
+    [el.ghRepo, el.ghBranch, el.ghPath, el.ghToken].forEach(function (input) {
+      if (!input) return;
+      input.addEventListener("change", readGithubForm);
+    });
     el.shareBackup.addEventListener("click", shareBackup);
     el.restoreBtn.addEventListener("click", function () { el.restoreInput.click(); });
     el.restoreInput.addEventListener("change", function () {
@@ -4723,6 +4975,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     systemTheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
     loadSettings();
     loadKeys();
+    loadGithub();
     if (!loadCatalogCache()) {
       state.catalog = FALLBACK.slice();
       state.catalogSource = "repli";

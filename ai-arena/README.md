@@ -101,6 +101,34 @@ les brouillons repliables (Markdown rendu à l'ouverture), la réponse finale, l
 - Chaque manche premium enregistre aussi son coût et son **solde après coup** dans le fil.
 - Lien de recharge dans l'en-tête, le dialogue Crédits et le dialogue Sauvegardes.
 
+## Sauvegarde GitHub (comme Arena)
+
+Le dialogue **Sauvegarde JSON** contient une section **Mon GitHub** : l'app écrit et relit
+directement un fichier JSON dans **ton** dépôt, via l'API GitHub. Pas d'installation, pas de
+serveur : un `fetch` authentifié par ton jeton.
+
+| Champ | Exemple | Rôle |
+|---|---|---|
+| Dépôt | `Yandevil974/Tueurs-en-s-rie-` | pré-rempli avec ton dépôt |
+| Branche | `main` | branche cible |
+| Chemin | `arena-x/sauvegarde.json` | fichier JSON versionné |
+| Jeton | `github_pat_…` | *fine-grained*, droit **Contents → Read and write** sur ce seul dépôt |
+
+- **Envoyer sur GitHub** — crée le fichier au premier envoi, le met à jour ensuite (le `sha` est
+  relu avant chaque écriture, donc pas de conflit sur des envois successifs).
+- **Récupérer** — lit le fichier du dépôt et restaure la conversation sur n'importe quel
+  appareil, y compris après une réinstallation.
+- **Tester** — vérifie que le dépôt et le jeton répondent, et indique si le fichier existe déjà.
+- **Automatique** — quand la sauvegarde auto est active, le JSON part **aussi** sur GitHub à
+  chaque intervalle, sans rien télécharger.
+
+Le jeton reste dans le `localStorage` de ce navigateur (`arenax.github.v3`) et **n'est jamais
+inclus dans les sauvegardes** ni dans le fichier exporté. « Tout effacer » le supprime.
+
+> Créer le jeton : [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new)
+> → *Only select repositories* → ton dépôt → *Repository permissions* → **Contents :
+> Read and write**. C'est le seul droit nécessaire.
+
 ## Sauvegarde JSON automatique (Android)
 
 Le bouton **↓** de l'en-tête ouvre le dialogue **Sauvegarde JSON** :
