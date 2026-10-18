@@ -1242,10 +1242,14 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   ];
 
   /* Repli si le catalogue réseau est indisponible. */
-  /* Roster gratuit : les modèles Groq + le routeur gratuit d'OpenRouter.
-     Les autres modèles :free d'OpenRouter ne sont pas proposés. */
+  /* Liste de secours : tous les modèles gratuits utilisables, Groq et routeur
+     en tête. Le panneau par défaut, lui, privilégie Groq + routeur. */
   var FALLBACK = [
     f("openrouter", "openrouter/free", "Routeur gratuit", true, 0, 0),
+    f("openrouter", "openai/gpt-oss-120b:free", "GPT-OSS 120B (free)", true, 0, 0),
+    f("openrouter", "google/gemma-4-31b-it:free", "Gemma 4 31B (free)", true, 0, 0),
+    f("openrouter", "google/gemma-4-26b-a4b-it:free", "Gemma 4 26B (free)", true, 0, 0),
+    f("openrouter", "nvidia/nemotron-3-super-120b-a12b:free", "Nemotron 3 Super (free)", true, 0, 0),
     f("groq", "openai/gpt-oss-120b", "GPT-OSS 120B · Groq", true, 0, 0),
     f("groq", "openai/gpt-oss-20b", "GPT-OSS 20B · Groq", true, 0, 0),
     f("groq", "qwen/qwen3.8-27b", "Qwen3.8 27B · Groq", true, 0, 0),
@@ -1674,13 +1678,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var hasOR = !!state.keys.openrouter.trim();
     var hasGroq = !!state.keys.groq.trim();
     var anyKey = hasOR || hasGroq;
-    /* Roster volontairement court : modèles Groq + routeur gratuit OpenRouter.
-       Clé absente = fournisseur masqué, sauf si aucune clé n'existe (démo). */
+    /* Clé absente = fournisseur masqué, sauf si aucune clé n'existe :
+       dans ce cas on garde tout pour que la démonstration reste utilisable. */
     return state.catalog.filter(function (m) {
-      if (!m.free && m.id !== "openrouter/free") return false;
-      if (m.provider === "groq") return anyKey ? hasGroq : true;
-      if (m.id !== "openrouter/free") return false;
-      return anyKey ? hasOR : true;
+      if (!m.free) return false;
+      if (!anyKey) return true;
+      return m.provider === "groq" ? hasGroq : hasOR;
     });
   }
 
@@ -1696,12 +1699,21 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   function defaultPanel(mode) {
     var p = pools()[mode];
     var ordered = rankModels(p, mode === "free" ? FREE_ORDER : PAID_ORDER);
+    var groq = ordered.filter(function (m) { return m.provider === "groq"; });
+    var router = ordered.filter(function (m) { return m.id === "openrouter/free"; })[0];
+    if (mode === "free" && groq.length) {
+      /* Défaut voulu : deux modèles Groq écrivent, le routeur gratuit rédige la synthèse
+         s'il est disponible (clé OpenRouter) ; sinon un Groq fait la synthèse.
+         Groq gratuit plafonne à 8 000 tokens/minute : jamais plus de 2 appels Groq. */
+      var drafts = groq.slice(0, 2).map(function (m) { return m.key; });
+      var synth = router ? router.key : (groq[2] || groq[0]).key;
+      return { drafts: drafts, synth: synth };
+    }
     var groqOnly = ordered.length > 0 && ordered.every(function (m) { return m.provider === "groq"; });
-    /* Groq gratuit plafonne à 8 000 tokens/minute : on reste à 2 brouillons + 1 synthèse. */
     var n = groqOnly ? Math.min(2, Math.max(1, ordered.length - 1)) : 3;
-    var drafts = ordered.slice(0, n).map(function (m) { return m.key; });
-    var synth = (ordered[n] || ordered[0] || {}).key || null;
-    return { drafts: drafts, synth: synth };
+    var drafts2 = ordered.slice(0, n).map(function (m) { return m.key; });
+    var synth2 = (ordered[n] || ordered[0] || {}).key || null;
+    return { drafts: drafts2, synth: synth2 };
   }
 
   function availableModels(mode) {
@@ -1791,7 +1803,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         key: modelKey("groq", m.id),
         provider: "groq",
         id: m.id,
-        name: prettyName(humanizeId(m.id), m.id),
+        name: prettyName(humanizeId(m.id), m.id) + " · Groq",
         free: true,
         inPrice: 0,
         outPrice: 0,
@@ -3073,7 +3085,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       el.panelSave.textContent = "Enregistrer";
       if (state.mode === "free") {
       el.panelNotice.textContent = hasAnyKey() ?
-        "Roster gratuit : modèles Groq + routeur gratuit. Quatre brouillons maximum." :
+        "Modèles gratuits : Groq + routeur, et les meilleurs :free d'OpenRouter si la clé est là. Quatre brouillons maximum." :
         "Aucune clé : mode démonstration. Ajoute ta clé Groq pour de vraies réponses.";
     } else if (!hasPaidAccess()) {
       el.panelNotice.textContent = (state.keys.openrouter.trim() ?

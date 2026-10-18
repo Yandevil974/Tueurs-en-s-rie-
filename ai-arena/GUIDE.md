@@ -229,12 +229,12 @@ Ta liste date de 2024. Depuis, les fournisseurs ont retiré plusieurs modèles :
 | `llama-3.1-8b-instant` (Groq) | annoncé retiré en 2026 | `openai/gpt-oss-20b` |
 | Gemini Flash 1.5 `:free`, Pixtral 12B `:free`, DeepSeek Chat `:free`, Llama 3.3 70B `:free` | plus « gratuits » sur OpenRouter (paliers supprimés) | `openrouter/free`, `nvidia/nemotron-3-super-120b-a12b:free` |
 
-Le roster gratuit a été volontairement réduit à **deux sources** : le routeur gratuit
-`openrouter/free` et les quatre modèles Groq (`openai/gpt-oss-120b`, `openai/gpt-oss-20b`,
-`qwen/qwen3.8-27b`, `openai/gpt-oss-safeguard-20b`). Les autres modèles `:free` d'OpenRouter
-(Gemma, Nemotron…) ne sont ni embarqués ni proposés, même si le catalogue live les renvoie :
-`freePool()` filtre sur cet identifiant. `mergeCatalog()` réinjecte le routeur et les Groq
-s'ils manquent au catalogue distant. Quand l'API répond « modèle inexistant », la carte
+Le roster gratuit embarqué contient le routeur `openrouter/free`, les quatre modèles Groq
+(`openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.8-27b`,
+`openai/gpt-oss-safeguard-20b`) et les meilleurs `:free` d'OpenRouter
+(`openai/gpt-oss-120b:free`, `google/gemma-4-31b-it:free`,
+`google/gemma-4-26b-a4b-it:free`, `nvidia/nemotron-3-super-120b-a12b:free`).
+`mergeCatalog()` réinjecte le routeur et les Groq s'ils manquent au catalogue distant. Quand l'API répond « modèle inexistant », la carte
 affiche un message clair au lieu d'un écran muet. Pour remettre à jour la liste : `GET https://openrouter.ai/api/v1/models`
 et `GET https://api.groq.com/openai/v1/models` (avec ta clé).
 
@@ -263,11 +263,11 @@ state.style = "collab"                 state.style = "solo"
 - **Le panneau s'adapte** : en Solo, la liste devient une sélection unique (radio) et les
   onglets Brouillons/Synthèse ainsi que les presets disparaissent — pas de bouton inutile.
 - **Catalogue piloté par les clés** : `pools()` masque un fournisseur dont la clé est absente
-  (sauf si aucune clé n'existe, pour garder la démo utilisable). Le roster gratuit est
-  volontairement court : **modèles Groq + routeur gratuit `openrouter/free`**. Avec une clé
-  Groq seule, le panneau gratuit se réduit à 2 brouillons + 1 synthèse (palier
-  8 000 tokens/minute) et `ensurePanels()` revalide brouillons, synthèse **et** modèle solo
-  après chaque changement de clé.
+  (sauf si aucune clé n'existe, pour garder la démo utilisable). Le panneau gratuit par
+  défaut privilégie **2 modèles Groq + le routeur `openrouter/free` en synthèse** (un Groq
+  prend le relais sans clé OpenRouter). Avec une clé Groq seule, on reste à 2 brouillons +
+  1 synthèse (palier 8 000 tokens/minute) et `ensurePanels()` revalide brouillons, synthèse
+  **et** modèle solo après chaque changement de clé.
 - **Premium sans crédits = repli réel, pas démo** : `hasPaidAccess()` exige une clé
   OpenRouter et, si le solde est connu, un solde > 0. Sinon `pools().paid` renvoie le roster
   gratuit, la manche porte `degraded: true` et l'interface affiche « premium non activé ».

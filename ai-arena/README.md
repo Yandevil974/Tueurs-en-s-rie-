@@ -27,8 +27,8 @@ Ouvre index.html  →  choisis Collaboration ou Solo  →  pose ta question
      (collaboration et solo) : le catalogue se limite alors aux modèles Groq et le panneau
      se recalcule tout seul (2 modèles + synthèse, à cause des 8 000 tokens/minute du palier).
    - une clé [OpenRouter](https://openrouter.ai/keys) `sk-or-…` est **optionnelle** : elle
-     ajoute le **routeur gratuit** (`openrouter/free`) au roster gratuit et débloque tout le
-     **premium** facturé dès qu'il y a du solde.
+     ajoute le **routeur gratuit** (`openrouter/free`) et les autres modèles `:free`, et
+     débloque tout le **premium** facturé dès qu'il y a du solde.
 
 > **Premium sans crédits = pas de démo.** Tant qu'aucun solde OpenRouter n'est disponible,
 > le mode Premium répond **réellement** avec les modèles gratuits (Groq + routeur) et
@@ -49,7 +49,7 @@ python3 -m http.server 8000 --bind 0.0.0.0 --directory ai-arena
 
 | | 🍃 Gratuit | 💎 Premium |
 |---|---|---|
-| Modèles | **modèles Groq + routeur gratuit** (`openrouter/free`) | les meilleurs modèles payants |
+| Modèles | tous les gratuits (Groq, routeur `openrouter/free`, `:free`) ; **le panneau par défaut = 2 Groq + routeur** | les meilleurs modèles payants |
 | Coût | 0 $ | facturé par OpenRouter |
 | Suivi | coût de la manche (0 $) | **crédits restants affichés à chaque utilisation** |
 | Sans crédits | déjà dans son régime normal | **repli gratuit : répond avec Groq + routeur**, jamais de simulation |
@@ -64,6 +64,10 @@ barre de panneau) :
 | Affichage | cartes de brouillons + carte « Réponse finale » | une seule carte « Réponse » |
 | Choix | panneau de brouillons + synthétiseur | **un seul modèle** |
 | Mémoire | un panneau par catalogue | un modèle solo par catalogue |
+
+Le panneau gratuit par défaut est volontairement simple : **2 modèles Groq écrivent, le
+routeur gratuit rédige la synthèse** (un Groq prend le relais si le routeur n'est pas
+disponible). Les autres modèles gratuits restent sélectionnables dans le panneau.
 
 Le choix est **persistant** (il survit au rechargement) et se règle à deux endroits :
 le sélecteur de l'accueil / de la barre de panneau pour basculer instantanément, ou le
