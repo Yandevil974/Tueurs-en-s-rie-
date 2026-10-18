@@ -977,7 +977,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     <div class="dlg-head">
       <div>
         <h2 id="settingsTitle">Clés &amp; réglages</h2>
-        <p>Une clé OpenRouter suffit pour le gratuit et le premium. Groq est optionnel.</p>
+        <p>Une clé <b>Groq</b> suffit pour tout le mode gratuit. OpenRouter débloque les modèles <code>:free</code> et le premium.</p>
       </div>
       <button class="btn ghost icon-btn close" type="button" data-close="settingsDlg" aria-label="Fermer">
         <svg class="icon lg" aria-hidden="true"><use href="#i-x"></use></svg>
@@ -1006,7 +1006,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
           <label for="groqKey">Clé Groq <span style="color:var(--faint);font-weight:500">(gratuite)</span></label>
           <input class="mono" id="groqKey" type="password" placeholder="gsk_…" spellcheck="false" autocomplete="off" autocapitalize="off">
           <div class="key-state" id="groqState"><span class="dot" aria-hidden="true"></span><span>Non configurée</span></div>
-          <p class="help">Ajoute les modèles Groq très rapides au panneau gratuit. <a class="link" href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Créer une clé ↗</a></p>
+          <p class="help">Suffit à faire tourner tout le gratuit (collaboration et solo) avec les modèles Groq. <a class="link" href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">Créer une clé ↗</a></p>
         </div>
 
         <label class="check"><input type="checkbox" id="rememberKeys" checked> Mémoriser les clés sur cet appareil</label>
