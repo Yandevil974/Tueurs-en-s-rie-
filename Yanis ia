@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Arène des IA</title>
+<script src="https://tailwindcss.com"></script>
+<style>
+.winner { border-color: #22c55e !important; box-shadow: 0 0 10px rgba(34, 197, 94, 0.3); }
+.loser { opacity: 0.5; }
+</style>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen p-4 font-sans">
+
+<!-- Clés API -->
+<header class="max-w-6xl mx-auto bg-gray-900 border border-gray-800 p-4 rounded-xl mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
+<h1 class="text-xl font-bold text-purple-400">⚔️ L'Arène des IA</h1>
+<div class="flex gap-2 w-full md:w-auto">
+<input type="password" id="openrouterKey" placeholder="Clé OpenRouter" class="bg-gray-800 text-xs rounded p-2 border border-gray-700 w-full md:w-40">
+<input type="password" id="groqKey" placeholder="Clé Groq" class="bg-gray-800 text-xs rounded p-2 border border-gray-700 w-full md:w-40">
+</div>
+</header>
+
+<main class="max-w-6xl mx-auto space-y-6">
+<!-- Zone de saisie et Actions -->
+<section class="bg-gray-900 p-4 rounded-xl border border-gray-800 space-y-4">
+<textarea id="promptInput" rows="2" class="w-full bg-gray-950 border border-gray-800 rounded-lg p-3 text-sm focus:outline-none focus:border-purple-500" placeholder="Votre prompt ici..."></textarea>
+
+<div class="flex flex-wrap gap-2 justify-between items-center">
+<div class="flex flex-wrap gap-2 text-xs">
+<button onclick="activerGratuites()" class="bg-green-950/60 text-green-400 border border-green-800 px-3 py-2 rounded hover:bg-green-900/50">🍃 Les Gratuites Collaborent</button>
+<button onclick="activerPayantesLabo()" class="bg-amber-950/60 text-amber-400 border border-amber-800 px-3 py-2 rounded hover:bg-amber-900/50">💎 Les Payantes Collaborent</button>
+<span class="text-gray-500 self-center px-1">ou cliquez sur une payante pour le mode Solo</span>
+</div>
+
+<button onclick="lancerLeCombat()" id="btnLancer" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold py-2 px-6 rounded-lg transition">
+🔥 Lancer
+</button>
+</div>
+</section>
+
+<!-- Liste des IA Exacte -->
+<section class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+<h2 class="text-sm font-semibold text-gray-400 mb-3">Modèles disponibles :</h2>
+<div id="modelsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-2"></div>
+</section>
+
+<!-- Résultats -->
+<section id="resultsSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Rempli dynamiquement -->
+</section>
+</main>
+
+<script>
+// La liste exacte des 16 modèles validés ensemble
+const listeModeles = [
+// --- 8 GRATUITES ---
+{ id: "groq/llama-3.1-8b-instant", name: "Llama 3.1 8B", provider: "groq", type: "gratuit" },
+{ id: "groq/mixtral-8x7b-32768", name: "Mixtral 8x7B", provider: "groq", type: "gratuit" },
+{ id: "groq/gemma2-9b-it", name: "Gemma 2 9B", provider: "groq", type: "gratuit" },
+{ id: "google/gemini-flash-1.5", name: "Gemini Flash 1.5", provider: "openrouter", type: "gratuit" },
+{ id: "mistralai/pixtral-12b", name: "Pixtral 12B", provider: "openrouter", type: "gratuit" },
+{ id: "deepseek/deepseek-chat", name: "DeepSeek Chat", provider: "openrouter", type: "gratuit" },
+{ id: "qwen/qwen-2.5-coder-7b", name: "Qwen 2.5 Coder", provider: "openrouter", type: "gratuit" },
+{ id: "meta-llama/llama-3.1-8b-instruct", name: "Llama 3.1 8B OS", provider: "openrouter", type: "gratuit" },
+
+// --- 8 PAYANTES ---
+{ id: "openai/gpt-4o", name: "GPT-4o", provider: "openrouter", type: "payant" },
+{ id: "openai/gpt-4o-mini", name: "GPT-4o Mini", provider: "openrouter", type: "payant" },
+{ id: "openai/o1-mini", name: "OpenAI o1-Mini", provider: "openrouter", type: "payant" },
+{ id: "anthropic/claude-3.5-sonnet", name: "Claude 3.5 Sonnet", provider: "openrouter", type: "payant" },
+{ id: "google/gemini-pro-1.5", name: "Gemini Pro 1.5", provider: "openrouter", type: "payant" },
+{ id: "mistralai/mistral-large", name: "Mistral Large 2", provider: "openrouter", type: "payant" },
+{ id: "meta-llama/llama-3.1-405b-instruct", name: "Llama 3.1 405B", provider: "openrouter", type: "payant" },
+{ id: "groq/llama-3.1-70b-versatile", name: "Llama 3.1 70B", provider: "groq", type: "payant" }
+];
+
+// Remplissage de la grille
+const grid = document.getElementById('modelsGrid');
+listeModeles.forEach(m => {
+const div = document.createElement('div');
+const icon = m.type === 'payant' ? '💎' : '🍃';
+div.className = "flex items-center gap-2 bg-gray-950 p-2 rounded border border-gray-800 text-xs cursor-pointer hover:border-gray-600 transition";
+div.innerHTML = &lt;input type="checkbox" id="${m.id}" data-provider="${m.provider}" data-type="${m.type}" data-name="${m.name}" class="rounded text-purple-600 focus:ring-0 pointer-events-none"&gt; &lt;span class="truncate flex-1"&gt;${icon} ${m.name}&lt;/span&gt;;
+
+div.onclick = () => {
+const input = div.querySelector('input');
+if (m.type === 'payant') {
+document.querySelectorAll('#modelsGrid input').forEach(i => i.checked = false);
+input.checked = true;
+} else {
+input.checked = !input.checked;
+}
+};
+grid.appendChild(div);
+});
+
+function activerGratuites() {
+document.querySelectorAll('#modelsGrid input').forEach(i => {
+i.checked = i.getAttribute('data-type') === 'gratuit';
+});
+}
+
+function activerPayantesLabo() {
+document.querySelectorAll('#modelsGrid input').forEach(i => {
+i.checked = i.getAttribute('data-type') === 'payant';
+});
+}
+
+activerGratuites();
+
+async function lancerLeCombat() {
+const prompt = document.getElementById('promptInput').value.trim();
+if (!prompt) return alert("Entrez un texte.");
+
+const selection = document.querySelectorAll('#modelsGrid input:checked');
+if (selection.length === 0) return alert("Sélectionnez au moins une IA.");
+
+const orKey = document.getElementById('openrouterKey').value.trim();
+const groqKey = document.getElementById('groqKey').value.trim();
+
+const container = document.getElementById('resultsSection');
+container.innerHTML = '';
+container.classList.remove('hidden');
+
+selection.forEach(cb => {
+const div = document.createElement('div');
+div.id = res-${cb.id.replace(///g, '-')}; div.className = "bg-gray-900 border border-gray-800 p-4 rounded-xl flex flex-col justify-between"; div.innerHTML =
+<div>
+<div class="flex justify-between items-center mb-2 border-b border-gray-800 pb-2">
+<span class="font-bold text-purple-400 text-sm">${cb.getAttribute('data-name')}&lt;/span&gt; &lt;span class="badge text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded animate-pulse"&gt;Calcul...&lt;/span&gt; &lt;/div&gt; &lt;p class="text-xs text-gray-300 font-mono whitespace-pre-wrap out-text"&gt;En attente...&lt;/p&gt; &lt;/div&gt; &lt;div class="flex justify-between items-center mt-4 pt-2 border-t border-gray-800 text-[11px]"&gt; &lt;span class="time text-gray-500"&gt;-- ms&lt;/span&gt; &lt;div class="flex gap-1"&gt; &lt;button onclick="voter('${div.id}', true)" class="bg-gray-800 px-2 py-1 rounded hover:bg-green-700">👍 Top</button>
+<button onclick="voter('${div.id}', false)" class="bg-gray-800 px-2 py-1 rounded hover:bg-red-700"&gt;👎 Flop&lt;/button&gt; &lt;/div&gt; &lt;/div&gt;;
+container.appendChild(div);
+});
+
+const actions = Array.from(selection).map(async (cb) => {
+const id = cb.id;
+const prov = cb.getAttribute('data-provider');
+const cleanId = res-${id.replace(///g, '-')}`;
+const block = document.getElementById(cleanId);
+
+const start = performance.now();
+try {
+let url = prov === 'groq' ? "https://groq.com" : "https://openrouter.ai";
+let key = prov === 'groq' ? groqKey : orKey;
+
+if (!key) throw new Error("Clé manquante");
+
+const res = await fetch(url, {
+method: "POST",
+headers: { "Authorization": Bearer${key}`, "Content-Type": "application/json" },
+body: JSON.stringify({
+model: prov === 'groq' ? id.replace('groq/', '') : id,
+messages: [{ role: "user", content: prompt }]
+})
+});
+
+
+### 🛠️ Partie 2 : Les démarches d'activation étape par étape #### Étape 1 : Créer l'application dans Acode 1. Ouvrez votre application **Acode** sur votre téléphone. 2. Créez un **Nouveau Fichier** (souvent via le bouton `+` ou le menu). 3. Nommez précisément ce fichier : **`arene_ia.html`** 4. **Collez** l'intégralité du grand bloc de code ci-dessus dans la page blanche. 5. Enregistrez le fichier. #### Étape 2 : Récupérer vos clés d'accès (Une seule fois) 1. **Pour les IA Gratuites :** Allez sur [://groq.com](https://://groq.com/), créez un compte gratuit, cliquez sur **API Keys**, créez-en une et copiez-la. 2. **Pour les IA Payantes :** Allez sur [openrouter.ai/keys](https://openrouter.ai), créez un compte, ajoutez quelques crédits dans la partie "Credit" si vous voulez utiliser les modèles premium, générez une clé et copiez-la. #### Étape 3 : Lancer l'affrontement 1. Dans **Acode**, utilisez le bouton de lecture (icône **Play / Lancer**) en haut de l'écran pour ouvrir la page web directement. 2. Collez vos clés récupérées dans les cases **Clé OpenRouter** et **Clé Groq** situées tout en haut. 3. Tapez votre question dans la zone de texte. 4. Utilisez les boutons selon vos besoins : * **🍃 Les Gratuites Collaborent** : Toutes les IA gratuites travailleront ensemble. * **💎 Les Payantes Collaborent** : Toutes les IA payantes s'activeront pour répondre en même temps. * **Mode Solo** : Cliquez directement sur un seul modèle payant (comme *Claude 3.5 Sonnet*) pour désactiver le reste et ne faire travailler que lui. 5. Cliquez sur **🔥 Lancer** pour lancer l'analyse en direct.
