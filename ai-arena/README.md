@@ -1,14 +1,19 @@
 # ARENA//X — les IA collaborent, tu récoltes la meilleure réponse
 
-Un **seul fichier** (`index.html`, ~190 Ko) qui fait travailler plusieurs modèles d'IA sur la
-même question, puis confie leurs brouillons à un **synthétiseur** qui fusionne, corrige et
-rédige une réponse finale unique. Streaming en direct, métriques, votes, crédits OpenRouter
-suivis à chaque manche, sauvegarde JSON automatique — aucune dépendance, aucun serveur.
+Un **seul fichier** (`index.html`) qui propose **deux façons d'obtenir une réponse** :
+
+- **Collaboration** — plusieurs modèles écrivent en parallèle, un **synthétiseur** fusionne,
+  corrige et rédige une réponse finale unique.
+- **Solo** — **un seul modèle** répond directement, sans brouillons ni synthèse.
+
+Les deux options existent **en gratuit et en premium**, se choisissent en un clic et sont
+mémorisées. Streaming en direct, métriques, votes, crédits OpenRouter suivis à chaque manche,
+sauvegarde JSON automatique — aucune dépendance, aucun serveur.
 
 ```
-Ouvre index.html  →  pose ta question  →  N modèles écrivent en parallèle
-                                      →  le synthétiseur corrige et fusionne
-                                      →  une seule réponse, sourcée par plusieurs IA
+Ouvre index.html  →  choisis Collaboration ou Solo  →  pose ta question
+   Collaboration :  N modèles écrivent  →  le synthétiseur fusionne  →  1 réponse
+   Solo          :  1 modèle choisi écrit                          →  1 réponse
 ```
 
 ## Démarrer
@@ -16,10 +21,15 @@ Ouvre index.html  →  pose ta question  →  N modèles écrivent en parallèle
 1. Ouvre `index.html` (double-clic, `file://`, ou GitHub Pages).
 2. Sans clé, tout fonctionne en **mode démonstration** : l'interface, le streaming simulé,
    les métriques, la synthèse, les votes et les sauvegardes sont testables.
-3. Clique l'onglet **Réglages** (⚙), colle une clé [OpenRouter](https://openrouter.ai/keys)
-   (mode gratuit **et** premium) et, si tu veux, une clé
-   [Groq](https://console.groq.com/keys) et une
-   [clé de gestion](https://openrouter.ai/settings/management-keys) pour le solde exact.
+3. Clique l'onglet **Réglages** (⚙) et colle **une seule clé pour commencer** :
+   - **tu as déjà Groq** → colle la clé `gsk_…` de
+     [console.groq.com/keys](https://console.groq.com/keys). Elle suffit pour le **gratuit**
+     (collaboration et solo) : le catalogue se limite alors aux modèles Groq et le panneau
+     se recalcule tout seul (2 modèles + synthèse, à cause des 8 000 tokens/minute du palier).
+   - une clé [OpenRouter](https://openrouter.ai/keys) `sk-or-…` est **optionnelle** : elle
+     débloque les modèles `:free` d'OpenRouter et tout le **premium** facturé.
+   - une [clé de gestion](https://openrouter.ai/settings/management-keys) OpenRouter est
+     optionnelle aussi : elle affiche le **solde restant** exact en premium.
 
 ```bash
 # tester sur le téléphone, même Wi-Fi
@@ -27,7 +37,9 @@ python3 -m http.server 8000 --bind 0.0.0.0 --directory ai-arena
 # puis ouvrir http://IP-DU-PC:8000/
 ```
 
-## Les deux modes
+## Deux catalogues × deux façons de répondre
+
+**Catalogues** (bouton Gratuit / Premium de l'en-tête) :
 
 | | 🍃 Gratuit | 💎 Premium |
 |---|---|---|
@@ -36,8 +48,20 @@ python3 -m http.server 8000 --bind 0.0.0.0 --directory ai-arena
 | Suivi | compteur « démo » / coût de la manche | **crédits restants affichés à chaque utilisation** |
 | Recharge | — | [openrouter.ai/settings/credits](https://openrouter.ai/settings/credits) |
 
-Le fonctionnement est identique dans les deux modes : **3 brouillons en parallèle** (jusqu'à 4),
-puis **1 synthèse**. Seul le panneau de modèles change.
+**Façons de répondre** (sélecteur `Collaboration | Solo`, présent dans l'accueil et dans la
+barre de panneau) :
+
+| | 🤝 Collaboration | 🎯 Solo |
+|---|---|---|
+| Appels par question | 3 brouillons (2 si Groq seul) + 1 synthèse | **1 seul appel** |
+| Affichage | cartes de brouillons + carte « Réponse finale » | une seule carte « Réponse » |
+| Choix | panneau de brouillons + synthétiseur | **un seul modèle** |
+| Mémoire | un panneau par catalogue | un modèle solo par catalogue |
+
+Le choix est **persistant** (il survit au rechargement) et se règle à deux endroits :
+le sélecteur de l'accueil / de la barre de panneau pour basculer instantanément, ou le
+bouton **Panneau** pour choisir précisément les modèles. En Solo, le premier modèle proposé
+est présélectionné : l'app est utilisable immédiatement.
 
 ### Comment la collaboration fonctionne
 
@@ -94,12 +118,13 @@ Le JSON contient `app`, `schema`, `version`, `exportedAt`, `settings`, `panels`,
 - **Markdown sûr** : HTML échappé d'abord, liens en liste blanche, tableaux, listes,
   citations, blocs de code avec bouton copier.
 - **Mode démo intégral** : aucun appel réseau, textes simulés distincts par modèle.
-- **Panneau de collaboration** : recherche, onglets Brouillons/Synthèse, presets,
-  4 brouillons max, sélection persistante par mode.
+- **Panneau à deux visages** : en Collaboration, recherche + onglets Brouillons/Synthèse +
+  presets + 4 brouillons max ; en Solo, sélection unique en un clic. Sélection persistante
+  par catalogue **et** par mode.
 - **Clés** : `localStorage` ou `sessionStorage` (case « mémoriser »), affichage masqué,
   bouton « Tester » les trois connexions avec message d'erreur lisible.
 - **Thèmes** sombre / clair / système, sans flash au chargement.
-- **Mobile d'abord** : 0 px de débordement à 390 px, barre de panneau collante,
+- **Mobile d'abord** : 0 px de débordement de 320 à 1440 px, barre de panneau collante,
   composeur fixe, dialogues plein écran.
 - **Accessibilité** : `<dialog>` natif, focus visible, `aria-live`, lien d'évitement,
   navigation clavier (`Ctrl/⌘ + ↵`), `prefers-reduced-motion`, styles d'impression.

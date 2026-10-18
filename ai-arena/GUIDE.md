@@ -1,9 +1,10 @@
 # Comment construire une arène d'IA performante en un seul fichier HTML
 
-Ce guide accompagne `ai-arena/index.html` — un fichier autonome d'environ 185 Ko où plusieurs
-modèles rédigent des brouillons en parallèle, puis un synthétiseur produit une réponse finale
-unique. Streaming, métriques, crédits OpenRouter suivis à chaque manche, sauvegarde JSON
-automatique. Il explique **les décisions techniques** et **ce qu'il faut éviter**.
+Ce guide accompagne `ai-arena/index.html` — un fichier autonome d'environ 190 Ko qui propose
+**deux modes** : en collaboration, plusieurs modèles rédigent des brouillons en parallèle puis
+un synthétiseur produit une réponse finale unique ; en solo, un seul modèle répond directement.
+Streaming, métriques, crédits OpenRouter suivis à chaque manche, sauvegarde JSON automatique.
+Il explique **les décisions techniques** et **ce qu'il faut éviter**.
 
 ---
 
@@ -226,12 +227,48 @@ Ta liste date de 2024. Depuis, les fournisseurs ont retiré plusieurs modèles :
 | Gemma 2 9B (Groq) | retiré | `openai/gpt-oss-20b` |
 | Llama 3.1 70B `llama-3.1-70b-versatile` (Groq) | retiré le 24/01/2025 | `openai/gpt-oss-120b` |
 | `llama-3.1-8b-instant` (Groq) | annoncé retiré en 2026 | `openai/gpt-oss-20b` |
-| Gemini Flash 1.5 `:free`, Pixtral 12B `:free`, DeepSeek Chat `:free` | plus « gratuits » sur OpenRouter (paliers supprimés) | `openrouter/free`, `meta-llama/llama-3.3-70b-instruct:free`… |
+| Gemini Flash 1.5 `:free`, Pixtral 12B `:free`, DeepSeek Chat `:free`, Llama 3.3 70B `:free` | plus « gratuits » sur OpenRouter (paliers supprimés) | `openrouter/free`, `nvidia/nemotron-3-super-120b-a12b:free` |
 
-La page **garde tes 16 modèles** (c'est ta sélection), marque les identifiants historiques
-d'un ⚠, et affiche un message clair quand l'API répond « modèle inexistant » au lieu d'un
-écran muet. Pour remettre à jour la liste : `GET https://openrouter.ai/api/v1/models`
+La liste embarquée de secours (`FALLBACK`) ne contient plus que des identifiants **encore
+gratuits en 2026** : `openai/gpt-oss-120b:free`, `google/gemma-4-31b-it:free`,
+`google/gemma-4-26b-a4b-it:free`, `nvidia/nemotron-3-super-120b-a12b:free`, `openrouter/free`
+côté OpenRouter ; `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `qwen/qwen3.8-27b`,
+`openai/gpt-oss-safeguard-20b` côté Groq. Quand l'API répond « modèle inexistant », la carte
+affiche un message clair au lieu d'un écran muet. Pour remettre à jour la liste : `GET https://openrouter.ai/api/v1/models`
 et `GET https://api.groq.com/openai/v1/models` (avec ta clé).
+
+---
+
+## 5 bis. Deux modes de réponse : collaboration et solo
+
+Le même fichier sert deux stratégies, sans dupliquer le moteur :
+
+```
+state.style = "collab"                 state.style = "solo"
+  panels[mode]  → N brouillons           soloModels[mode] → 1 modèle
+  synths[mode]  → 1 synthétiseur         runSolo()        → 1 appel direct
+  runRound() → runDraft() × N + runSynth()
+```
+
+- **Choix persisté** : `style`, `soloFree`, `soloPaid` sont stockés avec les autres réglages
+  (`arenax.settings.v3`). Un modèle solo **par catalogue** : changer Gratuit/Premium ne
+  perd pas la sélection de l'autre côté.
+- **Source unique de vérité** : `currentKeys()` renvoie toujours `{ drafts, synth, solo, mode }`.
+  Les deux moteurs (`runRound`, `runSolo`) et les deux rendus (`buildTurn`) lisent cette
+  structure, donc le reste du code (crédits, historique, sauvegarde JSON) est partagé.
+- **Une manche solo = un seul appel**, donc un seul contrôleur d'annulation
+  (`turn.id + ":solo"`), une seule carte dans le fil, et une seule ligne de métriques
+  (« réponse N tok · coût réponse »). L'état de l'étape unique est dérivé de `turn.synth`.
+- **Le panneau s'adapte** : en Solo, la liste devient une sélection unique (radio) et les
+  onglets Brouillons/Synthèse ainsi que les presets disparaissent — pas de bouton inutile.
+- **Catalogue piloté par les clés** : `pools()` masque un fournisseur dont la clé est absente
+  (sauf si aucune clé n'existe, pour garder la démo utilisable). Avec une clé Groq seule,
+  le panneau gratuit se réduit à 2 brouillons + 1 synthèse (palier 8 000 tokens/minute) et
+  `ensurePanels()` revalide brouillons, synthèse **et** modèle solo après chaque changement
+  de clé.
+- **Limitation de débit Groq** : un sémaphore maison garde au maximum **2 requêtes Groq
+  simultanées** ; les suivantes attendent leur tour (et sont annulées proprement par
+  « Arrêter »), ce qui évite les 429 sur le palier gratuit.
 
 ---
 

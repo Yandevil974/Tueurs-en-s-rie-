@@ -270,7 +270,9 @@ a { color: var(--mint); text-underline-offset: 2px; }
 .examples .btn { height: 28px; padding: 0 11px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); font-size: 11.5px; }
 .examples .btn:hover { color: var(--text); border-color: var(--line-2); }
 @media (max-width: 680px) { .examples { margin-top: 12px; } .examples .btn:last-child { display: none; } }
-.hero-links { display: none; margin-top: 10px; }
+.hero-links { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.hero-links .seg { padding: 3px; }
+.hero-links .seg button { font-size: 12px; }
 .hero-note { display: flex; align-items: center; gap: 6px; margin-top: 12px; color: var(--faint); font-size: 11px; }
 .hero-note .icon { width: 12px; height: 12px; }
 
@@ -294,6 +296,7 @@ a { color: var(--mint); text-underline-offset: 2px; }
 .panelbar .mini-credits b { color: var(--text); font-weight: 650; }
 .panelbar .recharge-mini { color: var(--amber); border-color: rgba(251, 191, 36, 0.28); }
 .panelbar .recharge-mini:hover { color: var(--amber); border-color: var(--amber); background: rgba(251, 191, 36, 0.08); }
+body:not(.has-chat) .panelbar, body:not(.has-chat) .empty { display: none; }
 
 .avatar {
   display: inline-grid; place-items: center; width: 27px; height: 27px; flex: none;
@@ -549,6 +552,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 .seg { display: inline-flex; gap: 3px; padding: 3px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .seg button { height: 28px; padding: 0 10px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 11.5px; font-weight: 650; }
 .seg button.active { background: var(--panel-2); color: var(--text); box-shadow: inset 0 0 0 1px var(--line-2); }
+.style-seg { flex: none; }
+.style-seg button[data-style="collab"].active { box-shadow: inset 0 0 0 1px rgba(74, 222, 128, 0.35); color: var(--text); }
+.style-seg button[data-style="solo"].active { box-shadow: inset 0 0 0 1px rgba(125, 211, 252, 0.35); color: var(--text); }
+#panelDlg .style-seg { margin-bottom: 10px; display: flex; }
+#panelDlg .style-seg button { flex: 1; height: 32px; }
+#panelDlg .style-seg button.active { background: var(--panel-2); }
 /* fondu bas : signale qu'il y a d'autres modèles à faire défiler */
 .model-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; max-height: 300px; overflow-y: auto; padding: 2px 2px 26px 0;
   -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 34px), transparent 100%);
@@ -604,14 +613,14 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
 /* Toasts */
 .toast {
-  position: fixed; top: 76px; right: 16px; z-index: 300;
-  max-width: min(380px, calc(100vw - 32px)); padding: 10px 13px;
+  position: fixed; top: auto; bottom: calc(var(--dock-h, 96px) + 14px); left: 50%; z-index: 300;
+  max-width: min(420px, calc(100vw - 32px)); padding: 10px 13px;
   border: 1px solid var(--line-2); border-radius: 11px; background: var(--panel-solid);
   box-shadow: var(--shadow); color: var(--text); font-size: 12.5px; line-height: 1.45;
-  opacity: 0; transform: translateY(-7px); pointer-events: none;
+  opacity: 0; transform: translate(-50%, 7px); pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
-.toast.show { opacity: 1; transform: none; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
 .toast.err { border-color: rgba(251, 113, 133, 0.45); }
 .toast.ok { border-color: rgba(74, 222, 128, 0.4); }
 
@@ -827,22 +836,22 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
 <main class="shell">
   <section class="hero" id="hero" aria-labelledby="heroTitle">
-    <p class="eyebrow"><span class="spark" aria-hidden="true">✦</span> plusieurs modèles · une réponse finale</p>
-    <h1 id="heroTitle">Les IA <span class="grad">collaborent</span>,<br>tu récoltes la meilleure réponse.</h1>
-    <p class="hero-sub">Chaque manche, <b>plusieurs modèles</b> réfléchissent en parallèle, puis un <b>synthétiseur</b> fusionne, corrige et rédige.<span class="hide-mobile"> Compare les brouillons, garde le meilleur — et suis ton solde OpenRouter à chaque appel.</span></p>
+    <p class="eyebrow"><span class="spark" aria-hidden="true">✦</span> collaboration ou solo · à toi de choisir</p>
+    <h1 id="heroTitle">Les IA <span class="grad">collaborent</span>,<br>ou répondent en <span class="grad">solo</span>.</h1>
+    <p class="hero-sub">En <b>collaboration</b>, plusieurs modèles réfléchissent en parallèle, puis un <b>synthétiseur</b> fusionne, corrige et rédige. En <b>solo</b>, un seul modèle répond directement, sans brouillons.<span class="hide-mobile"> Suis ton solde OpenRouter à chaque appel.</span></p>
 
     <div class="hero-cards">
       <button class="hero-card" id="heroFree" type="button">
-        <h2><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg> Collaboration gratuite <span class="tag">0 $</span></h2>
-        <p>Les meilleures IA gratuites du moment (OpenRouter + Groq) s'entraident. Aucune carte bancaire.</p>
+        <h2><svg class="icon" aria-hidden="true"><use href="#i-layers"></use></svg> Gratuit <span class="tag">0 $</span></h2>
+        <p>Les meilleures IA gratuites du moment (OpenRouter + Groq), en collaboration ou en solo. Aucune carte bancaire.</p>
         <div class="card-foot">
           <div class="stack" id="stackFree" aria-hidden="true"></div>
           <span class="go">Lancer <svg class="icon sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
         </div>
       </button>
       <button class="hero-card paid" id="heroPaid" type="button">
-        <h2><svg class="icon" aria-hidden="true"><use href="#i-wallet"></use></svg> Collaboration premium <span class="tag">crédits</span></h2>
-        <p>Les meilleurs modèles payants collaborent. Recharge sur OpenRouter, solde et dépense suivis ici.</p>
+        <h2><svg class="icon" aria-hidden="true"><use href="#i-wallet"></use></svg> Premium <span class="tag">crédits</span></h2>
+        <p>Les meilleurs modèles payants, en collaboration ou en solo. Recharge sur OpenRouter, solde et dépense suivis ici.</p>
         <div class="card-foot">
           <div class="stack" id="stackPaid" aria-hidden="true"></div>
           <span class="go">Lancer <svg class="icon sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
@@ -851,6 +860,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     </div>
     <div class="examples" id="examples" aria-label="Exemples de questions"></div>
     <div class="hero-links">
+      <div class="seg style-seg" id="styleSegHero" role="group" aria-label="Mode de réponse">
+        <button type="button" data-style="collab" class="active">Collaboration</button>
+        <button type="button" data-style="solo">Un seul modèle</button>
+      </div>
       <button class="btn sm ghost" type="button" data-open-panel="1">
         <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg> Personnaliser le panneau
       </button>
@@ -870,6 +883,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       <a class="btn sm ghost recharge-mini" id="miniTopup" href="https://openrouter.ai/settings/credits" target="_blank" rel="noopener noreferrer" hidden>
         <svg class="icon" aria-hidden="true"><use href="#i-wallet"></use></svg> Recharger
       </a>
+      <div class="seg style-seg" id="styleSeg" role="group" aria-label="Mode de réponse">
+        <button type="button" data-style="collab" class="active">Collaboration</button>
+        <button type="button" data-style="solo">Solo</button>
+      </div>
       <button class="btn sm ghost" id="panelBtn" type="button">
         <svg class="icon" aria-hidden="true"><use href="#i-settings"></use></svg> <span id="panelBtnLabel">Panneau</span>
       </button>
@@ -877,7 +894,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
     <div class="thread" id="thread"></div>
     <div class="empty" id="empty">
-      <p><strong>Le panneau est prêt.</strong> Écris une question — les modèles consultent, le synthétiseur rédige.</p>
+      <p><strong>Le panneau est prêt.</strong> <span id="emptyHint">Écris une question — les modèles consultent, le synthétiseur rédige.</span></p>
     </div>
   </section>
 </main>
@@ -916,14 +933,18 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     <div class="dlg-head">
       <div>
         <h2 id="panelDlgTitle">Panneau de collaboration</h2>
-        <p>Choisis les modèles qui préparent les brouillons, puis celui qui rédige la réponse finale.</p>
+        <p id="panelDlgSub">Choisis les modèles qui préparent les brouillons, puis celui qui rédige la réponse finale.</p>
       </div>
       <button class="btn ghost icon-btn close" type="button" data-close="panelDlg" aria-label="Fermer">
         <svg class="icon lg" aria-hidden="true"><use href="#i-x"></use></svg>
       </button>
     </div>
     <div class="dlg-body">
-      <div class="seg" role="group" aria-label="Groupe de modèles">
+      <div class="seg style-seg" id="styleSegDlg" role="group" aria-label="Mode de réponse">
+        <button type="button" data-style="collab" class="active">Collaboration</button>
+        <button type="button" data-style="solo">Un seul modèle</button>
+      </div>
+      <div class="seg" id="panelTabs" role="group" aria-label="Groupe de modèles">
         <button type="button" data-panel-tab="drafts" class="active">Brouillons</button>
         <button type="button" data-panel-tab="synth">Synthèse</button>
       </div>
@@ -931,7 +952,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
         <input id="modelSearch" type="search" placeholder="Rechercher un modèle…" aria-label="Rechercher un modèle">
       </div>
-      <div class="btn-row">
+      <div class="btn-row" id="presetRow">
         <button class="btn sm" type="button" data-preset="top">✦ Top 3 du panneau</button>
         <button class="btn sm" type="button" data-preset="top-bis">Compléter</button>
         <button class="btn sm ghost" type="button" data-preset="clear">Vider</button>
@@ -1204,15 +1225,15 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     remember: true,
     theme: "dark",
     backup: { auto: true, minutes: 10 },
-    mode: "free"
+    mode: "free",
+    style: "collab"
   };
 
   /* Ordre de préférence pour composer automatiquement le panneau. */
   var FREE_ORDER = [
-    /gpt-oss-120b/i, /gpt-oss-20b/i, /qwen3-coder/i, /gemma-4-31b/i,
-    /gemma-4-26b/i, /llama-3\.3-70b/i, /nemotron-3-super/i, /deepseek-r1/i,
-    /qwen3-next-80b/i, /qwen3\.8-27b/i, /qwen3\.6-27b/i, /glm|kimi|minimax/i,
-    /openrouter\/free/i
+    /gpt-oss-120b/i, /qwen3\.8-27b/i, /nemotron-3-super/i, /gemma-4-31b/i,
+    /gpt-oss-20b/i, /gemma-4-26b/i, /nemotron-3/i, /qwen3/i,
+    /glm|kimi|minimax|north|apodex|ling/i, /openrouter\/free/i
   ];
   var PAID_ORDER = [
     /claude.*(sonnet|opus)/i, /gpt-5(?!-mini)/i, /gpt-4o(?!-mini)/i,
@@ -1223,14 +1244,14 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   /* Repli si le catalogue réseau est indisponible. */
   var FALLBACK = [
     f("openrouter", "openai/gpt-oss-120b:free", "GPT-OSS 120B (free)", true, 0, 0),
-    f("openrouter", "qwen/qwen3-coder:free", "Qwen3 Coder (free)", true, 0, 0),
     f("openrouter", "google/gemma-4-31b-it:free", "Gemma 4 31B (free)", true, 0, 0),
-    f("openrouter", "meta-llama/llama-3.3-70b-instruct:free", "Llama 3.3 70B (free)", true, 0, 0),
+    f("openrouter", "google/gemma-4-26b-a4b-it:free", "Gemma 4 26B (free)", true, 0, 0),
     f("openrouter", "nvidia/nemotron-3-super-120b-a12b:free", "Nemotron 3 Super (free)", true, 0, 0),
-    f("openrouter", "deepseek/deepseek-r1:free", "DeepSeek R1 (free)", true, 0, 0),
     f("openrouter", "openrouter/free", "Routeur gratuit", true, 0, 0),
     f("groq", "openai/gpt-oss-120b", "GPT-OSS 120B · Groq", true, 0, 0),
     f("groq", "openai/gpt-oss-20b", "GPT-OSS 20B · Groq", true, 0, 0),
+    f("groq", "qwen/qwen3.8-27b", "Qwen3.8 27B · Groq", true, 0, 0),
+    f("groq", "openai/gpt-oss-safeguard-20b", "GPT-OSS Safeguard · Groq", true, 0, 0),
     f("openrouter", "anthropic/claude-3.5-sonnet", "Claude 3.5 Sonnet", false, 3, 15),
     f("openrouter", "openai/gpt-4o", "GPT-4o", false, 2.5, 10),
     f("openrouter", "openai/gpt-4o-mini", "GPT-4o Mini", false, 0.15, 0.6),
@@ -1262,6 +1283,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   /* 2. État ---------------------------------------------------------------- */
   var state = {
     mode: "free",
+    style: "collab",
+    soloModels: { free: null, paid: null },
     panels: { free: [], paid: [] },
     synths: { free: null, paid: null },
     turns: [],
@@ -1277,7 +1300,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     streaming: false,
     controllers: new Map(),
     stick: true,
-    pending: { drafts: [], synth: null, tab: "drafts", query: "" },
+    pending: { drafts: [], synth: null, solo: null, style: "collab", tab: "drafts", query: "" },
     ui: { openDrafts: new Set() }
   };
 
@@ -1535,6 +1558,22 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     return prettyName(id.replace(/[-_]/g, " ").replace(/\b\w/g, function (c) { return c.toUpperCase(); }));
   }
 
+  var NICER_NAMES = {
+    "openai/gpt-oss-120b": "GPT-OSS 120B",
+    "openai/gpt-oss-20b": "GPT-OSS 20B",
+    "openai/gpt-oss-safeguard-20b": "GPT-OSS Safeguard 20B",
+    "qwen/qwen3.8-27b": "Qwen 3.8 27B",
+    "meta-llama/llama-4-scout-17b-16e-instruct": "Llama 4 Scout 17B",
+    "meta-llama/llama-4-maverick-17b-128e-instruct": "Llama 4 Maverick 17B"
+  };
+
+  function humanizeId(id) {
+    var raw = String(id || "");
+    if (NICER_NAMES[raw]) return NICER_NAMES[raw];
+    var base = raw.split("/").pop() || raw;
+    return base.replace(/-/g, " ").replace(/\b(\d+)b\b/g, "$1B").trim();
+  }
+
   function prettyName(name, id) {
     var n = String(name || id || "");
     n = n.replace(/^[^:]{2,40}:\s*/, "");
@@ -1614,9 +1653,15 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   }
 
   function pools() {
+    var hasOR = !!state.keys.openrouter.trim();
     var hasGroq = !!state.keys.groq.trim();
+    var anyKey = hasOR || hasGroq;
+    /* Clé absente = fournisseur masqué, sauf si aucune clé n'existe :
+       dans ce cas on garde tout pour que la démonstration reste utilisable. */
     var free = state.catalog.filter(function (m) {
-      return m.free && (m.provider === "openrouter" || (m.provider === "groq" && hasGroq));
+      if (!m.free) return false;
+      if (!anyKey) return true;
+      return m.provider === "groq" ? hasGroq : hasOR;
     });
     var paid = state.catalog.filter(function (m) { return !m.free && m.provider === "openrouter"; });
     return { free: free, paid: paid };
@@ -1625,8 +1670,11 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   function defaultPanel(mode) {
     var p = pools()[mode];
     var ordered = rankModels(p, mode === "free" ? FREE_ORDER : PAID_ORDER);
-    var drafts = ordered.slice(0, 3).map(function (m) { return m.key; });
-    var synth = (ordered[3] || ordered[0] || {}).key || null;
+    var groqOnly = ordered.length > 0 && ordered.every(function (m) { return m.provider === "groq"; });
+    /* Groq gratuit plafonne à 8 000 tokens/minute : on reste à 2 brouillons + 1 synthèse. */
+    var n = groqOnly ? Math.min(2, Math.max(1, ordered.length - 1)) : 3;
+    var drafts = ordered.slice(0, n).map(function (m) { return m.key; });
+    var synth = (ordered[n] || ordered[0] || {}).key || null;
     return { drafts: drafts, synth: synth };
   }
 
@@ -1638,34 +1686,49 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     return typeof k === "string" && /^(openrouter|groq)::\S+$/.test(k);
   }
 
+  function inPool(key, mode) {
+    if (!validKey(key)) return false;
+    return pools()[mode].some(function (m) { return m.key === key; });
+  }
+
   function ensurePanels() {
     var dropped = 0;
     ["free", "paid"].forEach(function (mode) {
       var drafts = state.panels[mode].filter(function (k) {
-        if (!validKey(k)) return false;
-        if (modelByKey(k)) return true;
+        if (inPool(k, mode)) return true;
         dropped++;
         return false;
       });
       if (!drafts.length) {
         var d = defaultPanel(mode);
         drafts = d.drafts;
-        if (!state.synths[mode] || !modelByKey(state.synths[mode])) state.synths[mode] = d.synth;
+        if (!state.synths[mode] || !inPool(state.synths[mode], mode)) state.synths[mode] = d.synth;
       }
       state.panels[mode] = drafts.slice(0, MAX_DRAFTS);
-      if (!state.synths[mode] || !modelByKey(state.synths[mode])) {
+      if (!state.synths[mode] || !inPool(state.synths[mode], mode)) {
         var ordered = rankModels(pools()[mode], mode === "free" ? FREE_ORDER : PAID_ORDER);
         var cand = ordered.filter(function (m) { return state.panels[mode].indexOf(m.key) === -1; })[0] || ordered[0];
         state.synths[mode] = cand ? cand.key : null;
+      }
+      /* Modèle unique du mode Solo */
+      var solo = state.soloModels[mode];
+      if (!inPool(solo, mode)) {
+        var best = rankModels(pools()[mode], mode === "free" ? FREE_ORDER : PAID_ORDER)[0];
+        state.soloModels[mode] = best ? best.key : null;
       }
     });
     if (dropped) state.panelDropped = dropped;
   }
 
   function currentKeys() {
+    if (state.style === "solo") {
+      var solo = state.soloModels[state.mode] || state.panels[state.mode][0] || null;
+      return { drafts: [], synth: null, solo: solo, mode: state.mode };
+    }
     return {
       drafts: state.panels[state.mode].slice(0, MAX_DRAFTS),
       synth: state.synths[state.mode],
+      solo: null,
       mode: state.mode
     };
   }
@@ -1702,7 +1765,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         key: modelKey("groq", m.id),
         provider: "groq",
         id: m.id,
-        name: prettyName(m.id.replace(/\//g, " "), m.id),
+        name: prettyName(humanizeId(m.id), m.id),
         free: true,
         inPrice: 0,
         outPrice: 0,
@@ -1757,7 +1820,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       lists.push(catalogFromOpenRouter(json.data));
       state.catalogSource = "openrouter";
     } catch (e) {
-      errors.push("OpenRouter : " + (e && e.name === "AbortError" ? "délai dépassé" : "réseau indisponible"));
+      if (state.keys.openrouter.trim()) {
+        errors.push("OpenRouter : " + (e && e.name === "AbortError" ? "délai dépassé" : "réseau indisponible"));
+      }
     }
     if (state.keys.groq) {
       try {
@@ -1814,6 +1879,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       minutes: [5, 10, 30, 60].indexOf(Number(b.minutes)) !== -1 ? Number(b.minutes) : 10
     };
     state.mode = s.mode === "paid" ? "paid" : "free";
+    state.style = s.style === "solo" ? "solo" : "collab";
+    state.soloModels.free = typeof s.soloFree === "string" ? s.soloFree : null;
+    state.soloModels.paid = typeof s.soloPaid === "string" ? s.soloPaid : null;
     state.panels.free = Array.isArray(s.panelFree) ? s.panelFree.slice(0, MAX_DRAFTS) : [];
     state.panels.paid = Array.isArray(s.panelPaid) ? s.panelPaid.slice(0, MAX_DRAFTS) : [];
     state.synths.free = typeof s.synthFree === "string" ? s.synthFree : null;
@@ -1825,6 +1893,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   function persistSettings() {
     var s = Object.assign({}, state.settings, {
       mode: state.mode,
+      style: state.style,
+      soloFree: state.soloModels.free,
+      soloPaid: state.soloModels.paid,
       panelFree: state.panels.free,
       panelPaid: state.panels.paid,
       synthFree: state.synths.free,
@@ -1893,12 +1964,14 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         r.key = d.key;
         return r;
       }).filter(Boolean);
-      if (!cleanDrafts.length) return;
+      var isSolo = !!t.solo;
+      if (!cleanDrafts.length && !isSolo) return;
       var synth = null;
       if (t.synth && validKey(t.synth.key)) {
         var s = sanitizeResponse(t.synth);
         s.key = t.synth.key;
         s.fallback = !!t.synth.fallback;
+        s.solo = isSolo || !!t.synth.solo;
         synth = s;
       }
       out.push({
@@ -1908,6 +1981,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         prompt: t.prompt.slice(0, 8000),
         drafts: cleanDrafts.slice(0, MAX_DRAFTS),
         synth: synth,
+        solo: isSolo,
         demo: !!t.demo,
         creditsAfter: typeof t.creditsAfter === "number" ? t.creditsAfter : null,
         creditsUsed: typeof t.creditsUsed === "number" ? t.creditsUsed : null,
@@ -1928,7 +2002,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       updated: Date.now(),
       turns: state.turns.map(function (t) {
         return {
-          id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo,
+          id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo, solo: !!t.solo,
           creditsAfter: t.creditsAfter, creditsUsed: t.creditsUsed, steps: t.steps,
           drafts: t.drafts.map(function (d) {
             return { key: d.key, status: d.status, content: d.content, metrics: d.metrics, error: d.error };
@@ -2388,7 +2462,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       var mode = pair[0], node = pair[1];
       if (!node) return;
       node.replaceChildren();
-      state.panels[mode].slice(0, 3).forEach(function (k) {
+      var picks = state.style === "solo" ? [state.soloModels[mode]] : state.panels[mode].slice(0, 3);
+      picks.forEach(function (k) {
         var m = modelByKey(k);
         if (m) node.appendChild(avatarEl(m));
       });
@@ -2398,19 +2473,34 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   function renderPanelbar() {
     if (!el.panelAvatars) return;
     var keys = state.panels[state.mode];
+    var soloKey = state.soloModels[state.mode];
+    var soloModel = modelByKey(soloKey);
+    var solo = state.style === "solo";
     el.panelAvatars.replaceChildren();
-    keys.slice(0, 4).forEach(function (k) {
-      var m = modelByKey(k);
-      if (m) el.panelAvatars.appendChild(avatarEl(m));
-    });
+    if (solo) {
+      if (soloModel) el.panelAvatars.appendChild(avatarEl(soloModel));
+    } else {
+      keys.slice(0, 4).forEach(function (k) {
+        var m = modelByKey(k);
+        if (m) el.panelAvatars.appendChild(avatarEl(m));
+      });
+    }
     var synth = modelByKey(state.synths[state.mode]);
-    var total = keys.length + (synth ? 1 : 0);
-    el.panelTitle.textContent = keys.length + " modèle" + (keys.length > 1 ? "s" : "") +
-      (synth ? " + synthèse" : "");
-    el.panelSub.textContent = synth ? "Synthèse : " + shortName(prettyName(synth.name, synth.id)) : "Aucun synthétiseur";
-    el.panelSub.title = synth ? synth.name : "";
+    var total = solo ? (soloModel ? 1 : 0) : keys.length + (synth ? 1 : 0);
+    if (solo) {
+      el.panelTitle.textContent = soloModel ? "1 modèle solo" : "Aucun modèle solo";
+      el.panelSub.textContent = soloModel ? "Réponse directe : " + shortName(prettyName(soloModel.name, soloModel.id)) :
+        "Choisis un modèle dans le panneau";
+      el.panelSub.title = soloModel ? soloModel.name : "";
+    } else {
+      el.panelTitle.textContent = keys.length + " modèle" + (keys.length > 1 ? "s" : "") +
+        (synth ? " + synthèse" : "");
+      el.panelSub.textContent = synth ? "Synthèse : " + shortName(prettyName(synth.name, synth.id)) : "Aucun synthétiseur";
+      el.panelSub.title = synth ? synth.name : "";
+    }
+    syncStyleButtons();
     var label = document.getElementById("panelBtnLabel");
-    if (label) label.textContent = total ? "Panneau" : "Choisir";
+    if (label) label.textContent = solo ? "Modèle" : total ? "Panneau" : "Choisir";
     if (state.mode === "paid" && !state.keys.openrouter.trim()) {
       el.panelSub.textContent += " · démo sans clé";
     }
@@ -2539,7 +2629,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var head = elem("div", "synth-head");
     var label = elem("span", "synth-label");
     label.appendChild(elem("span", "spark", "✦"));
-    label.appendChild(document.createTextNode(!synth ? "Pas de réponse finale" : synth.fallback ? "Meilleur brouillon" : "Réponse finale"));
+    label.appendChild(document.createTextNode(!synth ? (turn.solo ? "Aucune réponse" : "Pas de réponse finale") :
+      turn.solo ? "Réponse" : synth.fallback ? "Meilleur brouillon" : "Réponse finale"));
     head.appendChild(label);
 
     var model = synth && synth.key ? modelByKey(synth.key) : null;
@@ -2557,13 +2648,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     } else if (synth.status === "streaming") {
       var dot = elem("span", "live-dot");
       status.appendChild(dot);
-      status.appendChild(document.createTextNode("synthèse en direct"));
+      status.appendChild(document.createTextNode(turn.solo ? "réponse en direct" : "synthèse en direct"));
     } else if (synth.status === "error") {
       status.textContent = "échec";
     } else if (synth.status === "stopped") {
       status.textContent = "interrompu";
     } else {
-      status.textContent = synth.fallback ? "synthèse indisponible" : "terminé";
+      status.textContent = turn.solo ? "terminé" : synth.fallback ? "synthèse indisponible" : "terminé";
     }
     head.appendChild(status);
     wrap.appendChild(head);
@@ -2605,10 +2696,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     body.className = "synth-body md";
     if (synth.status === "error") {
       var box = elem("div", "synth-error");
-      box.appendChild(elem("strong", "", "La synthèse a échoué"));
+      box.appendChild(elem("strong", "", turn.solo ? "La réponse a échoué" : "La synthèse a échoué"));
       box.appendChild(elem("span", "", synth.error && synth.error.message ? synth.error.message : "Erreur inconnue."));
       var actions = elem("div", "err-actions");
-      var retry = elem("button", "btn sm", "Relancer la synthèse");
+      var retry = elem("button", "btn sm", turn.solo ? "Relancer la réponse" : "Relancer la synthèse");
       retry.type = "button";
       retry.dataset.retrySynth = String(turn.id);
       actions.appendChild(retry);
@@ -2632,15 +2723,17 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var metrics = [];
     if (synth.metrics) {
       if (synth.metrics.demo) metrics.push("démo");
-      metrics.push("synthèse " + fmtInt(synth.metrics.completionTokens || 0) + " tok");
+      metrics.push((turn.solo ? "réponse " : "synthèse ") + fmtInt(synth.metrics.completionTokens || 0) + " tok");
       metrics.push(fmtUSD(synth.metrics.cost || 0));
     }
     var totalCost = (turn.drafts || []).reduce(function (n, d) { return n + ((d.metrics && d.metrics.cost) || 0); }, 0);
     totalCost += (synth.metrics && synth.metrics.cost) || 0;
-    if (turn.drafts && turn.drafts.length) {
+    if (turn.solo) {
+      metrics.push("1 appel");
+    } else if (turn.drafts && turn.drafts.length) {
       metrics.push(fmtInt(turn.drafts.length + 1) + " appels");
     }
-    metrics.push("coût manche " + fmtUSD(totalCost));
+    metrics.push((turn.solo ? "coût réponse " : "coût manche ") + fmtUSD(totalCost));
 
     metrics.forEach(function (m, i) {
       if (i) foot.appendChild(elem("span", "sep"));
@@ -2678,13 +2771,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       var copy = elem("button", "icon-btn");
       copy.type = "button";
       copy.dataset.copySynth = String(turn.id);
-      copy.title = "Copier la réponse finale";
+      copy.title = turn.solo ? "Copier la réponse" : "Copier la réponse finale";
       copy.appendChild(iconEl("copy"));
       actions.appendChild(copy);
       var again = elem("button", "icon-btn");
       again.type = "button";
       again.dataset.retrySynth = String(turn.id);
-      again.title = "Relancer la synthèse";
+      again.title = turn.solo ? "Relancer la réponse" : "Relancer la synthèse";
       again.appendChild(iconEl("refresh"));
       actions.appendChild(again);
     }
@@ -2692,6 +2785,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   }
 
   function stepState(turn, name) {
+    if (turn && turn.solo && name === "synth") {
+      var st = turn.synth && turn.synth.status;
+      if (st === "streaming") return "run";
+      if (st === "done" || st === "stopped") return "done";
+      if (st === "error") return "error";
+      return "";
+    }
     return (turn.steps && turn.steps[name]) || "";
   }
 
@@ -2699,6 +2799,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var article = elem("article", "turn");
     article.dataset.turn = String(turn.id);
     article.dataset.mode = turn.mode;
+    article.dataset.style = turn.solo ? "solo" : "collab";
 
     var you = elem("div", "you");
     you.appendChild(elem("span", "you-mark", "VOUS"));
@@ -2709,7 +2810,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var collab = elem("div", "collab");
     var head = elem("div", "collab-head");
     var steps = elem("div", "steps");
-    [["consult", "1", "Consultation"], ["synth", "2", "Synthèse"]].forEach(function (def, i) {
+    var stepDefs = turn.solo ? [["synth", "1", "Réponse"]] :
+      [["consult", "1", "Consultation"], ["synth", "2", "Synthèse"]];
+    stepDefs.forEach(function (def, i) {
       if (i) steps.appendChild(elem("span", "step-sep"));
       var s = elem("span", "step");
       s.dataset.step = def[0];
@@ -2722,15 +2825,17 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
     var right = elem("div", "head-right");
     var tag = elem("span", "turn-tag");
-    tag.textContent = (turn.mode === "paid" ? "premium" : "gratuit") + " · " + turn.drafts.length +
-      (turn.drafts.length > 1 ? " brouillons" : " brouillon");
+    tag.textContent = (turn.mode === "paid" ? "premium" : "gratuit") + " · " +
+      (turn.solo ? "1 modèle" : turn.drafts.length + (turn.drafts.length > 1 ? " brouillons" : " brouillon"));
     right.appendChild(tag);
     head.appendChild(right);
     collab.appendChild(head);
 
-    var drafts = elem("div", "drafts");
-    turn.drafts.forEach(function (d, i) { drafts.appendChild(buildDraft(turn, d, i)); });
-    collab.appendChild(drafts);
+    if (!turn.solo) {
+      var drafts = elem("div", "drafts");
+      turn.drafts.forEach(function (d, i) { drafts.appendChild(buildDraft(turn, d, i)); });
+      collab.appendChild(drafts);
+    }
 
     if (turn.synth) collab.appendChild(buildSynth(turn));
     article.appendChild(collab);
@@ -2825,9 +2930,19 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.sendBtn.hidden = state.streaming;
     el.stopBtn.hidden = !state.streaming;
     el.prompt.placeholder = state.streaming ? "Réponses en cours…" :
+      state.style === "solo" ? "Pose ta question au modèle choisi…" :
       state.mode === "paid" ? "Pose ta question au panneau premium…" : "Pose ta question au panneau gratuit…";
+    if (el.emptyHint) {
+      el.emptyHint.textContent = state.style === "solo" ?
+        "Écris une question — le modèle choisi répond directement." :
+        "Écris une question — les modèles consultent, le synthétiseur rédige.";
+    }
     if (el.dockNote) {
-      if (state.mode !== "paid") {
+      if (state.style === "solo") {
+        var soloName = modelByKey(state.soloModels[state.mode]);
+        el.dockNote.textContent = "Mode solo · 1 modèle" + (soloName ? " (" + shortName(prettyName(soloName.name, soloName.id)) + ")" : "") +
+          " · " + (state.mode === "paid" ? "facturé au tarif" : "gratuit");
+      } else if (state.mode !== "paid") {
         el.dockNote.textContent = "Mode gratuit : 0 $ · " + state.panels.free.length + " modèles + synthèse · clés locales";
       } else if (!state.keys.openrouter.trim()) {
         el.dockNote.textContent = "Mode premium : démonstration sans clé · recharge sur OpenRouter";
@@ -2860,19 +2975,21 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var order = rankModels(list.length ? list : pool, state.mode === "free" ? FREE_ORDER : PAID_ORDER);
     var shown = order.filter(function (m) { return !q || (m.name + " " + m.id).toLowerCase().indexOf(q) !== -1; });
 
+    var soloMode = state.pending.style === "solo";
     el.modelList.replaceChildren();
     shown.slice(0, 80).forEach(function (m) {
       var isDraft = state.pending.drafts.indexOf(m.key) !== -1;
       var isSynth = state.pending.synth === m.key;
-      var selected = state.pending.tab === "drafts" ? isDraft : isSynth;
-      var row = elem("button", "model-row" + (selected ? " on" : "") + (state.pending.tab === "synth" ? " synth-row" : ""));
+      var selected = soloMode ? state.pending.solo === m.key :
+        (state.pending.tab === "drafts" ? isDraft : isSynth);
+      var row = elem("button", "model-row" + (selected ? " on" : "") + (!soloMode && state.pending.tab === "synth" ? " synth-row" : ""));
       row.type = "button";
       row.setAttribute("role", "option");
       row.setAttribute("aria-selected", selected ? "true" : "false");
       row.dataset.key = m.key;
       row.appendChild(avatarEl(m));
       var meta = elem("div", "meta");
-      meta.appendChild(elem("span", "nm", prettyName(m.name, m.id) + (state.pending.tab === "drafts" && isDraft && !selected ? " ✓" : "")));
+      meta.appendChild(elem("span", "nm", prettyName(m.name, m.id) + (!soloMode && state.pending.tab === "drafts" && isDraft && !selected ? " ✓" : "")));
       meta.appendChild(elem("span", "sub", providerLabel(m.provider) + (m.ctx ? " · " + Math.round(m.ctx / 1000) + "K ctx" : "")));
       row.appendChild(meta);
       row.appendChild(elem("span", "price", m.free ? "gratuit" : fmtPerM(m.inPrice).replace(" $/M", "") + " → " + fmtPerM(m.outPrice)));
@@ -2887,11 +3004,34 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     }
     el.listMore.textContent = shown.length > 80 ? "80 premiers résultats sur " + shown.length + ". Précise la recherche." : "";
     var n = state.pending.drafts.length;
-    el.panelCount.textContent = n + " brouillon" + (n > 1 ? "s" : "") + (state.pending.synth ? " · 1 synthèse" : " · aucune synthèse");
-    el.panelSave.disabled = !n || !state.pending.synth;
-    el.panelNotice.textContent = state.mode === "free" ?
-      "Ces modèles sont gratuits : palier gratuit OpenRouter, plus Groq si une clé est enregistrée. Quatre brouillons maximum." :
-      "Chaque brouillon et la synthèse sont facturés au tarif du modèle. Choisis selon ton budget.";
+    if (soloMode) {
+      el.panelCount.textContent = state.pending.solo ? "1 modèle · réponse directe" : "aucun modèle choisi";
+      el.panelSave.disabled = !state.pending.solo;
+      el.panelSave.textContent = "Utiliser ce modèle";
+      el.panelNotice.textContent = state.mode === "free" ?
+        "Mode solo gratuit : un seul modèle répond, sans brouillons ni synthèse. Une requête par question." :
+        "Mode solo premium : un seul appel facturé au tarif du modèle choisi.";
+      if (el.panelTabs) el.panelTabs.hidden = true;
+      if (el.presetRow) el.presetRow.hidden = true;
+    } else {
+      el.panelCount.textContent = n + " brouillon" + (n > 1 ? "s" : "") + (state.pending.synth ? " · 1 synthèse" : " · aucune synthèse");
+      el.panelSave.disabled = !n || !state.pending.synth;
+      el.panelSave.textContent = "Enregistrer";
+      el.panelNotice.textContent = state.mode === "free" ?
+        "Ces modèles sont gratuits : palier gratuit OpenRouter, plus Groq si une clé est enregistrée. Quatre brouillons maximum." :
+        "Chaque brouillon et la synthèse sont facturés au tarif du modèle. Choisis selon ton budget.";
+      if (el.panelTabs) el.panelTabs.hidden = false;
+      if (el.presetRow) el.presetRow.hidden = false;
+    }
+    if (el.panelDlgTitle) {
+      el.panelDlgTitle.textContent = soloMode ? "Choisir un seul modèle" : "Panneau de collaboration";
+    }
+    if (el.panelDlgSub) {
+      el.panelDlgSub.textContent = soloMode ?
+        "Le modèle choisi répond directement, sans brouillons ni synthèse. Le choix est mémorisé pour ce mode." :
+        "Choisis les modèles qui préparent les brouillons, puis celui qui rédige la réponse finale.";
+    }
+    syncStyleButtons();
   }
 
   function renderSettingsDialog() {
@@ -3064,9 +3204,43 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     return pump();
   }
 
+  /* Groq gratuit plafonne à 8 000 tokens/minute : deux appels simultanés maximum,
+     les suivants attendent leur tour au lieu de provoquer des 429. */
+  var groqActive = 0;
+  var groqWait = [];
+
+  function acquireGroq(signal) {
+    if (groqActive < 2) { groqActive++; return Promise.resolve(); }
+    return new Promise(function (resolve, reject) {
+      var entry = { resolve: resolve, reject: reject };
+      groqWait.push(entry);
+      if (signal) {
+        signal.addEventListener("abort", function () {
+          var i = groqWait.indexOf(entry);
+          if (i !== -1) { groqWait.splice(i, 1); reject(abortErr()); }
+        }, { once: true });
+      }
+    });
+  }
+
+  function releaseGroq() {
+    var next = groqWait.shift();
+    if (next) next.resolve();
+    else groqActive = Math.max(0, groqActive - 1);
+  }
+
   async function streamModel(model, messages, signal, onDelta) {
     var key = keyFor(model.provider);
     if (!key) throw new ApiError("Aucune clé " + providerLabel(model.provider) + ".", "", 0);
+    if (model.provider === "groq") await acquireGroq(signal);
+    try {
+      return await streamModelInner(model, messages, signal, onDelta, key);
+    } finally {
+      if (model.provider === "groq") releaseGroq();
+    }
+  }
+
+  async function streamModelInner(model, messages, signal, onDelta, key) {
     var url = (model.provider === "groq" ? GROQ : OR) + "/chat/completions";
     var headers = { "Content-Type": "application/json", "Authorization": "Bearer " + key };
     if (model.provider === "openrouter") headers["X-Title"] = "ARENA//X";
@@ -3208,6 +3382,119 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       { role: "system", content: system },
       { role: "user", content: user }
     ];
+  }
+
+  var SOLO_SYSTEM = "Tu réponds directement à la question de l'utilisateur, seul, sans mentionner d'autres modèles ni de processus interne. Sois précis, structuré et utile. Utilise le Markdown quand c'est pertinent. Réponds dans la langue de la question.";
+
+  function soloMessages(prompt) {
+    var system = (state.settings.system || "").trim() || SOLO_SYSTEM;
+    return [
+      { role: "system", content: system },
+      { role: "user", content: prompt }
+    ];
+  }
+
+  function demoSoloText(model, prompt) {
+    var p = prompt.replace(/\s+/g, " ").trim();
+    var short = p.length > 180 ? p.slice(0, 180).trim() + "…" : p;
+    return [
+      "**Réponse de démonstration — " + model.name + "**",
+      "",
+      "> " + short,
+      "",
+      "Un modèle branché répondrait ici en un seul passage, sans brouillons ni synthèse. Voici la structure qu'il suivrait :",
+      "",
+      "1. **Réponse directe** en deux phrases.",
+      "2. **Le point clé** qui fait la différence.",
+      "3. **Un exemple concret** pour illustrer.",
+      "",
+      "*Mode démo : ajoute la clé " + providerLabel(model.provider) + " dans les réglages pour une vraie réponse.*"
+    ].join("\n");
+  }
+
+  async function runSolo(turn) {
+    var key = turn.synth && turn.synth.key ? turn.synth.key : state.soloModels[turn.mode];
+    var model = modelByKey(key);
+    if (!model) {
+      turn.synth = {
+        key: key, status: "error", content: "", metrics: null, vote: null, solo: true, fallback: false,
+        error: { message: "Modèle introuvable dans le catalogue.", detail: "", status: 0 }
+      };
+      paintSynth(turn);
+      return;
+    }
+    var demo = !keyFor(model.provider);
+    turn.synth = { key: key, status: "streaming", content: "", metrics: null, error: null, vote: null, solo: true, fallback: false };
+    paintSynth(turn);
+
+    var ctrl = new AbortController();
+    var jobKey = turn.id + ":solo";
+    state.controllers.set(jobKey, ctrl);
+    var t0 = performance.now();
+    var firstAt = 0;
+    var raw = "";
+    var usage = null;
+    var finish = null;
+    var frame = 0;
+    var timeout = false;
+    var messages = soloMessages(turn.prompt);
+    var timer = setTimeout(function () { timeout = true; try { ctrl.abort(); } catch (e) { /* ignore */ } }, 150000);
+
+    function flush() {
+      frame = 0;
+      var root = turnEl(turn);
+      if (!root) return;
+      var body = root.querySelector(".synth-body");
+      if (body) body.textContent = plainStream(raw);
+      follow();
+    }
+    function onDelta(text) {
+      if (!text) return;
+      if (!firstAt) firstAt = performance.now();
+      raw += text;
+      if (!frame) frame = requestAnimationFrame(flush);
+    }
+
+    try {
+      if (demo) {
+        await demoStream(demoSoloText(model, turn.prompt), ctrl.signal, onDelta);
+      } else {
+        var r = await streamModel(model, messages, ctrl.signal, onDelta);
+        if (r) { usage = r.usage; finish = r.finish; }
+      }
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
+      if (!raw.trim()) throw new ApiError("Réponse vide.", "Aucun contenu reçu.", 0);
+      turn.synth = {
+        key: key, status: "done", content: raw, metrics: computeMetrics({
+          usage: usage, raw: raw, messages: messages, model: model,
+          t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish
+        }), error: null, vote: null, solo: true, fallback: false
+      };
+    } catch (e) {
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
+      var aborted = e && (e.name === "AbortError" || e.code === 20);
+      if (aborted && !timeout && raw.trim()) {
+        turn.synth = {
+          key: key, status: "stopped", content: raw, metrics: computeMetrics({
+            usage: usage, raw: raw, messages: messages, model: model,
+            t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish
+          }), error: null, vote: null, solo: true, fallback: false
+        };
+      } else {
+        turn.synth = {
+          key: key, status: "error", content: raw, metrics: null, vote: null, solo: true, fallback: false,
+          error: {
+            message: timeout ? "Délai dépassé (150 s)." : (e && e.message) || "Erreur inconnue.",
+            detail: (e && e.detail) || "", status: (e && e.status) || 0
+          }
+        };
+      }
+    } finally {
+      clearTimeout(timer);
+      state.controllers.delete(jobKey);
+      paintSynth(turn);
+      saveChatSoon();
+    }
   }
 
   async function runDraft(turn, index) {
@@ -3414,12 +3701,60 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     if (state.streaming) return;
     state.stopRequested = false;
     var keys = currentKeys();
+    var mode = state.mode;
+
+    if (state.style === "solo") {
+      if (!keys.solo) {
+        showToast("Aucun modèle sélectionné : choisis-en un.", "err");
+        openPanelDialog();
+        return;
+      }
+      var soloModel = modelByKey(keys.solo);
+      var soloTurn = {
+        id: state.turns.length ? Math.max.apply(null, state.turns.map(function (t) { return t.id; })) + 1 : 1,
+        ts: Date.now(),
+        mode: mode,
+        prompt: prompt,
+        solo: true,
+        demo: soloModel ? !keyFor(soloModel.provider) : true,
+        drafts: [],
+        synth: { key: keys.solo, status: "streaming", content: "", metrics: null, error: null, vote: null, solo: true },
+        steps: { consult: "", synth: "" },
+        creditsAfter: null,
+        creditsUsed: null
+      };
+      state.streaming = true;
+      el.prompt.value = "";
+      autoGrow();
+      updateSendState();
+      appendTurn(soloTurn);
+      announce("Réponse directe en cours.");
+      if (soloTurn.demo && mode === "paid") {
+        showToast("Mode démo : ajoute une clé OpenRouter pour de vraies réponses premium.");
+      }
+      try {
+        await runSolo(soloTurn);
+      } finally {
+        state.streaming = false;
+        state.controllers.clear();
+        updateSendState();
+        renderPanelbar();
+        persistChat();
+        saveChatSoon();
+        announce(soloTurn.synth && soloTurn.synth.status !== "error" ? "Réponse prête." : "Réponse en échec.");
+        state.sessionSpend += roundCost(soloTurn);
+        renderCredits();
+        maybeAutoBackup();
+      }
+      if (mode === "paid" && !soloTurn.demo) refreshCreditsAfter(soloTurn);
+      return;
+    }
+
     if (!keys.drafts.length) {
       showToast("Le panneau est vide : choisis au moins un modèle.", "err");
       openPanelDialog();
       return;
     }
-    var mode = state.mode;
     var demoTurn = keys.drafts.every(function (k) {
       var m = modelByKey(k);
       return m && !keyFor(m.provider);
@@ -3463,9 +3798,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     if (turn !== state.turns[state.turns.length - 1]) { showToast("Relance possible sur la dernière manche."); return; }
     state.streaming = true;
     updateSendState();
-    turn.steps.synth = "run";
-    paintSynth(turn);
-    runSynth(turn).finally(function () {
+    if (!turn.solo) {
+      turn.steps.synth = "run";
+      paintSynth(turn);
+    }
+    var job = turn.solo ? runSolo(turn) : runSynth(turn);
+    job.finally(function () {
       state.streaming = false;
       updateSendState();
       persistChat();
@@ -3559,12 +3897,37 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     state.stopRequested = false;
     state.streaming = true;
     turn.ts = Date.now();
+    turn.creditsAfter = null;
+    turn.creditsUsed = null;
+    if (turn.solo) {
+      var key = (turn.synth && turn.synth.key) || state.soloModels[turn.mode];
+      turn.drafts = [];
+      turn.synth = { key: key, status: "streaming", content: "", metrics: null, error: null, vote: null, solo: true };
+      turn.steps = { consult: "", synth: "" };
+      var r0 = turnEl(turn);
+      if (r0) r0.replaceWith(buildTurn(turn));
+      else renderThread();
+      updateSendState();
+      showToast("Réponse relancée.");
+      runSolo(turn).finally(function () {
+        state.streaming = false;
+        state.controllers.clear();
+        updateSendState();
+        renderPanelbar();
+        persistChat();
+        if (turn.synth && turn.synth.metrics) {
+          state.sessionSpend += turn.synth.metrics.cost || 0;
+          renderCredits();
+        }
+        maybeAutoBackup();
+      });
+      return;
+    }
     turn.drafts = turn.drafts.map(function (d) {
       return { key: d.key, status: "streaming", content: "", metrics: null, error: null };
     });
     turn.synth = null;
     turn.steps = { consult: "run", synth: "" };
-    turn.creditsAfter = null;
     var root = turnEl(turn);
     if (root) root.replaceWith(buildTurn(turn));
     else renderThread();
@@ -3650,12 +4013,15 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   function openPanelDialog() {
     state.pending.drafts = state.panels[state.mode].slice(0, MAX_DRAFTS);
     state.pending.synth = state.synths[state.mode];
+    state.pending.solo = state.soloModels[state.mode];
+    state.pending.style = state.style;
     state.pending.tab = "drafts";
     state.pending.query = "";
     el.modelSearch.value = "";
     switchPanelTab("drafts");
     renderPanelDialog();
     openDialog(el.panelDlg);
+    syncStyleButtons();
   }
 
   function switchPanelTab(tab) {
@@ -3667,6 +4033,11 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   }
 
   function togglePendingModel(key) {
+    if (state.pending.style === "solo") {
+      state.pending.solo = key;
+      renderPanelDialog();
+      return;
+    }
     if (state.pending.tab === "synth") {
       state.pending.synth = key;
     } else {
@@ -3688,6 +4059,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   function applyPanelPreset(kind) {
     var p = pools()[state.mode];
     var ordered = rankModels(p, state.mode === "free" ? FREE_ORDER : PAID_ORDER);
+    if (state.pending.style === "solo") {
+      if (kind === "clear") state.pending.solo = null;
+      else if (ordered.length) state.pending.solo = ordered[0].key;
+      renderPanelDialog();
+      return;
+    }
     if (kind === "top") {
       state.pending.drafts = ordered.slice(0, 3).map(function (m) { return m.key; });
       var synth = ordered.filter(function (m) { return state.pending.drafts.indexOf(m.key) === -1; })[0] || ordered[0];
@@ -3709,15 +4086,77 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   }
 
   function savePanel() {
+    if (state.pending.style === "solo") {
+      if (!state.pending.solo) { showToast("Choisis un modèle.", "err"); return; }
+      state.style = "solo";
+      state.soloModels[state.mode] = state.pending.solo;
+      persistSettings();
+      syncStyleButtons();
+      renderPanelbar();
+      updateSendState();
+      el.panelDlg.close();
+      var sm = modelByKey(state.pending.solo);
+      showToast("Mode solo : " + (sm ? prettyName(sm.name, sm.id) : "modèle choisi") + ".", "ok");
+      return;
+    }
     if (!state.pending.drafts.length) { showToast("Choisis au moins un brouillon.", "err"); return; }
     if (!state.pending.synth) { showToast("Choisis un modèle de synthèse.", "err"); return; }
+    state.style = "collab";
     state.panels[state.mode] = state.pending.drafts.slice(0, MAX_DRAFTS);
     state.synths[state.mode] = state.pending.synth;
     persistSettings();
+    syncStyleButtons();
     renderPanelbar();
     updateSendState();
     el.panelDlg.close();
-    showToast("Panneau enregistré : " + state.panels[state.mode].length + " brouillons + synthèse.", "ok");
+    showToast("Collaboration : " + state.panels[state.mode].length + " brouillons + synthèse.", "ok");
+  }
+
+  function markStyle(root, style) {
+    if (!root) return;
+    var list = root.querySelectorAll ? root.querySelectorAll("[data-style]") : [];
+    Array.prototype.forEach.call(list, function (b) {
+      var on = b.dataset.style === style;
+      b.classList.toggle("active", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+
+  function syncStyleButtons() {
+    var dialogOpen = !!(el.panelDlg && el.panelDlg.open);
+    markStyle(el.styleSeg, state.style);
+    markStyle(el.styleSegHero, state.style);
+    markStyle(el.styleSegDlg, dialogOpen ? state.pending.style : state.style);
+  }
+
+  /* Bascule immédiate depuis la barre de panneau : le choix est enregistré tout de suite. */
+  function setStyle(style) {
+    var next = style === "solo" ? "solo" : "collab";
+    var changed = state.style !== next;
+    state.style = next;
+    state.pending.style = next;
+    if (next === "solo" && !state.soloModels[state.mode]) {
+      var ordered = rankModels(pools()[state.mode], state.mode === "free" ? FREE_ORDER : PAID_ORDER);
+      state.soloModels[state.mode] = ordered.length ? ordered[0].key : null;
+    }
+    persistSettings();
+    syncStyleButtons();
+    renderPanelbar();
+    updateSendState();
+    if (changed) {
+      if (next === "solo" && !state.soloModels[state.mode]) {
+        showToast("Aucun modèle solo disponible : choisis-en un dans le panneau.", "err");
+      } else {
+        showToast(next === "solo" ? "Mode solo : un seul modèle répond." : "Mode collaboration : brouillons puis synthèse.", "ok");
+      }
+    }
+  }
+
+  function switchPanelStyle(style) {
+    state.pending.style = style === "solo" ? "solo" : "collab";
+    if (state.pending.style === "solo" && !state.pending.solo) state.pending.solo = state.soloModels[state.mode];
+    syncStyleButtons();
+    renderPanelDialog();
   }
 
   function testConnections() {
@@ -3795,10 +4234,15 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.settingsDlg.close();
     refreshCredits(true);
     refreshCatalog(true).then(function () {
+      ensurePanels();
       renderThread();
       renderPanelbar();
       updateSendState();
-      showToast("Réglages enregistrés.", "ok");
+      if (!state.keys.openrouter && state.keys.groq) {
+        showToast("Clé Groq active : modèle gratuit Groq sélectionné automatiquement.", "ok");
+      } else {
+        showToast("Réglages enregistrés.", "ok");
+      }
     });
   }
 
@@ -3811,10 +4255,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.groqKey.value = "";
     el.testResult.replaceChildren();
     persistKeys();
+    ensurePanels();
     refreshKeyStates();
     renderCredits();
+    renderThread();
     renderPanelbar();
-    showToast("Clés effacées.", "ok");
+    updateSendState();
+    showToast("Clés effacées · mode démonstration.", "ok");
   }
 
   function openCredits() {
@@ -3886,6 +4333,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.sendBtn = $("#sendBtn");
     el.stopBtn = $("#stopBtn");
     el.dockNote = $("#dockNote");
+    el.emptyHint = $("#emptyHint");
     el.jumpBtn = $("#jumpBtn");
     el.toast = $("#toast");
     el.live = $("#live");
@@ -3896,6 +4344,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.listMore = $("#listMore");
     el.panelNotice = $("#panelNotice");
     el.panelSave = $("#panelSave");
+    el.panelTabs = $("#panelTabs");
+    el.presetRow = $("#presetRow");
+    el.panelDlgTitle = $("#panelDlgTitle");
+    el.panelDlgSub = $("#panelDlgSub");
+    el.styleSeg = $("#styleSeg");
+    el.styleSegDlg = $("#styleSegDlg");
+    el.styleSegHero = $("#styleSegHero");
     el.settingsDlg = $("#settingsDlg");
     el.orKey = $("#orKey");
     el.mgmtKey = $("#mgmtKey");
@@ -4031,6 +4486,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     });
     $all("[data-preset]").forEach(function (b) {
       b.addEventListener("click", function () { applyPanelPreset(b.dataset.preset); });
+    });
+    $all("[data-style]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (b.closest("#panelDlg")) switchPanelStyle(b.dataset.style);
+        else setStyle(b.dataset.style);
+      });
     });
     el.panelSave.addEventListener("click", savePanel);
 
