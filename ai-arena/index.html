@@ -851,7 +851,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       </button>
       <button class="hero-card paid" id="heroPaid" type="button">
         <h2><svg class="icon" aria-hidden="true"><use href="#i-wallet"></use></svg> Premium <span class="tag">crédits</span></h2>
-        <p>Les meilleurs modèles payants, en collaboration ou en solo. Recharge sur OpenRouter, solde et dépense suivis ici.</p>
+        <p>Sans crédits, le premium répond avec les modèles gratuits (Groq + routeur). Recharge sur OpenRouter pour débloquer Claude, GPT-4o, Grok.</p>
         <div class="card-foot">
           <div class="stack" id="stackPaid" aria-hidden="true"></div>
           <span class="go">Lancer <svg class="icon sm" aria-hidden="true"><use href="#i-arrow-right"></use></svg></span>
@@ -1242,11 +1242,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   ];
 
   /* Repli si le catalogue réseau est indisponible. */
+  /* Roster gratuit : les modèles Groq + le routeur gratuit d'OpenRouter.
+     Les autres modèles :free d'OpenRouter ne sont pas proposés. */
   var FALLBACK = [
-    f("openrouter", "openai/gpt-oss-120b:free", "GPT-OSS 120B (free)", true, 0, 0),
-    f("openrouter", "google/gemma-4-31b-it:free", "Gemma 4 31B (free)", true, 0, 0),
-    f("openrouter", "google/gemma-4-26b-a4b-it:free", "Gemma 4 26B (free)", true, 0, 0),
-    f("openrouter", "nvidia/nemotron-3-super-120b-a12b:free", "Nemotron 3 Super (free)", true, 0, 0),
     f("openrouter", "openrouter/free", "Routeur gratuit", true, 0, 0),
     f("groq", "openai/gpt-oss-120b", "GPT-OSS 120B · Groq", true, 0, 0),
     f("groq", "openai/gpt-oss-20b", "GPT-OSS 20B · Groq", true, 0, 0),
@@ -1563,6 +1561,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     "openai/gpt-oss-20b": "GPT-OSS 20B",
     "openai/gpt-oss-safeguard-20b": "GPT-OSS Safeguard 20B",
     "qwen/qwen3.8-27b": "Qwen 3.8 27B",
+    "openrouter/free": "Routeur gratuit",
+    "openrouter/auto": "Routeur auto",
     "meta-llama/llama-4-scout-17b-16e-instruct": "Llama 4 Scout 17B",
     "meta-llama/llama-4-maverick-17b-128e-instruct": "Llama 4 Maverick 17B"
   };
@@ -1652,18 +1652,44 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     return picked;
   }
 
-  function pools() {
+  function hasAnyKey() {
+    return !!(state.keys.openrouter.trim() || state.keys.groq.trim());
+  }
+
+  /* Premium réellement disponible ? Il faut une clé OpenRouter ET, si le solde
+     est connu, un solde strictement positif. Sinon on répond avec le gratuit. */
+  function hasPaidAccess() {
+    if (!state.keys.openrouter.trim()) return false;
+    var c = state.credits;
+    if (c && (c.kind === "account" || c.kind === "key") && c.remaining != null) {
+      return c.remaining > 0;
+    }
+    if (c && c.kind === "error" && (c.status === 401 || c.status === 402 || c.status === 403)) {
+      return false;
+    }
+    return true;
+  }
+
+  function freePool() {
     var hasOR = !!state.keys.openrouter.trim();
     var hasGroq = !!state.keys.groq.trim();
     var anyKey = hasOR || hasGroq;
-    /* Clé absente = fournisseur masqué, sauf si aucune clé n'existe :
-       dans ce cas on garde tout pour que la démonstration reste utilisable. */
-    var free = state.catalog.filter(function (m) {
-      if (!m.free) return false;
-      if (!anyKey) return true;
-      return m.provider === "groq" ? hasGroq : hasOR;
+    /* Roster volontairement court : modèles Groq + routeur gratuit OpenRouter.
+       Clé absente = fournisseur masqué, sauf si aucune clé n'existe (démo). */
+    return state.catalog.filter(function (m) {
+      if (!m.free && m.id !== "openrouter/free") return false;
+      if (m.provider === "groq") return anyKey ? hasGroq : true;
+      if (m.id !== "openrouter/free") return false;
+      return anyKey ? hasOR : true;
     });
-    var paid = state.catalog.filter(function (m) { return !m.free && m.provider === "openrouter"; });
+  }
+
+  function pools() {
+    var free = freePool();
+    /* Sans accès payant, le premium tourne réellement sur les modèles gratuits. */
+    var paid = hasPaidAccess() ? state.catalog.filter(function (m) {
+      return !m.free && m.provider === "openrouter";
+    }) : free;
     return { free: free, paid: paid };
   }
 
@@ -1746,7 +1772,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         key: modelKey("openrouter", m.id),
         provider: "openrouter",
         id: m.id,
-        name: prettyName(m.name, m.id),
+        name: NICER_NAMES[m.id] ? NICER_NAMES[m.id] : prettyName(m.name, m.id),
         free: free,
         inPrice: pp * 1e6,
         outPrice: cp * 1e6,
@@ -1780,7 +1806,14 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     lists.forEach(function (list) {
       (list || []).forEach(function (m) { if (m && m.key && !map.has(m.key)) map.set(m.key, m); });
     });
-    return Array.from(map.values());
+    var merged = Array.from(map.values());
+    /* Le routeur gratuit et les Groq de secours survivent à un catalogue incomplet. */
+    FALLBACK.forEach(function (b) {
+      if (!b.free) return;
+      var seen = merged.some(function (m) { return m.key === b.key; });
+      if (!seen) merged.push(b);
+    });
+    return merged;
   }
 
   function loadCatalogCache() {
@@ -1985,6 +2018,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         demo: !!t.demo,
         creditsAfter: typeof t.creditsAfter === "number" ? t.creditsAfter : null,
         creditsUsed: typeof t.creditsUsed === "number" ? t.creditsUsed : null,
+        degraded: !!t.degraded,
         steps: t.steps && typeof t.steps === "object" ? t.steps : { consult: "done", synth: synth ? "done" : "error" }
       });
     });
@@ -2002,7 +2036,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       updated: Date.now(),
       turns: state.turns.map(function (t) {
         return {
-          id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo, solo: !!t.solo,
+          id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo, solo: !!t.solo, degraded: !!t.degraded,
           creditsAfter: t.creditsAfter, creditsUsed: t.creditsUsed, steps: t.steps,
           drafts: t.drafts.map(function (d) {
             return { key: d.key, status: d.status, content: d.content, metrics: d.metrics, error: d.error };
@@ -2201,6 +2235,14 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     state.creditsCache = state.credits;
     storageSet(localStorage, LS.credits, state.credits);
     setCreditsLoading(false);
+    var beforePaid = state.panels.paid.join("|") + "/" + state.soloModels.paid;
+    ensurePanels();
+    var afterPaid = state.panels.paid.join("|") + "/" + state.soloModels.paid;
+    if (beforePaid !== afterPaid) {
+      renderThread();
+      renderPanelbar();
+      updateSendState();
+    }
     renderCredits();
   }
 
@@ -2369,8 +2411,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var st = "none";
 
     if (!hasKey) {
-      amount = "démo";
-      cap = "sans clé";
+      amount = hasAnyKey() ? "0 $" : "démo";
+      cap = hasAnyKey() ? "repli gratuit" : "sans clé";
     } else if (c && c.remaining != null) {
       amount = fmtUSD(c.remaining);
       cap = "restants";
@@ -2393,7 +2435,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       if (state.mode !== "paid") {
         el.miniCredits.textContent = "";
       } else if (!hasKey) {
-        el.miniCredits.textContent = "démo";
+        el.miniCredits.textContent = hasAnyKey() ? "repli gratuit" : "démo";
       } else if (c && c.remaining != null) {
         el.miniCredits.innerHTML = "solde ≈ <b>" + esc(fmtUSD(c.remaining)) + "</b>";
       } else if (c && c.used != null) {
@@ -2409,9 +2451,11 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var capBig = "Ajoute une clé OpenRouter pour suivre ton solde.";
     var used = null, total = null, note = "";
     if (!hasKey) {
-      big = "démo";
+      big = hasAnyKey() ? "repli" : "démo";
       capBig = "Aucune clé OpenRouter configurée.";
-      note = "Le suivi des crédits nécessite une clé OpenRouter. Ta conversation reste utilisable en mode démonstration.";
+      note = hasAnyKey() ?
+        "Sans clé OpenRouter, le premium répond avec les modèles gratuits (Groq + routeur) : aucune dépense, aucun suivi de solde nécessaire." :
+        "Le suivi des crédits nécessite une clé OpenRouter. Sans aucune clé, la page tourne en démonstration.";
     } else if (!c) {
       note = "Chargement du solde…";
     } else if (c.kind === "account") {
@@ -2501,10 +2545,18 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     syncStyleButtons();
     var label = document.getElementById("panelBtnLabel");
     if (label) label.textContent = solo ? "Modèle" : total ? "Panneau" : "Choisir";
-    if (state.mode === "paid" && !state.keys.openrouter.trim()) {
-      el.panelSub.textContent += " · démo sans clé";
+    if (state.mode === "paid" && !hasPaidAccess()) {
+      if (!hasAnyKey()) {
+        el.panelTitle.textContent += " · démonstration";
+        el.panelSub.textContent = "Aucune clé : réponses simulées";
+      } else {
+        el.panelTitle.textContent += " · repli gratuit";
+        el.panelSub.textContent = state.keys.openrouter.trim() ?
+          "Crédits épuisés : réponse avec Groq + routeur" :
+          "Pas encore de clé OpenRouter : réponse avec les modèles Groq";
+      }
     }
-    if (el.miniTopup) el.miniTopup.hidden = state.mode !== "paid";
+    if (el.miniTopup) el.miniTopup.hidden = state.mode !== "paid" || !hasPaidAccess();
     renderCredits();
     renderHeroStacks();
   }
@@ -2825,7 +2877,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
     var right = elem("div", "head-right");
     var tag = elem("span", "turn-tag");
-    tag.textContent = (turn.mode === "paid" ? "premium" : "gratuit") + " · " +
+    tag.textContent = (turn.mode === "paid" ? (turn.degraded ? "premium non activé" : "premium") : "gratuit") + " · " +
       (turn.solo ? "1 modèle" : turn.drafts.length + (turn.drafts.length > 1 ? " brouillons" : " brouillon"));
     right.appendChild(tag);
     head.appendChild(right);
@@ -2944,8 +2996,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
           " · " + (state.mode === "paid" ? "facturé au tarif" : "gratuit");
       } else if (state.mode !== "paid") {
         el.dockNote.textContent = "Mode gratuit : 0 $ · " + state.panels.free.length + " modèles + synthèse · clés locales";
-      } else if (!state.keys.openrouter.trim()) {
-        el.dockNote.textContent = "Mode premium : démonstration sans clé · recharge sur OpenRouter";
+      } else if (!hasPaidAccess()) {
+        el.dockNote.textContent = state.keys.openrouter.trim() ?
+          "Premium non activé : crédits épuisés · réponse avec Groq + routeur" :
+          "Premium non activé : réponse avec les modèles Groq · 0 $";
       } else if (state.keys.management.trim()) {
         el.dockNote.textContent = "Mode premium : solde et dépense suivis à chaque manche";
       } else {
@@ -3017,9 +3071,17 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       el.panelCount.textContent = n + " brouillon" + (n > 1 ? "s" : "") + (state.pending.synth ? " · 1 synthèse" : " · aucune synthèse");
       el.panelSave.disabled = !n || !state.pending.synth;
       el.panelSave.textContent = "Enregistrer";
-      el.panelNotice.textContent = state.mode === "free" ?
-        "Ces modèles sont gratuits : palier gratuit OpenRouter, plus Groq si une clé est enregistrée. Quatre brouillons maximum." :
-        "Chaque brouillon et la synthèse sont facturés au tarif du modèle. Choisis selon ton budget.";
+      if (state.mode === "free") {
+      el.panelNotice.textContent = hasAnyKey() ?
+        "Roster gratuit : modèles Groq + routeur gratuit. Quatre brouillons maximum." :
+        "Aucune clé : mode démonstration. Ajoute ta clé Groq pour de vraies réponses.";
+    } else if (!hasPaidAccess()) {
+      el.panelNotice.textContent = (state.keys.openrouter.trim() ?
+        "Crédits épuisés : le premium répond avec Groq + routeur, sans facturation. Les modèles payants reviennent dès que tu recharges." :
+        "Pas encore de clé OpenRouter : le premium répond avec les modèles Groq, sans facturation. Ajoute des crédits pour débloquer Claude, GPT-4o, Grok.");
+    } else {
+      el.panelNotice.textContent = "Chaque brouillon et la synthèse sont facturés au tarif du modèle. Choisis selon ton budget.";
+    }
       if (el.panelTabs) el.panelTabs.hidden = false;
       if (el.presetRow) el.presetRow.hidden = false;
     }
@@ -3716,6 +3778,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         mode: mode,
         prompt: prompt,
         solo: true,
+        degraded: mode === "paid" && !hasPaidAccess(),
         demo: soloModel ? !keyFor(soloModel.provider) : true,
         drafts: [],
         synth: { key: keys.solo, status: "streaming", content: "", metrics: null, error: null, vote: null, solo: true },
@@ -3729,8 +3792,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       updateSendState();
       appendTurn(soloTurn);
       announce("Réponse directe en cours.");
-      if (soloTurn.demo && mode === "paid") {
-        showToast("Mode démo : ajoute une clé OpenRouter pour de vraies réponses premium.");
+      if (soloTurn.demo) {
+        showToast("Mode démonstration : ajoute ta clé Groq (gratuite) dans les réglages.", "err");
       }
       try {
         await runSolo(soloTurn);
@@ -3746,7 +3809,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         renderCredits();
         maybeAutoBackup();
       }
-      if (mode === "paid" && !soloTurn.demo) refreshCreditsAfter(soloTurn);
+      if (mode === "paid" && !soloTurn.demo && !soloTurn.degraded) refreshCreditsAfter(soloTurn);
       return;
     }
 
@@ -3766,6 +3829,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       mode: mode,
       prompt: prompt,
       demo: demoTurn,
+      degraded: mode === "paid" && !hasPaidAccess(),
       drafts: keys.drafts.map(function (k) {
         return { key: k, status: "streaming", content: "", metrics: null, error: null };
       }),
@@ -3779,7 +3843,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     updateSendState();
     appendTurn(turn);
     announce("Consultation de " + turn.drafts.length + " modèles.");
-    if (demoTurn && mode === "paid") showToast("Mode démo : ajoute une clé OpenRouter pour de vraies réponses premium.");
+    if (demoTurn) showToast("Mode démonstration : ajoute ta clé Groq (gratuite) dans les réglages.", "err");
 
     await runRound(turn);
   }
@@ -3863,7 +3927,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       renderCredits();
       maybeAutoBackup();
     }
-    if (turn.mode === "paid" && !turn.demo) refreshCreditsAfter(turn);
+    if (turn.mode === "paid" && !turn.demo && !turn.degraded) refreshCreditsAfter(turn);
   }
 
   function refreshCreditsAfter(turn) {
@@ -3998,8 +4062,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     syncModeButtons();
     renderPanelbar();
     updateSendState();
-    if (mode === "paid" && !state.keys.openrouter.trim()) {
-      showToast("Mode premium en démonstration : ajoute une clé OpenRouter pour la vraie collaboration.", "err");
+    if (mode === "paid" && !hasPaidAccess()) {
+      showToast(state.keys.openrouter.trim() ?
+        "Crédits épuisés : le premium répond avec les modèles gratuits." :
+        "Premium non activé : réponses avec Groq + routeur, sans facturation.", "ok");
     }
     if (mode === "paid") refreshCredits(false);
   }

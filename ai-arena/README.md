@@ -19,15 +19,21 @@ Ouvre index.html  →  choisis Collaboration ou Solo  →  pose ta question
 ## Démarrer
 
 1. Ouvre `index.html` (double-clic, `file://`, ou GitHub Pages).
-2. Sans clé, tout fonctionne en **mode démonstration** : l'interface, le streaming simulé,
-   les métriques, la synthèse, les votes et les sauvegardes sont testables.
+2. Sans aucune clé, tout fonctionne en **mode démonstration** : l'interface, le streaming
+   simulé, les métriques, la synthèse, les votes et les sauvegardes sont testables.
 3. Clique l'onglet **Réglages** (⚙) et colle **une seule clé pour commencer** :
    - **tu as déjà Groq** → colle la clé `gsk_…` de
      [console.groq.com/keys](https://console.groq.com/keys). Elle suffit pour le **gratuit**
      (collaboration et solo) : le catalogue se limite alors aux modèles Groq et le panneau
      se recalcule tout seul (2 modèles + synthèse, à cause des 8 000 tokens/minute du palier).
    - une clé [OpenRouter](https://openrouter.ai/keys) `sk-or-…` est **optionnelle** : elle
-     débloque les modèles `:free` d'OpenRouter et tout le **premium** facturé.
+     ajoute le **routeur gratuit** (`openrouter/free`) au roster gratuit et débloque tout le
+     **premium** facturé dès qu'il y a du solde.
+
+> **Premium sans crédits = pas de démo.** Tant qu'aucun solde OpenRouter n'est disponible,
+> le mode Premium répond **réellement** avec les modèles gratuits (Groq + routeur) et
+> l'étiquette « premium non activé » le signale. Les modèles payants remplacent
+> automatiquement le roster dès que le solde est positif.
    - une [clé de gestion](https://openrouter.ai/settings/management-keys) OpenRouter est
      optionnelle aussi : elle affiche le **solde restant** exact en premium.
 
@@ -43,9 +49,10 @@ python3 -m http.server 8000 --bind 0.0.0.0 --directory ai-arena
 
 | | 🍃 Gratuit | 💎 Premium |
 |---|---|---|
-| Modèles | les meilleurs `:free` d'OpenRouter + Groq | les meilleurs modèles payants |
+| Modèles | **modèles Groq + routeur gratuit** (`openrouter/free`) | les meilleurs modèles payants |
 | Coût | 0 $ | facturé par OpenRouter |
-| Suivi | compteur « démo » / coût de la manche | **crédits restants affichés à chaque utilisation** |
+| Suivi | coût de la manche (0 $) | **crédits restants affichés à chaque utilisation** |
+| Sans crédits | déjà dans son régime normal | **repli gratuit : répond avec Groq + routeur**, jamais de simulation |
 | Recharge | — | [openrouter.ai/settings/credits](https://openrouter.ai/settings/credits) |
 
 **Façons de répondre** (sélecteur `Collaboration | Solo`, présent dans l'accueil et dans la
