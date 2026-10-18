@@ -1,8 +1,9 @@
 # Comment construire une arène d'IA performante en un seul fichier HTML
 
-Ce guide accompagne `ai-arena/index.html` — un fichier autonome de ~147 Ko qui fait tourner
-16 modèles (8 gratuits, 8 payants), en duel ou en multi, avec streaming, métriques, vote et
-classement local. Il explique **les décisions techniques** et **ce qu'il faut éviter**.
+Ce guide accompagne `ai-arena/index.html` — un fichier autonome d'environ 185 Ko où plusieurs
+modèles rédigent des brouillons en parallèle, puis un synthétiseur produit une réponse finale
+unique. Streaming, métriques, crédits OpenRouter suivis à chaque manche, sauvegarde JSON
+automatique. Il explique **les décisions techniques** et **ce qu'il faut éviter**.
 
 ---
 
