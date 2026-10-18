@@ -1,0 +1,292 @@
+# Comment construire une arène d'IA performante en un seul fichier HTML
+
+Ce guide accompagne `ai-arena/index.html` — un fichier autonome de ~147 Ko qui fait tourner
+16 modèles (8 gratuits, 8 payants), en duel ou en multi, avec streaming, métriques, vote et
+classement local. Il explique **les décisions techniques** et **ce qu'il faut éviter**.
+
+---
+
+## 1. Pourquoi un seul fichier ?
+
+| Contrainte | Un seul fichier HTML | Projet React/Vite classique |
+|---|---|---|
+| Mise en route | double-clic, `file://` suffit | `npm install` + build |
+| Requêtes avant le premier pixel | **0** | JS + CSS + fonts |
+| Hébergement | GitHub Pages, un dossier, une clé USB | build + pipeline |
+| Mobile (Acode, Termux) | le fichier s'ouvre directement | build impossible |
+| Débogage | un seul endroit | source maps, bundler |
+
+Pour une arène d'IA, **95 % du temps est passé à attendre les fournisseurs** : le poids du
+frontend est donc négligeable devant la latence réseau. Un fichier unique supprime les
+requêtes bloquantes et rend l'outil transportable. C'est le bon compromis ici — pas pour une
+application à 50 écrans.
+
+---
+
+## 2. Les leviers de performance réellement utilisés
+
+### 2.1 Zéro ressource externe bloquante
+
+Aucun CDN, aucune police web, aucun `fetch` au chargement :
+
+```html
+<!-- à éviter : 3 requêtes bloquantes avant le premier rendu -->
+<script src="https://tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter" rel="stylesheet">
+```
+
+À la place : **CSS inline dans `<style>`**, **SVG en sprite inline** pour les icônes,
+**pile de polices système**.
+
+```css
+--sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+--mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+```
+
+Une police système s'affiche **immédiatement** (0 octet, 0 FOUT) et reste lisible. Les
+icônes sont des `<symbol>` réutilisés par `<use>` : quelques centaines d'octets au lieu
+d'une police d'icônes de 50 Ko.
+
+### 2.2 Le thème est décidé avant le premier pixel
+
+Un script de 8 lignes dans `<head>` lit `localStorage` et pose `data-theme` **avant** le
+rendu : aucun flash blanc au rechargement. Le reste du CSS bascule par variables :
+
+```css
+:root { --bg: #07080b; --text: #e9edf5; }
+[data-theme="light"] { --bg: #f6f6f1; --text: #15181e; }
+```
+
+### 2.3 Le streaming est la performance perçue
+
+Attendre la réponse complète de GPT-4o = 5 à 20 s d'écran figé. En streaming, le premier
+token arrive en ~300 ms. On affiche donc **au fil de l'eau**, avec `fetch` + `ReadableStream` :
+
+```js
+const reader = res.body.getReader();
+const decoder = new TextDecoder();
+let buffer = "";
+
+function pump() {
+  return reader.read().then(({ done, value }) => {
+    if (done) return;
+    buffer += decoder.decode(value, { stream: true });
+    let i;
+    while ((i = buffer.indexOf("\n")) !== -1) {   // SSE = une ligne = un événement
+      const line = buffer.slice(0, i).replace(/\r$/, "");
+      buffer = buffer.slice(i + 1);
+      if (line.startsWith("data:")) {
+        const data = line.slice(5).trim();
+        if (data === "[DONE]") return;
+        const json = JSON.parse(data);
+        const delta = json.choices?.[0]?.delta?.content;
+        if (delta) onDelta(delta);                // texte brut, pas d'innerHTML
+      }
+    }
+    return pump();
+  });
+}
+```
+
+Points importants :
+
+- `TextDecoder(..., { stream: true })` : un caractère UTF-8 peut être coupé entre deux
+  paquets réseau. Sans ça, « é » devient « Ã© ».
+- Le parseur SSE **tolère** les lignes vides, les commentaires (`: OPENROUTER PROCESSING`)
+  et les `data:` multi-lignes.
+- `stream_options: { include_usage: true }` (OpenRouter) renvoie les **vrais** tokens.
+  Chez Groq, les modèles classiques renvoient `usage` dans le dernier chunk.
+
+### 2.4 Les mises à jour DOM sont limitées à une par image
+
+```js
+function onDelta(text) {
+  raw += text;
+  if (!frame) frame = requestAnimationFrame(flush);  // max 60 rendus/s
+}
+```
+
+Sans ce garde-fou, un modèle rapide (Groq : 300–800 tok/s) déclenche des centaines de
+réécritures par seconde et fait chauffer le téléphone.
+
+Le Markdown n'est **analysé qu'à la fin** du stream (pendant le stream on affiche du texte
+brut) : c'est le meilleur rapport simplicité / coût.
+
+### 2.5 Défilement : un seul calcul par frame
+
+```js
+window.addEventListener("scroll", () => {
+  if (scrollRaf) return;                       // déjà planifié
+  state.stick = innerHeight + scrollY >= scrollHeight - 210;
+}, { passive: true });
+```
+
+`passive: true` évite de bloquer le défilement. Et si l'utilisateur remonte lire une
+réponse, **on arrête de le tirer vers le bas** : un bouton « Dernière réponse » apparaît.
+
+### 2.6 Sauvegarde différée
+
+`localStorage.setItem` est synchrone et peut coûter plusieurs millisecondes. On écrit :
+
+- pendant le stream : au maximum toutes les 600 ms (`saveChatSoon`),
+- à la fin de chaque réponse,
+- dans `pagehide` / `beforeunload` pour ne rien perdre.
+
+Et si le quota est dépassé, on **dégrade proprement** : on garde les 4 derniers échanges et
+on prévient l'utilisateur, au lieu de planter.
+
+### 2.7 Mesures honnêtes
+
+Trois nombres utiles, mesurés avec `performance.now()` :
+
+| Mesure | Calcul | Pourquoi |
+|---|---|---|
+| **TTFT** | premier delta − départ | réactivité perçue |
+| **tok/s** | tokens ÷ (fin − premier delta) | débit réel pendant la génération |
+| **coût** | tokens × tarif ÷ 1 000 000 | ordre de grandeur |
+
+Les tokens sont ceux de l'API quand elle les fournit ; sinon on estime (≈ 4 caractères par
+token) et on l'indique par « ≈ ». Les tarifs sont dans une table en haut du fichier :
+**ils changent**, et un prix affiché faux est pire que pas de prix.
+
+---
+
+## 3. Sécurité : trois règles non négociables
+
+### 3.1 Ne jamais interpréter le HTML du modèle
+
+Une réponse peut contenir `<img src=x onerror=...>`. Ici **tout le texte est échappé**
+avant d'être transformé en Markdown, et le HTML brut s'affiche comme du texte :
+
+```js
+const ESCAPES = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+const escHtml = (v) => String(v).replace(/[&<>"']/g, (c) => ESCAPES[c]);
+```
+
+Seul le Markdown *produit par notre propre parseur* finit dans `innerHTML`, avec des liens
+forcés en `rel="noopener noreferrer nofollow"`.
+
+### 3.2 Les clés API ne vont que chez le fournisseur
+
+- saisies dans l'interface, jamais dans le code ni dans le dépôt ;
+- stockées dans `localStorage` (ou `sessionStorage` si « mémoriser » est décoché) ;
+- envoyées **directement** à `openrouter.ai` / `api.groq.com`, sans serveur intermédiaire.
+
+C'est acceptable pour un usage personnel sur un appareil de confiance. Pour un site public,
+il faut un proxy serveur (voir §6) : sinon n'importe qui peut lire les clés dans le
+navigateur.
+
+### 3.3 `.gitignore`
+
+```
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+```
+
+Une clé poussée sur GitHub est compromise **immédiatement** (les robots scannent). Il faut
+la révoquer, pas seulement supprimer le commit.
+
+---
+
+## 4. Ce qui n'allait pas dans `Yanis ia`, et les corrections
+
+Le fichier `Yanis ia` déposé à la racine du dépôt partait d'une bonne idée (les 8 gratuites
+ou les 8 payantes « collaborent », boutons 👍 / 👎). Dans son état, il ne pouvait pas
+s'exécuter. Voici les défauts concrets, tous corrigés dans `ai-arena/index.html` :
+
+| Problème | Conséquence | Correction |
+|---|---|---|
+| `fetch("https://groq.com")` | 405 / HTML au lieu du JSON | `https://api.groq.com/openai/v1/chat/completions` |
+| `fetch("https://openrouter.ai")` | idem | `https://openrouter.ai/api/v1/chat/completions` |
+| `"Authorization": Bearer${key}` | `ReferenceError`, en-tête invalide | `"Bearer " + key` |
+| Template strings non fermées (`res-${...}`, `` Bearer${key}` ``) | **toute la page** ne parse pas | chaînes concaténées, `node --check` en pré-commit |
+| Du texte Markdown collé à la fin du `<script>` | SyntaxError | fichier valide, séparé en sections commentées |
+| `div.innerHTML = &lt;input …&gt;` | le HTML est échappé, aucun contrôle ne s'affiche | `document.createElement("input")` |
+| `<script src="https://tailwindcss.com">` | ce n'est pas un CDN Tailwind (mauvais MIME + bloquant) | CSS maison, 0 requête |
+| Classes `hidden` de Tailwind | aucun style sans Tailwind | `[hidden] { display: none !important }` et CSS propre |
+| `id` contenant `/` (`res-meta-llama/...`) | `getElementById` ne le retrouve pas | identifiants indexés (`data-ti` / `data-ri`) |
+| Aucun `AbortController` | impossible d'arrêter, pas de délai max | `AbortController` + bouton Stop + timeout 150 s |
+| Aucune gestion d'erreur | écran figé « Calcul… » | messages par code HTTP (401, 402, 429, 5xx…) + détails dépliables |
+| Clés en clair mais non persistées | à ressaisir à chaque rechargement | stockage local avec case « mémoriser » |
+| Modèles retirés (Mixtral, Gemma 2, Llama 3.1 70B…) | erreurs 400/404 garanties | identifiants actuels + message explicite pour les modèles historiques |
+
+---
+
+## 5. Les identifiants de modèles vieillissent vite
+
+Ta liste date de 2024. Depuis, les fournisseurs ont retiré plusieurs modèles :
+
+| Modèle de ta liste | Statut | Remplaçant |
+|---|---|---|
+| Mixtral 8x7B (Groq) | retiré le 20/03/2025 | `openai/gpt-oss-120b` |
+| Gemma 2 9B (Groq) | retiré | `openai/gpt-oss-20b` |
+| Llama 3.1 70B `llama-3.1-70b-versatile` (Groq) | retiré le 24/01/2025 | `openai/gpt-oss-120b` |
+| `llama-3.1-8b-instant` (Groq) | annoncé retiré en 2026 | `openai/gpt-oss-20b` |
+| Gemini Flash 1.5 `:free`, Pixtral 12B `:free`, DeepSeek Chat `:free` | plus « gratuits » sur OpenRouter (paliers supprimés) | `openrouter/free`, `meta-llama/llama-3.3-70b-instruct:free`… |
+
+La page **garde tes 16 modèles** (c'est ta sélection), marque les identifiants historiques
+d'un ⚠, et affiche un message clair quand l'API répond « modèle inexistant » au lieu d'un
+écran muet. Pour remettre à jour la liste : `GET https://openrouter.ai/api/v1/models`
+et `GET https://api.groq.com/openai/v1/models` (avec ta clé).
+
+---
+
+## 6. Passer en production (site public)
+
+Un fichier statique ne peut pas cacher une clé. Le schéma minimal :
+
+```
+Navigateur ──► ton serveur (/api/chat) ──► OpenRouter / Groq
+                 │ clé en variable d'environnement
+                 │ limitation de débit par IP
+                 └ quotas + journal d'usage
+```
+
+- **Le serveur relaie le flux tel quel** (`res.body` → `ReadableStream`), sinon tu perds le
+  streaming et donc tout l'intérêt.
+- Vercel / Cloudflare Workers : une fonction edge de ~30 lignes suffit.
+- Ajoute `Access-Control-Allow-Origin` **uniquement** sur ton domaine.
+- Prévois un quota : 8 modèles × 10 requêtes = 80 appels par clic ; sans limite, ta facture
+  suit le premier visiteur curieux.
+
+Pour un usage **personnel**, le fichier unique reste le plus rapide à déployer : GitHub
+Pages, ou même ouverture locale.
+
+---
+
+## 7. Héberger et tester
+
+```bash
+# ouverture directe (tout fonctionne, y compris le stockage local)
+xdg-open ai-arena/index.html
+
+# ou service local, utile pour tester sur téléphone
+python3 -m http.server 8000 --bind 0.0.0.0 --directory ai-arena
+```
+
+Sur GitHub : *Settings → Pages → Deploy from a branch*, dossier `/` puis l'URL
+`…/ai-arena/`. Sur mobile, Acode ouvre le fichier et le rend avec le moteur du téléphone.
+
+**Checklist de test** avant de partager :
+
+1. sans clé : réponses en démo, vote, classement, export ;
+2. avec clé OpenRouter puis Groq : streaming réel, métriques, erreurs 401/429 ;
+3. coupure réseau en pleine réponse → message et bouton « Réessayer » ;
+4. rechargement → conversation, thème, réglages, notes conservés ;
+5. mobile 390 px : rien ne déborde, le clavier ne masque pas le champ ;
+6. mode multi : 8 modèles maximum, notes 👍/👎 fusionnées dans le classement.
+
+---
+
+## 8. Limites assumées
+
+- **Appels directs = clé visible** par quiconque a accès à l'appareil.
+- **CORS** : certains fournisseurs bloquent les appels navigateur ; ici OpenRouter et Groq
+  l'autorisent, mais un modèle peut échouer pour cette raison (message dédié).
+- **Tarifs et identifiants** sont des données vivantes : table à maintenir.
+- **Tokens estimés** quand l'API ne les renvoie pas ; c'est indiqué par « ≈ ».
+- **Pas de multi-tour par modèle en multi** : chaque modèle reçoit son propre historique
+  (sinon les réponses des autres pollueraient le sien).
