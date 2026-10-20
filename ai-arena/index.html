@@ -354,6 +354,18 @@ body:not(.has-chat) .panelbar, body:not(.has-chat) .empty { display: none; }
 @keyframes pulse { 0%, 100% { opacity: 0.45; } 50% { opacity: 1; } }
 
 .drafts { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; align-items: start; }
+.drafts-wrap { margin-top: 12px; }
+.drafts-wrap .drafts { margin-top: 9px; }
+.drafts-wrap:not(.is-open) .drafts { display: none; }
+.drafts-toggle {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px;
+  border: 1px solid var(--line); border-radius: 999px; background: transparent;
+  color: var(--muted); font-size: 11.5px; font-weight: 600;
+}
+.drafts-toggle:hover { color: var(--text); border-color: var(--line-2); }
+.drafts-toggle .chev { transition: transform 0.16s ease; }
+.drafts-wrap.is-open .drafts-toggle .chev { transform: rotate(180deg); }
+.drafts-wrap.is-open .drafts-toggle { color: var(--text); border-color: var(--line-2); }
 .draft {
   position: relative; min-width: 0; overflow: hidden;
   border: 1px solid var(--line); border-radius: 13px; background: var(--panel-solid);
@@ -1251,7 +1263,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   var MGMT_URL = "https://openrouter.ai/settings/management-keys";
   var APP_NAME = "ARENA//X";
   var SCHEMA = 3;
-  var MAX_DRAFTS = 4;
+  var MAX_DRAFTS = 6;
 
   var LS = {
     settings: "arenax.settings.v3",
@@ -1350,7 +1362,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     stick: true,
     pending: { drafts: [], synth: null, solo: null, style: "collab", tab: "drafts", query: "" },
     github: { repo: "Yandevil974/Tueurs-en-s-rie-", branch: "main", path: "arena-x/sauvegarde.json", token: "", last: 0 },
-    ui: { openDrafts: new Set() }
+    ui: { openDrafts: new Set(), showDrafts: new Set() }
   };
 
   var el = {};
@@ -2944,15 +2956,56 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     head.appendChild(right);
     collab.appendChild(head);
 
+    /* La réponse finale passe en premier : c'est LE résultat.
+       Les brouillons sont secondaires, repliés derrière un bouton. */
+    if (turn.synth) collab.appendChild(buildSynth(turn));
+
     if (!turn.solo) {
+      var wrap = elem("div", "drafts-wrap");
+      wrap.dataset.draftsWrap = String(turn.id);
+      var toggle = elem("button", "drafts-toggle");
+      toggle.type = "button";
+      toggle.dataset.draftsToggle = String(turn.id);
+      toggle.appendChild(iconEl("chevron", "chev"));
+      toggle.appendChild(document.createTextNode(""));
+      wrap.appendChild(toggle);
       var drafts = elem("div", "drafts");
       turn.drafts.forEach(function (d, i) { drafts.appendChild(buildDraft(turn, d, i)); });
-      collab.appendChild(drafts);
+      wrap.appendChild(drafts);
+      collab.appendChild(wrap);
+      syncDraftsWrap(turn);
     }
-
-    if (turn.synth) collab.appendChild(buildSynth(turn));
     article.appendChild(collab);
     return article;
+  }
+
+  function draftsOpen(turn) {
+    if (!turn.synth) return true;                 /* pendant la consultation : on montre les brouillons */
+    return state.ui.showDrafts.has(turn.id);      /* ensuite : repliés par défaut */
+  }
+
+  function syncDraftsWrap(turn) {
+    var root = turnEl(turn);
+    if (!root) return;
+    var wrap = root.querySelector("[data-drafts-wrap]");
+    if (!wrap) return;
+    var open = draftsOpen(turn);
+    wrap.classList.toggle("is-open", open);
+    var toggle = wrap.querySelector(".drafts-toggle");
+    if (!toggle) return;
+    var n = turn.drafts.length;
+    var label = toggle.lastChild;
+    var text = (open ? "Masquer" : "Voir") + " les " + n + " brouillon" + (n > 1 ? "s" : "");
+    if (label && label.nodeType === 3) label.nodeValue = " " + text;
+    else toggle.appendChild(document.createTextNode(" " + text));
+    toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function toggleDrafts(turnId) {
+    if (state.ui.showDrafts.has(turnId)) state.ui.showDrafts.delete(turnId);
+    else state.ui.showDrafts.add(turnId);
+    var turn = state.turns.filter(function (t) { return t.id === turnId; })[0];
+    if (turn) syncDraftsWrap(turn);
   }
 
   function renderThread() {
@@ -3010,9 +3063,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     } else {
       var collab = root.querySelector(".collab");
       if (!collab) return;
-      collab.appendChild(fresh);
+      /* La réponse finale doit passer AVANT la liste des brouillons. */
+      var before = collab.querySelector("[data-drafts-wrap]");
+      if (before) collab.insertBefore(fresh, before);
+      else collab.appendChild(fresh);
     }
     updateSteps(turn);
+    syncDraftsWrap(turn);
   }
 
   function updateSteps(turn) {
@@ -3134,7 +3191,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       el.panelSave.textContent = "Enregistrer";
       if (state.mode === "free") {
       el.panelNotice.textContent = hasAnyKey() ?
-        "Modèles gratuits : Groq + routeur, et les meilleurs :free d'OpenRouter si la clé est là. Quatre brouillons maximum." :
+        "Modèles gratuits : Groq, routeur et :free d'OpenRouter. Six brouillons maximum, une seule réponse finale." :
         "Aucune clé : mode démonstration. Ajoute ta clé Groq pour de vraies réponses.";
     } else if (!hasPaidAccess()) {
       el.panelNotice.textContent = (state.keys.openrouter.trim() ?
@@ -3411,66 +3468,159 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   }
 
   function demoDraftText(model, prompt, index) {
-    var p = prompt.replace(/\s+/g, " ").trim();
-    var short = p.length > 180 ? p.slice(0, 180).trim() + "…" : p;
     var angles = [
-      [
-        "**Plan détaillé**",
-        "",
-        "1. **Cadrer** la question en une phrase et définir les termes importants.",
-        "2. **Expliquer** le mécanisme principal, puis l'illustrer par un exemple concret.",
-        "3. **Nuancer** : limites, exceptions et cas où la réponse change.",
-        "4. **Conclure** par ce qu'il faut retenir, sans répéter l'introduction."
-      ].join("\n"),
-      [
-        "**Réponse directe**",
-        "",
-        "Voici l'essentiel, sans détour :",
-        "",
-        "- la réponse courte à la question ;",
-        "- le point qui fait vraiment la différence ;",
-        "- l'erreur fréquente à éviter.",
-        "",
-        "Un exemple chiffré rendrait la réponse plus claire : c'est ce qu'un vrai modèle ajouterait ici."
-      ].join("\n"),
-      [
-        "**Comparaison**",
-        "",
-        "| Critère | Approche A | Approche B |",
-        "| --- | --- | --- |",
-        "| Simplicité | **élevée** | moyenne |",
-        "| Coût | faible | variable |",
-        "| Cas idéal | usage courant | besoins avancés |",
-        "",
-        "Un vrai modèle remplirait ce tableau avec des faits vérifiés et des chiffres."
-      ].join("\n")
+      "- Définir les termes de la question.\n- Donner le mécanisme principal.\n- Nuancer avec une limite.",
+      "- Réponse directe en une phrase.\n- Le point qui fait la différence.\n- L'erreur fréquente à éviter.",
+      "- Comparer deux approches sur trois critères.\n- Conclure par le cas d'usage décisif.",
+      "- Poser le contexte, puis l'exemple concret.\n- Terminer par ce qu'il faut retenir."
     ];
+    return angles[index % angles.length] + "\n\n*Brouillon simulé — clé " +
+      providerLabel(model.provider) + " absente.*";
+  }
+
+  /* Réponses de démonstration : du contenu réel, pour montrer la qualité du rendu
+     sans clé. Chaque entrée est une réponse unique et complète. */
+  var DEMO_ANSWERS = [
+    {
+      re: /sql|nosql|base de donn|mongodb|postgres/i,
+      text: [
+        "**SQL et NoSQL ne s'opposent pas sur la même question : SQL impose un schéma, NoSQL le laisse souple.**",
+        "",
+        "**1. La structure des données**",
+        "- **SQL** (PostgreSQL, MySQL) : des tables, des colonnes typées, des relations par clés étrangères. Le schéma est décidé avant d'écrire.",
+        "- **NoSQL** (MongoDB, Redis, Cassandra) : des documents, des paires clé-valeur ou des colonnes larges. Chaque enregistrement peut avoir sa propre forme.",
+        "",
+        "**2. La cohérence**",
+        "- SQL privilégie la **cohérence forte** (transactions ACID) : indispensable pour l'argent, les stocks, la facturation.",
+        "- NoSQL privilégie la **disponibilité et la montée en charge** : adapté aux flux, aux journaux, aux catalogues qui changent souvent.",
+        "",
+        "**3. Le critère de choix**",
+        "- Paiement, réservation, comptabilité → **SQL**.",
+        "- Messages, objets hétérogènes, cache, très gros volume en écriture → **NoSQL**.",
+        "- Beaucoup de projets démarrent en SQL, puis ajoutent une base NoSQL pour un usage précis.",
+        "",
+        "**À retenir** : « NoSQL » ne veut pas dire « sans SQL », mais « pas seulement relationnel ». Le vrai critère reste le besoin de cohérence et la forme des données."
+      ].join("\n")
+    },
+    {
+      re: /palindrome|python/i,
+      text: [
+        "```python",
+        "def est_palindrome(texte: str) -> bool:",
+        '    """Vrai si le texte se lit pareil dans les deux sens."""',
+        "    propre = [c.lower() for c in texte if c.isalnum()]",
+        "    return propre == propre[::-1]",
+        "",
+        "",
+        "print(est_palindrome(\"Élu par cette crapule\"))  # True",
+        "print(est_palindrome(\"Bonjour\"))               # False",
+        "```",
+        "",
+        "**Ce que fait le code**",
+        "1. On ne garde que les lettres et les chiffres, en minuscules : les espaces, accents et ponctuation ne doivent pas fausser le test.",
+        "2. On compare la liste à sa copie inversée.",
+        "",
+        "**Complexité** : `O(n)` en temps (une seule lecture du texte) et `O(n)` en mémoire pour la liste. On peut descendre à `O(1)` en mémoire avec deux index qui se rapprochent, mais le gain n'a d'intérêt que sur de très gros volumes.",
+        "",
+        "**Piège classique** : comparer les caractères bruts échoue sur « Élu par cette crapule » à cause de l'accent et des espaces. Normaliser d'abord, comparer ensuite."
+      ].join("\n")
+    },
+    {
+      re: /grands modèles|modèle de langage|llm|enfant de 10|métaphore/i,
+      text: [
+        "**Imagine un ami qui aurait lu des millions de livres, sans jamais rien retenir par cœur.**",
+        "",
+        "Il ne connaît pas les phrases par cœur : il a tellement lu qu'il devine **quel mot vient après quel autre**. C'est tout le secret d'un grand modèle de langage.",
+        "",
+        "**Comment il apprend**",
+        "1. On lui montre des montagnes de textes.",
+        "2. À chaque fois, on cache le mot suivant et il essaie de le deviner.",
+        "3. Il se trompe, on corrige un tout petit réglage, et on recommence des milliards de fois.",
+        "",
+        "**Pourquoi il a l'air de comprendre**",
+        "Parce que deviner correctement le mot suivant demande de savoir de quoi on parle. Pour finir la phrase « la recette du gâteau au chocolat commence par… », il faut avoir retenu qu'on casse des œufs avant de mettre la farine.",
+        "",
+        "**Ce qu'il ne fait pas**",
+        "- Il ne vérifie pas les faits : il produit ce qui **ressemble** à une bonne réponse.",
+        "- Il ne se souvient pas de votre conversation précédente, sauf si on la lui remet dans le message.",
+        "- Il ne « pense » pas en silence comme un humain : il écrit, un mot à la fois.",
+        "",
+        "**L'image à retenir** : un cuisinier qui aurait goûté des millions de plats et saurait reproduire une recette plausible — sans jamais avoir ouvert un livre de cuisine."
+      ].join("\n")
+    },
+    {
+      re: /podcast|documentaire|affaire|true crime/i,
+      text: [
+        "**Un plan en cinq parties, sans sensationnalisme : le récit au service des faits.**",
+        "",
+        "**1. Le cadre (8 min)** — Poser le lieu, l'époque et les personnes concernées. Annoncer la question centrale : que sait-on, que ne sait-on pas ?",
+        "",
+        "**2. Les faits établis (15 min)** — Uniquement ce qui figure au dossier : dates, lieux, témoignages vérifiés. Distinguer clairement « établi », « allégué » et « inconnu ».",
+        "",
+        "**3. L'enquête (20 min)** — Comment les enquêteurs ont travaillé : les pistes suivies, les impasses, les erreurs éventuelles. C'est souvent la partie la plus instructive.",
+        "",
+        "**4. Les personnes (12 min)** — Donner la parole aux proches et aux victimes sans les réduire à leur statut. Éviter les détails graphiques : ils n'apportent aucune information.",
+        "",
+        "**5. Ce que ça change (10 min)** — Les suites judiciaires, les leçons pour la police ou la société, et une conclusion nuancée.",
+        "",
+        "**Règles éditoriales**",
+        "- Citer chaque source à l'antenne.",
+        "- Ne jamais présenter une hypothèse comme un fait.",
+        "- Prévenir avant les passages difficiles.",
+        "- Faire relire les scripts par un tiers extérieur à l'enquête."
+      ].join("\n")
+    },
+    {
+      re: /clé api|api key|qu'est-ce qu'une clé/i,
+      text: [
+        "**Une clé API, c'est un badge nominatif pour un service en ligne.**",
+        "",
+        "Quand ton application veut utiliser une IA, elle frappe à la porte du fournisseur. La clé dit trois choses : **qui** appelle, **quel compte** sera facturé, et **à quoi** elle a droit.",
+        "",
+        "**Ce qu'elle permet**",
+        "- Être reconnu sans redonner son mot de passe à chaque requête.",
+        "- Compter l'usage et facturer le bon client.",
+        "- Couper l'accès immédiatement si la clé fuite.",
+        "",
+        "**Ce qu'elle n'est pas**",
+        "- Ce n'est pas un mot de passe : elle ne donne pas accès à ton compte, seulement à l'API.",
+        "- Ce n'est pas partageable : une clé publiée est une clé à révoquer.",
+        "",
+        "**Bonne pratique** : une clé par application, un droit minimal, et une rotation régulière. Dans un fichier HTML, la clé est visible par quiconque ouvre le code : c'est acceptable pour un usage personnel sur ton appareil, jamais pour un site public."
+      ].join("\n")
+    }
+  ];
+
+  function demoAnswerFor(prompt) {
+    for (var i = 0; i < DEMO_ANSWERS.length; i++) {
+      if (DEMO_ANSWERS[i].re.test(prompt)) return DEMO_ANSWERS[i].text;
+    }
+    var p = prompt.replace(/\s+/g, " ").trim();
+    var short = p.length > 140 ? p.slice(0, 140).trim() + "…" : p;
     return [
-      angles[index % angles.length],
+      "**" + (short.charAt(0).toUpperCase() + short.slice(1)) + "**",
       "",
-      "> Question simulée : « " + short + " »",
+      "Voici la réponse qu'un modèle branché rédigerait ici, en un seul bloc :",
       "",
-      "*Mode démo — clé " + providerLabel(model.provider) + " absente. Ce texte illustre le rendu, pas une vraie réponse.*"
+      "**L'essentiel** — une réponse directe en deux phrases, qui va au fait et ne récite pas la question.",
+      "",
+      "**Les points clés** — trois éléments vérifiés, chacun apportant une information nouvelle : le mécanisme, l'exemple concret, la limite.",
+      "",
+      "**L'exemple** — un cas réel ou un chiffre, pour que la réponse serve vraiment à quelque chose.",
+      "",
+      "**Ce qu'il faut retenir** — une phrase de conclusion, sans répéter l'introduction.",
+      "",
+      "*Mode démonstration : ajoute ta clé Groq (gratuite) dans les réglages pour obtenir de vraies réponses.*"
     ].join("\n");
   }
 
-  function demoSynthText(prompt, drafts) {
-    var p = prompt.replace(/\s+/g, " ").trim();
-    var short = p.length > 200 ? p.slice(0, 200).trim() + "…" : p;
-    return [
-      "**Synthèse de démonstration.**",
-      "",
-      "La question était : « " + short + " »",
-      "",
-      "Un vrai synthétiseur lirait les " + drafts.length + " brouillons, corrigerait leurs erreurs, supprimerait les redites et produirait une réponse unique. Voici la structure qu'il suivrait :",
-      "",
-      "1. **Réponse directe** — la conclusion en deux phrases.",
-      "2. **Points clés** — trois éléments vérifiés, sans répétition.",
-      "3. **Limites** — ce qui reste incertain ou dépend du contexte.",
-      "4. **Pour aller plus loin** — un exemple ou une action concrète.",
-      "",
-      "> Mode démo : ajoute une clé OpenRouter pour obtenir une vraie synthèse. Les appels restent directs depuis ce navigateur."
-    ].join("\n");
+  function demoSynthText(prompt) {
+    var text = demoAnswerFor(prompt);
+    if (text.indexOf("Mode démonstration") === -1) {
+      text += "\n\n*Mode démonstration : réponse d'exemple pré-écrite. " +
+        "Ajoute ta clé Groq dans les réglages pour une vraie réponse.*";
+    }
+    return text;
   }
 
   function demoStream(text, signal, onDelta) {
@@ -3756,7 +3906,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
     try {
       if (demo) {
-        await demoStream(demoSynthText(turn.prompt, doneDrafts), ctrl.signal, onDelta);
+        await demoStream(demoSynthText(turn.prompt), ctrl.signal, onDelta);
       } else {
         var r = await streamModel(model, messages, ctrl.signal, onDelta);
         if (r) { usage = r.usage; finish = r.finish; }
@@ -4231,6 +4381,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     state.style = "collab";
     state.panels[state.mode] = state.pending.drafts.slice(0, MAX_DRAFTS);
     state.synths[state.mode] = state.pending.synth;
+    var groqCount = state.panels[state.mode].filter(function (k) {
+      return k.indexOf("groq::") === 0;
+    }).length;
+    if (groqCount > 2) {
+      showToast(groqCount + " modèles Groq : le palier gratuit limite à 8 000 tokens/minute, certains appels attendront.", "err");
+    }
     persistSettings();
     syncStyleButtons();
     renderPanelbar();
@@ -4782,6 +4938,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         }
         return;
       }
+      var draftsBtn = e.target.closest("[data-drafts-toggle]");
+      if (draftsBtn) { toggleDrafts(Number(draftsBtn.dataset.draftsToggle)); return; }
       var vote = e.target.closest("[data-vote]");
       if (vote) { toggleVote(Number(vote.dataset.turn), vote.dataset.vote); return; }
       var copy = e.target.closest("[data-copy-synth]");

@@ -158,7 +158,7 @@ Le JSON contient `app`, `schema`, `version`, `exportedAt`, `settings`, `panels`,
   citations, blocs de code avec bouton copier.
 - **Mode démo intégral** : aucun appel réseau, textes simulés distincts par modèle.
 - **Panneau à deux visages** : en Collaboration, recherche + onglets Brouillons/Synthèse +
-  presets + 4 brouillons max ; en Solo, sélection unique en un clic. Sélection persistante
+  presets + 6 brouillons max ; en Solo, sélection unique en un clic. Sélection persistante
   par catalogue **et** par mode.
 - **Clés** : `localStorage` ou `sessionStorage` (case « mémoriser »), affichage masqué,
   bouton « Tester » les trois connexions avec message d'erreur lisible.
