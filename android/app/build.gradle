@@ -1,0 +1,56 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "com.arenax.app"
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.arenax.app"
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        debug {
+            applicationIdSuffix ""
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+    implementation "androidx.webkit:webkit:1.11.0"
+}
+
+/* Une seule source de vérité : l'application web vit dans ../ai-arena/index.html.
+   Elle est copiée dans les assets avant chaque build, donc l'APK embarque
+   toujours la dernière version du fichier HTML. */
+def webSource = rootProject.file("../ai-arena/index.html")
+def assetsDir = file("$projectDir/src/main/assets")
+
+tasks.register("syncWebAsset", Copy) {
+    from(webSource) {
+        rename { "arena-x.html" }
+    }
+    into assetsDir
+}
+
+tasks.matching { it.name == "preBuild" }.configureEach {
+    dependsOn "syncWebAsset"
+}

@@ -1,0 +1,63 @@
+name: Build APK Android
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "android/**"
+      - "ai-arena/index.html"
+      - ".github/workflows/android.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: APK debug
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: "8.7"
+
+      - name: Compiler l'APK
+        working-directory: android
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Préparer le fichier
+        run: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk ARENA-X.apk
+          ls -lh ARENA-X.apk
+
+      - name: Publier l'artefact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARENA-X-apk
+          path: ARENA-X.apk
+          retention-days: 90
+
+      - name: Mettre l'APK dans une release
+        if: github.ref == 'refs/heads/arena/5353aa12-tueurs-en-s-rie'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHA=$(git rev-parse --short HEAD)
+          gh release delete arena-x-app --yes --cleanup-tag 2>/dev/null || true
+          gh release create arena-x-app ARENA-X.apk \
+            --title "ARENA//X — application Android" \
+            --target "$GITHUB_SHA" \
+            --notes "APK autonome, construit depuis le commit \`$SHA\`.
+
+**Installation** : télécharge ARENA-X.apk ci-dessous, ouvre-le depuis les notifications, et autorise l'installation depuis cette source quand Android le demande.
+
+L'application embarque l'interface complète (aucun serveur) : 9 modèles gratuits, 9 premium, Collaboration ou Solo, sauvegarde JSON dans les Téléchargements. Colle ta clé Groq dans ⚙ pour de vraies réponses."
