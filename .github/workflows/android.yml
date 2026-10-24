@@ -34,6 +34,22 @@ jobs:
         working-directory: android
         run: gradle assembleDebug --no-daemon --stacktrace
 
+      - name: Verifier l'APK
+        run: |
+          set -e
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          echo "== contenu =="
+          unzip -l "$APK" | head -20
+          echo "== page embarquee =="
+          unzip -p "$APK" assets/arena-x.html | md5sum
+          md5sum ai-arena/index.html
+          echo "== manifeste =="
+          AAPT=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | tail -1)
+          "$AAPT" dump badging "$APK" | head -12
+          echo "== signature =="
+          SIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | tail -1)
+          "$SIGNER" verify --print-certs "$APK" | head -6
+
       - name: Preparer le fichier
         run: |
           cp android/app/build/outputs/apk/debug/app-debug.apk ARENA-X.apk
