@@ -980,6 +980,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         <input id="modelSearch" type="search" placeholder="Rechercher un modèle…" aria-label="Rechercher un modèle">
       </div>
       <div class="btn-row" id="presetRow">
+        <button class="btn sm" type="button" data-preset="code">Créer</button>
         <button class="btn sm" type="button" data-preset="top-tier">★ Meilleures</button>
         <button class="btn sm" type="button" data-preset="top">✦ Mon choix</button>
         <button class="btn sm" type="button" data-preset="top-bis">Compléter</button>
@@ -1803,6 +1804,24 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   ];
   var BEST_TOP_SYNTH = [/claude.*opus.*5\.5/i, /claude.*opus/i, /gpt-6-astra/i, /gpt-5\.6-sol/i];
 
+  /* « Créer » : pour écrire du code et bâtir une app.
+     Critères différents des autres panneaux : ici on regarde le code
+     (LiveCodeBench, SWE-bench, WebDev), pas l'indice de culture générale.
+     Gratuit : Qwen3.8 27B (LiveCodeBench 90,3) devant GPT-OSS.
+     Premium : Sol (Codage agent 80), Sonnet 5.5 (#1 LiveBench Coding) et
+     DeepSeek pour l'angle pas cher, synthèse Opus 5.5 (#1 WebDev, 1807). */
+  /* Qwen3.8 est le meilleur codeur gratuit : on le garde pour la synthèse,
+     et les brouillons partent sur trois autres modèles pour varier les angles. */
+  var BEST_CODE_FREE = [
+    /gpt-oss-120b/i, /north[^/]*code/i, /nemotron[^/]*ultra/i, /qwen3\.8-27b/i
+  ];
+  var BEST_CODE_FREE_SYNTH = [/qwen3\.8-27b/i, /openrouter\/free/i, /gpt-oss-120b/i];
+  var BEST_CODE_DRAFTS = [
+    /gpt-5\.6-sol/i, /claude.*sonnet.*5\.5/i, /deepseek/i,
+    /codex/i, /claude.*opus/i, /gpt-5\.6-terra/i
+  ];
+  var BEST_CODE_SYNTH = [/claude.*opus.*5\.5/i, /claude.*sonnet.*5\.5/i, /gpt-5\.6-sol/i, /claude.*opus/i];
+
   /* Identifiant sans suffixe de variante : évite de cocher deux fois le même
      modèle (ex. gpt-oss-120b sur Groq ET sa variante :free sur OpenRouter). */
   function baseModelId(id) {
@@ -1865,6 +1884,19 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       drafts: drafts.map(function (m) { return m.key; }),
       synth: synth ? synth.key : null
     };
+  }
+
+  /* Panneau « Créer » : orienté code et construction d'application. */
+  function bestCodePanel(mode) {
+    var pool = pools()[mode];
+    if (mode === "free") {
+      var fd = bestModels(pool, BEST_CODE_FREE, 3, []);
+      var fsynth = bestModels(pool, BEST_CODE_FREE_SYNTH, 1, fd)[0] || fd[0] || null;
+      return { drafts: fd.map(function (m) { return m.key; }), synth: fsynth ? fsynth.key : null };
+    }
+    var drafts = bestModels(pool, BEST_CODE_DRAFTS, 3, []);
+    var synth = bestModels(pool, BEST_CODE_SYNTH, 1, drafts)[0] || drafts[0] || null;
+    return { drafts: drafts.map(function (m) { return m.key; }), synth: synth ? synth.key : null };
   }
 
   function bestSolo(mode) {
@@ -3414,7 +3446,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       el.panelNotice.textContent = est >= 0.05
         ? "Haut de gamme : plus solide sur les questions difficiles, mais ~7× le prix de « Mon choix ». À réserver à ce qui compte."
         : est >= 0.004
-          ? "Le meilleur rendement : brouillons bon marché, bonne synthèse. Sur une question simple, la réponse sera quasi identique au haut de gamme."
+          ? "Le meilleur rendement : brouillons bon marché, bonne synthèse. Sur une question simple, la réponse sera quasi identique au haut de gamme ; sur du code complexe, les modèles frontière gardent l'avantage."
           : "Économique : budget protégé, mais brouillons plus faibles sur le raisonnement long et le code.";
     }
       if (el.panelTabs) el.panelTabs.hidden = false;
@@ -4695,7 +4727,16 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       renderPanelDialog();
       return;
     }
-    if (kind === "top-tier") {
+    if (kind === "code") {
+      var code = bestCodePanel(state.mode);
+      if (code.drafts.length) {
+        state.pending.drafts = code.drafts.slice();
+        state.pending.synth = code.synth;
+        state.panelCustom[state.mode] = false;
+        showToast("Panneau « Créer » : orienté code et construction, " +
+          fmtMoney4(estimateTurnCost(code.drafts, code.synth, null)) + " / question.", "ok");
+      }
+    } else if (kind === "top-tier") {
       var tier = bestPanelTier(state.mode);
       if (tier.drafts.length) {
         state.pending.drafts = tier.drafts.slice();
