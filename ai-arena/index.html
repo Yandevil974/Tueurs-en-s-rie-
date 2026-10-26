@@ -2731,7 +2731,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
   function paintDraftBody(body, d, open) {
     if (d.status === "streaming") {
-      body.textContent = plainStream(d.content || "");
+      var live = plainStream(d.content || "");
+      body.textContent = live || (d.reasoningChars ? "Réflexion… " + fmtInt(Math.round(d.reasoningChars / 4)) + " tokens" : "");
       return;
     }
     if (!open) {
@@ -2815,7 +2816,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     }
     if (synth.status === "streaming") {
       body.className = "synth-body streaming";
-      body.textContent = plainStream(synth.content || "");
+      var liveSynth = plainStream(synth.content || "");
+      body.textContent = liveSynth || (synth.reasoningChars ? "Réflexion du synthétiseur… " + fmtInt(Math.round(synth.reasoningChars / 4)) + " tokens" : "");
       return;
     }
     body.className = "synth-body md";
@@ -2973,7 +2975,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       turn.drafts.forEach(function (d, i) { drafts.appendChild(buildDraft(turn, d, i)); });
       wrap.appendChild(drafts);
       collab.appendChild(wrap);
-      syncDraftsWrap(turn);
+      paintDraftsWrap(wrap, turn);
     }
     article.appendChild(collab);
     return article;
@@ -2984,21 +2986,26 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     return state.ui.showDrafts.has(turn.id);      /* ensuite : repliés par défaut */
   }
 
-  function syncDraftsWrap(turn) {
-    var root = turnEl(turn);
-    if (!root) return;
-    var wrap = root.querySelector("[data-drafts-wrap]");
+  function paintDraftsWrap(wrap, turn) {
     if (!wrap) return;
     var open = draftsOpen(turn);
     wrap.classList.toggle("is-open", open);
     var toggle = wrap.querySelector(".drafts-toggle");
     if (!toggle) return;
     var n = turn.drafts.length;
+    var live = turn.drafts.some(function (d) { return d.status === "streaming"; });
+    var text = live ? n + " brouillon" + (n > 1 ? "s" : "") + " en cours…" :
+      (open ? "Masquer" : "Voir") + " les " + n + " brouillon" + (n > 1 ? "s" : "");
     var label = toggle.lastChild;
-    var text = (open ? "Masquer" : "Voir") + " les " + n + " brouillon" + (n > 1 ? "s" : "");
     if (label && label.nodeType === 3) label.nodeValue = " " + text;
     else toggle.appendChild(document.createTextNode(" " + text));
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function syncDraftsWrap(turn) {
+    var root = turnEl(turn);
+    if (!root) return;
+    paintDraftsWrap(root.querySelector("[data-drafts-wrap]"), turn);
   }
 
   function toggleDrafts(turnId) {
@@ -3322,7 +3329,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     };
   }
 
-  function readSSE(res, onDelta) {
+  function readSSE(res, onDelta, onReasoning) {
     var reader = res.body.getReader();
     var decoder = new TextDecoder();
     var buffer = "";
@@ -3342,6 +3349,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       if (choice.finish_reason) finish = choice.finish_reason;
       var delta = choice.delta;
       if (delta) {
+        var think = typeof delta.reasoning === "string" ? delta.reasoning :
+          typeof delta.reasoning_content === "string" ? delta.reasoning_content :
+          (delta.reasoning && typeof delta.reasoning.text === "string") ? delta.reasoning.text : "";
+        if (think && onReasoning) onReasoning(think);
         if (typeof delta.content === "string") onDelta(delta.content);
         else if (Array.isArray(delta.content)) {
           onDelta(delta.content.map(function (p) { return (p && p.text) || ""; }).join(""));
@@ -3389,6 +3400,42 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   var groqActive = 0;
   var groqWait = [];
 
+  function sleepAbortable(ms, signal) {
+    return new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () { cleanup(); resolve(); }, ms);
+      function onAbort() { cleanup(); reject(abortErr()); }
+      function cleanup() {
+        clearTimeout(timer);
+        if (signal) signal.removeEventListener("abort", onAbort);
+      }
+      if (signal) {
+        if (signal.aborted) { cleanup(); reject(abortErr()); return; }
+        signal.addEventListener("abort", onAbort, { once: true });
+      }
+    });
+  }
+
+  /* Réservation de tokens sur 60 s : la synthèse ne part plus en rafale juste
+     après les brouillons, ce qui provoquait des 429. */
+  var GROQ_TPM = 7000;
+  var groqTpm = [];
+
+  function groqTpmUsed() {
+    var now = Date.now();
+    while (groqTpm.length && now - groqTpm[0].at > 60000) groqTpm.shift();
+    return groqTpm.reduce(function (n, e) { return n + e.tokens; }, 0);
+  }
+
+  async function acquireBudget(model, messages, signal) {
+    if (model.provider !== "groq") return;
+    var need = estimateTokens(JSON.stringify(messages)) + 600;
+    while (groqTpmUsed() + need > GROQ_TPM) {
+      var wait = groqTpm.length ? 60000 - (Date.now() - groqTpm[0].at) + 250 : 1000;
+      await sleepAbortable(Math.min(15000, Math.max(500, wait)), signal);
+    }
+    groqTpm.push({ at: Date.now(), tokens: need });
+  }
+
   function acquireGroq(signal) {
     if (groqActive < 2) { groqActive++; return Promise.resolve(); }
     return new Promise(function (resolve, reject) {
@@ -3409,64 +3456,126 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     else groqActive = Math.max(0, groqActive - 1);
   }
 
-  async function streamModel(model, messages, signal, onDelta) {
+  async function streamModel(model, messages, signal, onDelta, onReasoning) {
     var key = keyFor(model.provider);
     if (!key) throw new ApiError("Aucune clé " + providerLabel(model.provider) + ".", "", 0);
-    if (model.provider === "groq") await acquireGroq(signal);
-    try {
-      return await streamModelInner(model, messages, signal, onDelta, key);
-    } finally {
-      if (model.provider === "groq") releaseGroq();
+    if (model.provider === "groq") {
+      await acquireGroq(signal);
+      try {
+        await acquireBudget(model, messages, signal);
+        return await streamModelInner(model, messages, signal, onDelta, onReasoning, key);
+      } finally {
+        releaseGroq();
+      }
     }
+    return streamModelInner(model, messages, signal, onDelta, onReasoning, key);
+  }
+  /* Budget de tokens. Les modèles de raisonnement (gpt-oss) consomment leur
+     budget en réflexion AVANT d'écrire : sans marge la réponse revient vide. */
+  var REASONING_HEADROOM = 1536;
+
+  function requestBody(model, messages, retry) {
+    var id = model.id || "";
+    var os = /gpt-oss/i.test(id);
+    var qwen3 = /qwen3/i.test(id);
+    var base = Math.max(256, Number(state.settings.maxTokens) || 1024);
+    var budget = base + (os ? REASONING_HEADROOM : 0);
+    if (retry) budget = Math.max(budget, 4096);
+    var body = { model: model.id, messages: messages, stream: true, stream_options: { include_usage: true } };
+    if (state.settings.temperature != null) body.temperature = state.settings.temperature;
+    if (model.provider === "groq") {
+      /* max_tokens est déconseillé chez Groq : max_completion_tokens inclut la réflexion. */
+      body.max_completion_tokens = budget;
+      if (os) { body.reasoning_effort = "low"; body.include_reasoning = false; }
+      else if (qwen3) { body.reasoning_effort = "none"; }
+    } else {
+      body.max_tokens = budget;
+    }
+    return body;
   }
 
-  async function streamModelInner(model, messages, signal, onDelta, key) {
+  async function streamModelInner(model, messages, signal, onDelta, onReasoning, key) {
     var url = (model.provider === "groq" ? GROQ : OR) + "/chat/completions";
     var headers = { "Content-Type": "application/json", "Authorization": "Bearer " + key };
     if (model.provider === "openrouter") headers["X-Title"] = "ARENA//X";
-    var body = { model: model.id, messages: messages, stream: true, stream_options: { include_usage: true } };
-    if (state.settings.temperature != null) body.temperature = state.settings.temperature;
-    if (state.settings.maxTokens) body.max_tokens = state.settings.maxTokens;
+    var body = requestBody(model, messages, false);
+    var text = "";
+    var reasoning = "";
+    var usage = null;
+    var finish = null;
 
     async function call() {
-      try {
-        return await fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body), signal: signal });
-      } catch (e) {
-        if (e && e.name === "AbortError") throw e;
-        throw new ApiError("Connexion bloquée (CORS ou réseau).", String(e && e.message || e), 0);
+      var attempt = 0;
+      for (;;) {
+        var r;
+        try {
+          r = await fetch(url, { method: "POST", headers: headers, body: JSON.stringify(body), signal: signal });
+        } catch (e) {
+          if (e && e.name === "AbortError") throw e;
+          throw new ApiError("Connexion bloquée (CORS ou réseau).", String(e && e.message || e), 0);
+        }
+        /* Limite de débit : on attend puis on réessaie au lieu d'abandonner. */
+        if (r.status !== 429 || attempt >= 2) return r;
+        attempt++;
+        var wait = Number(r.headers.get("retry-after"));
+        if (!isFinite(wait) || wait <= 0) wait = attempt === 1 ? 3 : 8;
+        try { if (r.body && r.body.cancel) r.body.cancel(); } catch (e2) { /* ignore */ }
+        await sleepAbortable(Math.min(30, Math.max(1, wait)) * 1000, signal);
       }
     }
 
-    var res = await call();
-    if (!res.ok) {
-      var text = await res.text();
-      if (res.status === 400 && /temperature|max_tokens|stream_options|unsupported|not supported/i.test(text)) {
-        delete body.temperature;
-        delete body.max_tokens;
-        delete body.stream_options;
-        res = await call();
-        if (!res.ok) throw httpError(res.status, await res.text());
-      } else {
-        throw httpError(res.status, text);
+    /* Deux passes : si le modèle a réfléchi sans écrire, on relance avec plus de marge. */
+    for (var pass = 0; pass < 2; pass++) {
+      text = "";
+      reasoning = "";
+      usage = null;
+      finish = null;
+      var res = await call();
+      if (!res.ok) {
+        var raw = await res.text();
+        if (res.status === 400 && /temperature|max_tokens|max_completion_tokens|stream_options|reasoning|include_reasoning|unsupported|not supported/i.test(raw)) {
+          delete body.temperature;
+          delete body.max_tokens;
+          delete body.max_completion_tokens;
+          delete body.stream_options;
+          delete body.reasoning_effort;
+          delete body.include_reasoning;
+          body.max_tokens = Math.max(256, Number(state.settings.maxTokens) || 1024) + REASONING_HEADROOM;
+          res = await call();
+          if (!res.ok) throw httpError(res.status, await res.text());
+        } else {
+          throw httpError(res.status, raw);
+        }
       }
-    }
 
-    var ctype = (res.headers.get("content-type") || "").toLowerCase();
-    if (!res.body || ctype.indexOf("application/json") !== -1) {
-      var txt = await res.text();
-      var json = null;
-      try { json = JSON.parse(txt); } catch (e) { /* ignore */ }
-      var choice = json && json.choices && json.choices[0];
-      if (choice && choice.message) {
+      var ctype = (res.headers.get("content-type") || "").toLowerCase();
+      if (!res.body || ctype.indexOf("application/json") !== -1) {
+        var txt = await res.text();
+        var json = null;
+        try { json = JSON.parse(txt); } catch (e) { /* ignore */ }
+        var choice = json && json.choices && json.choices[0];
+        if (!choice || !choice.message) {
+          throw new ApiError("Réponse illisible du fournisseur.", txt.slice(0, 800), res.status);
+        }
         var content = choice.message.content;
-        if (typeof content === "string") onDelta(content);
-        return { usage: json.usage || null, finish: choice.finish_reason || null };
+        if (typeof content === "string") { text = content; onDelta(content); }
+        if (typeof choice.message.reasoning === "string") {
+          reasoning = choice.message.reasoning;
+          if (onReasoning && reasoning) onReasoning(reasoning);
+        }
+        usage = json.usage || null;
+        finish = choice.finish_reason || null;
+      } else {
+        var out = await readSSE(res, function (t) { text += t; onDelta(t); },
+          function (t) { reasoning += t; if (onReasoning) onReasoning(t); });
+        usage = out.usage;
+        finish = out.finish;
       }
-      throw new ApiError("Réponse illisible du fournisseur.", txt.slice(0, 800), res.status);
+      if (text.trim() || finish !== "length" || pass === 1) break;
+      body = requestBody(model, messages, true);
     }
-    return readSSE(res, onDelta);
+    return { usage: usage, finish: finish, text: text, reasoning: reasoning };
   }
-
   function demoDraftText(model, prompt, index) {
     var angles = [
       "- Définir les termes de la question.\n- Donner le mécanisme principal.\n- Nuancer avec une limite.",
@@ -3643,9 +3752,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   }
 
   function synthMessages(turn, doneDrafts) {
+    /* Le prompt de synthèse doit tenir sous la limite de 8 000 tokens/minute
+       de Groq : plus il y a de brouillons, plus chacun est raccourci. */
+    var per = Math.min(6000, Math.max(1200, Math.floor(7000 / Math.max(1, doneDrafts.length))));
     var blocks = doneDrafts.map(function (d) {
       var m = modelByKey(d.key);
-      return "### " + (m ? m.name : d.key) + "\n" + clip(d.content, 6000);
+      return "### " + (m ? m.name : d.key) + "\n" + clip(d.content, per);
     }).join("\n\n---\n\n");
     var user = "QUESTION :\n" + turn.prompt + "\n\nBROUILLONS :\n" + blocks +
       "\n\nRédige maintenant la réponse finale. Corrige les erreurs factuelles, fusionne les apports, " +
@@ -3697,7 +3809,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       return;
     }
     var demo = !keyFor(model.provider);
-    turn.synth = { key: key, status: "streaming", content: "", metrics: null, error: null, vote: null, solo: true, fallback: false };
+    turn.synth = { key: key, status: "streaming", content: "", metrics: null, error: null, vote: null, solo: true, fallback: false, reasoningChars: 0 };
     paintSynth(turn);
 
     var ctrl = new AbortController();
@@ -3718,7 +3830,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       var root = turnEl(turn);
       if (!root) return;
       var body = root.querySelector(".synth-body");
-      if (body) body.textContent = plainStream(raw);
+      if (body) {
+        body.textContent = raw ? plainStream(raw) :
+          (turn.synth && turn.synth.reasoningChars ? "Réflexion… " + fmtInt(Math.round(turn.synth.reasoningChars / 4)) + " tokens" : "");
+      }
       follow();
     }
     function onDelta(text) {
@@ -3727,16 +3842,23 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       raw += text;
       if (!frame) frame = requestAnimationFrame(flush);
     }
+    function onReasoning(text) {
+      if (!text || raw || !turn.synth) return;
+      turn.synth.reasoningChars = (turn.synth.reasoningChars || 0) + text.length;
+      if (!frame) frame = requestAnimationFrame(flush);
+    }
 
     try {
       if (demo) {
         await demoStream(demoSoloText(model, turn.prompt), ctrl.signal, onDelta);
       } else {
-        var r = await streamModel(model, messages, ctrl.signal, onDelta);
+        var r = await streamModel(model, messages, ctrl.signal, onDelta, onReasoning);
         if (r) { usage = r.usage; finish = r.finish; }
       }
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
-      if (!raw.trim()) throw new ApiError("Réponse vide.", "Aucun contenu reçu.", 0);
+      if (!raw.trim()) {
+        throw new ApiError("Le modèle a réfléchi sans conclure.", "Budget de tokens épuisé par la réflexion. Augmente « Longueur maximale des réponses » dans les réglages.", 0);
+      }
       turn.synth = {
         key: key, status: "done", content: raw, metrics: computeMetrics({
           usage: usage, raw: raw, messages: messages, model: model,
@@ -3784,6 +3906,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     d.content = "";
     d.metrics = null;
     d.error = null;
+    d.reasoningChars = 0;
     paintDraft(turn, index);
 
     var ctrl = new AbortController();
@@ -3804,7 +3927,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       var root = turnEl(turn);
       if (!root) return;
       var body = root.querySelector('.draft[data-i="' + index + '"] .draft-body');
-      if (body) body.textContent = plainStream(raw);
+      if (body) {
+        body.textContent = raw ? plainStream(raw) :
+          (d.reasoningChars ? "Réflexion… " + fmtInt(Math.round(d.reasoningChars / 4)) + " tokens" : "");
+      }
       follow();
     }
     function onDelta(text) {
@@ -3813,16 +3939,23 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       raw += text;
       if (!frame) frame = requestAnimationFrame(flush);
     }
+    function onReasoning(text) {
+      if (!text || raw) return;
+      d.reasoningChars = (d.reasoningChars || 0) + text.length;
+      if (!frame) frame = requestAnimationFrame(flush);
+    }
 
     try {
       if (demo) {
         await demoStream(demoDraftText(model, turn.prompt, index), ctrl.signal, onDelta);
       } else {
-        var r = await streamModel(model, messages, ctrl.signal, onDelta);
+        var r = await streamModel(model, messages, ctrl.signal, onDelta, onReasoning);
         if (r) { usage = r.usage; finish = r.finish; }
       }
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
-      if (!raw.trim()) throw new ApiError("Réponse vide.", "Aucun contenu reçu.", 0);
+      if (!raw.trim()) {
+        throw new ApiError("Le modèle a réfléchi sans conclure.", "Budget de tokens épuisé par la réflexion. Augmente « Longueur maximale des réponses » dans les réglages.", 0);
+      }
       var end = performance.now();
       d.status = "done";
       d.content = raw;
@@ -3872,7 +4005,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     }
 
     var demo = !keyFor(model.provider);
-    turn.synth = { key: key, status: "streaming", content: "", metrics: null, error: null, vote: null, fallback: false };
+    turn.synth = { key: key, status: "streaming", content: "", metrics: null, error: null, vote: null, fallback: false, reasoningChars: 0 };
     paintSynth(turn);
     updateSteps(turn);
 
@@ -3894,7 +4027,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       var root = turnEl(turn);
       if (!root) return;
       var body = root.querySelector(".synth-body");
-      if (body) body.textContent = plainStream(raw);
+      if (body) {
+        body.textContent = raw ? plainStream(raw) :
+          (turn.synth && turn.synth.reasoningChars ? "Réflexion du synthétiseur… " + fmtInt(Math.round(turn.synth.reasoningChars / 4)) + " tokens" : "");
+      }
       follow();
     }
     function onDelta(text) {
@@ -3903,12 +4039,17 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       raw += text;
       if (!frame) frame = requestAnimationFrame(flush);
     }
+    function onReasoning(text) {
+      if (!text || raw || !turn.synth) return;
+      turn.synth.reasoningChars = (turn.synth.reasoningChars || 0) + text.length;
+      if (!frame) frame = requestAnimationFrame(flush);
+    }
 
     try {
       if (demo) {
         await demoStream(demoSynthText(turn.prompt), ctrl.signal, onDelta);
       } else {
-        var r = await streamModel(model, messages, ctrl.signal, onDelta);
+        var r = await streamModel(model, messages, ctrl.signal, onDelta, onReasoning);
         if (r) { usage = r.usage; finish = r.finish; }
       }
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
