@@ -1293,11 +1293,30 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     /gpt-oss-20b/i, /gemma-4-26b/i, /nemotron-3/i, /qwen3/i,
     /glm|kimi|minimax|north|apodex|ling/i, /openrouter\/free/i
   ];
+  /* Ordre premium : on veut voir d'abord ce qui vaut son prix en 2026,
+     pas les générations précédentes. Le reste est trié par prix croissant. */
   var PAID_ORDER = [
-    /claude.*(sonnet|opus)/i, /gpt-5(?!-mini)/i, /gpt-4o(?!-mini)/i,
-    /gemini.*pro/i, /grok/i, /mistral.*large/i, /deepseek-chat/i,
-    /qwen3-235b/i, /gpt-4o-mini/i, /llama.*405b/i
+    /claude.*sonnet.*5\.5|sonnet[ -]?5\.5/i,
+    /claude.*opus.*5\.5|opus[ -]?5\.5/i,
+    /gpt-5\.6-(sol|terra|luna)/i,
+    /gemini.*3\.[0-9]*(\.[0-9]+)?.*pro/i,
+    /gemini.*(flash|pro)/i,
+    /claude.*(sonnet|opus)/i,
+    /gpt-5\.(6|5|4)/i,
+    /deepseek/i,
+    /qwen/i,
+    /grok/i,
+    /mistral|llama/i,
+    /kimi|glm|minimax|inkling/i,
+    /gpt-4o|gpt-5\b/i
   ];
+
+  /* Comparateur de repli : moins cher d'abord (entrée + sortie). */
+  function byPrice(a, b) {
+    var pa = (Number(a.inPrice) || 0) + (Number(a.outPrice) || 0);
+    var pb = (Number(b.inPrice) || 0) + (Number(b.outPrice) || 0);
+    return pa - pb;
+  }
 
   /* Repli si le catalogue réseau est indisponible. */
   /* Liste de secours : tous les modèles gratuits utilisables, Groq et routeur
@@ -1701,17 +1720,21 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     return s.replace(".", ",") + " $/M";
   }
 
-  function rankModels(pool, order) {
+  function rankModels(pool, order, cmp, cap) {
     var picked = [];
     var seen = new Set();
+    var limit = cap || 0;
     order.forEach(function (re) {
-      pool.forEach(function (m) {
-        if (!seen.has(m.key) && re.test(m.id)) { seen.add(m.key); picked.push(m); }
-      });
+      /* Dans chaque famille, le moins cher d'abord : on ne propose pas
+         un modèle à 30 $/180 $ quand un équivalent coûte dix fois moins. */
+      var group = pool.filter(function (m) { return !seen.has(m.key) && re.test(m.id); });
+      if (cmp) group.sort(cmp);
+      var take = limit ? group.slice(0, limit) : group;
+      take.forEach(function (m) { seen.add(m.key); picked.push(m); });
     });
-    pool.forEach(function (m) {
-      if (!seen.has(m.key)) { seen.add(m.key); picked.push(m); }
-    });
+    var rest = pool.filter(function (m) { return !seen.has(m.key); });
+    if (cmp) rest.sort(cmp);
+    rest.forEach(function (m) { picked.push(m); });
     return picked;
   }
 
@@ -1741,6 +1764,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
        dans ce cas on garde tout pour que la démonstration reste utilisable. */
     return state.catalog.filter(function (m) {
       if (!m.free) return false;
+      if (m.noChat || m.batch) return false;
       if (!anyKey) return true;
       return m.provider === "groq" ? hasGroq : hasOR;
     });
@@ -1750,7 +1774,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var free = freePool();
     /* Sans accès payant, le premium tourne réellement sur les modèles gratuits. */
     var paid = hasPaidAccess() ? state.catalog.filter(function (m) {
-      return !m.free && m.provider === "openrouter";
+      return !m.free && m.provider === "openrouter" && !m.noChat && !m.batch;
     }) : free;
     return { free: free, paid: paid };
   }
@@ -1839,6 +1863,13 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       if (!isFinite(pp)) pp = 0;
       if (!isFinite(cp)) cp = 0;
       var free = pp === 0 && cp === 0;
+      /* Sorties non textuelles (image, audio, embeddings) : inutilisables comme
+         brouillon. Les variantes « batch » (lot asynchrone) non plus : elles ne
+         repondent pas dans un appel normal. On les ecarte du panneau. */
+      var outs = (m.architecture && m.architecture.output_modalities) || null;
+      var noChat = Array.isArray(outs) && outs.length > 0 &&
+        outs.every(function (o) { return String(o).toLowerCase() !== "text"; });
+      var batch = /:(batch|free)$/i.test(m.id) || /\(batch\)/i.test(m.name || "");
       return {
         key: modelKey("openrouter", m.id),
         provider: "openrouter",
@@ -1848,7 +1879,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         inPrice: pp * 1e6,
         outPrice: cp * 1e6,
         ctx: Number(m.context_length) || 0,
-        created: Number(m.created) || 0
+        created: Number(m.created) || 0,
+        noChat: noChat && !/:(free)$/i.test(m.id),
+        batch: batch && !/:(free)$/i.test(m.id)
       };
     }).filter(Boolean);
   }
@@ -3151,8 +3184,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     var list = pool.filter(function (m) {
       return !q || (m.name + " " + m.id).toLowerCase().indexOf(q) !== -1;
     });
-    var order = rankModels(list.length ? list : pool, state.mode === "free" ? FREE_ORDER : PAID_ORDER);
-    var shown = order.filter(function (m) { return !q || (m.name + " " + m.id).toLowerCase().indexOf(q) !== -1; });
+    var shown = rankModels(list.length ? list : pool,
+      state.mode === "free" ? FREE_ORDER : PAID_ORDER,
+      state.mode === "free" ? null : byPrice,
+      state.mode === "free" ? 0 : 2);
 
     var soloMode = state.pending.style === "solo";
     el.modelList.replaceChildren();
@@ -3181,7 +3216,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     if (!shown.length) {
       el.modelList.appendChild(elem("p", "list-more", "Aucun modèle ne correspond à « " + state.pending.query + " »."));
     }
-    el.listMore.textContent = shown.length > 80 ? "80 premiers résultats sur " + shown.length + ". Précise la recherche." : "";
+    var hidden = state.catalog.filter(function (m) { return m.noChat || m.batch; }).length;
+    var note = shown.length > 80 ? "80 premiers résultats sur " + shown.length + ". Précise la recherche." : "";
+    if (hidden && !q) note += (note ? " " : "") + fmtInt(hidden) + " modèles image, audio ou « batch » masqués (ils ne répondent pas ici).";
+    el.listMore.textContent = note;
     var n = state.pending.drafts.length;
     if (soloMode) {
       el.panelCount.textContent = state.pending.solo ? "1 modèle · réponse directe" : "aucun modèle choisi";
