@@ -3393,7 +3393,11 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         "Crédits épuisés : le premium répond avec Groq + routeur, sans facturation. Les modèles payants reviennent dès que tu recharges." :
         "Pas encore de clé OpenRouter : le premium répond avec les modèles Groq, sans facturation. Ajoute des crédits pour débloquer Claude, GPT-4o, Grok.");
     } else {
-      el.panelNotice.textContent = "Chaque brouillon et la synthèse sont facturés au tarif du modèle. Choisis selon ton budget.";
+      el.panelNotice.textContent = est >= 0.05
+        ? "Haut de gamme : plus solide sur les questions difficiles, mais ~7× le prix de « Mon choix ». À réserver à ce qui compte."
+        : est >= 0.004
+          ? "Le meilleur rendement : brouillons bon marché, bonne synthèse. Sur une question simple, la réponse sera quasi identique au haut de gamme."
+          : "Économique : budget protégé, mais brouillons plus faibles sur le raisonnement long et le code.";
     }
       if (el.panelTabs) el.panelTabs.hidden = false;
       if (el.presetRow) el.presetRow.hidden = false;
