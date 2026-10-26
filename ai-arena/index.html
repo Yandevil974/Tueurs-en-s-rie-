@@ -1758,11 +1758,17 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   var BEST_FREE_SYNTH = [/openrouter\/free/i, /inkling(?!.*small)/i, /gpt-oss-120b/i];
   var BEST_FREE_SOLO = [/gpt-oss-120b/i, /qwen3\.8-27b/i, /nemotron[^/]*ultra/i];
 
+  /* Premium : le choix retenu après le rapport qualité/coût.
+     Brouillons = les modèles qui offrent le plus d'indice par dollar, dans des
+     laboratoires différents (OpenAI, Google, DeepSeek). Synthèse = la meilleure
+     plume pour 0,007 $ l'appel. Total ≈ 0,010 $ la question.
+     Le panneau « tout en haut de gamme » (Sol + Opus, ≈ 0,045 $) reste
+     accessible à la main : il n'est plus le défaut. */
   var BEST_PAID_DRAFTS = [
-    /gpt-5\.6-sol/i, /gemini.*3\.[0-9]+.*pro/i, /gpt-5\.6-terra/i,
-    /deepseek/i, /gpt-5\.6-luna/i, /claude.*sonnet/i
+    /gpt-5\.6-luna/i, /gemini.*3\.[0-9]+.*flash/i, /deepseek/i,
+    /gpt-5\.6-terra/i, /gemini.*pro/i, /claude.*sonnet/i
   ];
-  var BEST_PAID_SYNTH = [/claude.*opus.*5\.5/i, /claude.*opus/i, /claude.*sonnet.*5\.5/i];
+  var BEST_PAID_SYNTH = [/claude.*sonnet.*5\.5/i, /claude.*sonnet/i, /claude.*opus.*5\.5/i, /gpt-5\.6-sol/i];
   var BEST_PAID_SOLO = [/claude.*opus.*5\.5/i, /claude.*sonnet.*5\.5/i, /gpt-5\.6-sol/i];
 
   /* Identifiant sans suffixe de variante : évite de cocher deux fois le même
@@ -1806,7 +1812,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   function bestPanel(mode) {
     var pool = pools()[mode];
     var free = mode === "free";
-    var drafts = bestModels(pool, free ? BEST_FREE_DRAFTS : BEST_PAID_DRAFTS, 4, []);
+    /* Trois brouillons en premium : au-delà, la synthèse coûte plus qu'elle
+       n'apporte (le quatrième appel est un doublon d'angle, facturé plein tarif). */
+    var drafts = bestModels(pool, free ? BEST_FREE_DRAFTS : BEST_PAID_DRAFTS, free ? 4 : 3, []);
     var synth = bestModels(pool, free ? BEST_FREE_SYNTH : BEST_PAID_SYNTH, 1, drafts)[0] ||
       drafts[0] || null;
     return {
