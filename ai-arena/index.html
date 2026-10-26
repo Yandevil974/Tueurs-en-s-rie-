@@ -1418,6 +1418,31 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     if (v > 0 && v < 0.01) return "< 0,01 $";
     return v.toFixed(2).replace(".", ",") + " $";
   }
+  /* Estimation affichée : une question courte ≈ 1 000 tokens d'entrée et
+     500 de sortie par appel. C'est un ordre de grandeur, pas une facture. */
+  var EST_IN = 1000;
+  var EST_OUT = 500;
+
+  function estimateCallCost(m) {
+    if (!m || m.free) return 0;
+    return (EST_IN * (m.inPrice || 0) + EST_OUT * (m.outPrice || 0)) / 1e6;
+  }
+
+  function estimateTurnCost(draftKeys, synthKey, soloKey) {
+    if (soloKey) return estimateCallCost(modelByKey(soloKey));
+    var total = 0;
+    (draftKeys || []).forEach(function (k) { total += estimateCallCost(modelByKey(k)); });
+    if (synthKey) total += estimateCallCost(modelByKey(synthKey));
+    return total;
+  }
+
+  function fmtMoney4(v) {
+    if (!v) return "0 $";
+    if (v < 0.001) return "< 0,001 $";
+    if (v < 0.01) return v.toFixed(4).replace(".", ",") + " $";
+    return v.toFixed(3).replace(".", ",") + " $";
+  }
+
   function fmtSec(ms) {
     var s = ms / 1000;
     return (s < 10 ? s.toFixed(2) : s.toFixed(1)).replace(".", ",") + " s";
@@ -3243,10 +3268,11 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         el.dockNote.textContent = state.keys.openrouter.trim() ?
           "Premium non activé : crédits épuisés · réponse avec Groq + routeur" :
           "Premium non activé : réponse avec les modèles Groq · 0 $";
-      } else if (state.keys.management.trim()) {
-        el.dockNote.textContent = "Mode premium : solde et dépense suivis à chaque manche";
       } else {
-        el.dockNote.textContent = "Mode premium : usage de la clé suivi · clé de gestion pour le solde exact";
+        var turnCost = estimateTurnCost(state.panels[state.mode], state.synths[state.mode], null);
+        var calls = state.panels[state.mode].length + (state.synths[state.mode] ? 1 : 0);
+        el.dockNote.textContent = "Premium · " + calls + " appels ≈ " + fmtMoney4(turnCost) + " la question" +
+          (state.keys.management.trim() ? " · solde suivi" : "");
       }
     }
   }
@@ -3307,7 +3333,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.listMore.textContent = note;
     var n = state.pending.drafts.length;
     if (soloMode) {
-      el.panelCount.textContent = state.pending.solo ? "1 modèle · réponse directe" : "aucun modèle choisi";
+      el.panelCount.textContent = state.pending.solo
+        ? "1 modèle · " + fmtMoney4(estimateTurnCost([], null, state.pending.solo)) + " / question"
+        : "aucun modèle choisi";
       el.panelSave.disabled = !state.pending.solo;
       el.panelSave.textContent = "Utiliser ce modèle";
       el.panelNotice.textContent = state.mode === "free" ?
@@ -3316,7 +3344,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       if (el.panelTabs) el.panelTabs.hidden = true;
       if (el.presetRow) el.presetRow.hidden = true;
     } else {
-      el.panelCount.textContent = n + " brouillon" + (n > 1 ? "s" : "") + (state.pending.synth ? " · 1 synthèse" : " · aucune synthèse");
+      var est = estimateTurnCost(state.pending.drafts, state.pending.synth, null);
+      el.panelCount.textContent = n + " brouillon" + (n > 1 ? "s" : "") +
+        (state.pending.synth ? " · 1 synthèse" : " · aucune synthèse") +
+        " · " + fmtMoney4(est) + " / question";
       el.panelSave.disabled = !n || !state.pending.synth;
       el.panelSave.textContent = "Enregistrer";
       if (state.mode === "free") {

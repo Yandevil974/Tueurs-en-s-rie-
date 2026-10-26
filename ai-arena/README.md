@@ -185,3 +185,15 @@ Le JSON contient `app`, `schema`, `version`, `exportedAt`, `settings`, `panels`,
   `/api/v1/models` et une liste locale sert de secours hors ligne.
 - Chrome Android peut bloquer les téléchargements répétés : autorise-les, ou utilise
   **Partager**.
+
+## Rapport qualité / coût
+
+`rapport-qualite-cout.html` chiffre le coût réel d'une question pour chaque
+configuration de l'app (Solo, Éco, Équilibre, Meilleur des meilleurs), les
+indices d'intelligence publics des modèles, et les endroits où l'argent est
+gaspillé. Prix issus du catalogue OpenRouter ; indices d'Artificial Analysis.
+
+À retenir : le nombre d'appels pèse plus que le choix du modèle — 5 appels
+coûtent 5 fois plus qu'un seul, quelle que soit la gamme. Les brouillons
+doivent rester bon marché (appelés 4 fois), la synthèse mérite le meilleur
+modèle (appelée une fois).
