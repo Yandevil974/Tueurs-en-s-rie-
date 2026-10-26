@@ -548,6 +548,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 .notice.warn { border-left-color: var(--amber); background: rgba(251, 191, 36, 0.06); }
 .divider { height: 1px; margin: 20px 0 0; background: var(--line); }
 .btn-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+#presetRow { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+#presetRow::-webkit-scrollbar { display: none; }
+#presetRow .btn { flex: none; white-space: nowrap; }
 .test-result { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
 .test-row { display: flex; align-items: flex-start; gap: 7px; color: var(--muted); font-size: 11px; }
 .test-row .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); flex: none; margin-top: 5px; }
@@ -977,7 +980,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         <input id="modelSearch" type="search" placeholder="Rechercher un modèle…" aria-label="Rechercher un modèle">
       </div>
       <div class="btn-row" id="presetRow">
-        <button class="btn sm" type="button" data-preset="top">✦ Les meilleurs</button>
+        <button class="btn sm" type="button" data-preset="top-tier">★ Meilleures</button>
+        <button class="btn sm" type="button" data-preset="top">✦ Mon choix</button>
         <button class="btn sm" type="button" data-preset="top-bis">Compléter</button>
         <button class="btn sm ghost" type="button" data-preset="clear">Vider</button>
       </div>
@@ -1771,6 +1775,16 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   var BEST_PAID_SYNTH = [/claude.*sonnet.*5\.5/i, /claude.*sonnet/i, /claude.*opus.*5\.5/i, /gpt-5\.6-sol/i];
   var BEST_PAID_SOLO = [/claude.*opus.*5\.5/i, /claude.*sonnet.*5\.5/i, /gpt-5\.6-sol/i];
 
+  /* « Les meilleures » : le haut de gamme, sans considération de prix.
+     Trois laboratoires, trois modèles frontière. La synthèse reste confiée à
+     Opus 5.5 : sur une réécriture, c'est la plume qui compte, pas l'indice
+     de raisonnement. Coût ≈ 0,071 $ la question (7 fois « mon choix »). */
+  var BEST_TOP_DRAFTS = [
+    /gpt-6-astra/i, /gpt-5\.6-sol/i, /gemini.*3\.[0-9]+.*pro/i,
+    /claude.*opus.*5\.5/i, /claude.*opus/i, /gemini.*pro/i
+  ];
+  var BEST_TOP_SYNTH = [/claude.*opus.*5\.5/i, /claude.*opus/i, /gpt-6-astra/i, /gpt-5\.6-sol/i];
+
   /* Identifiant sans suffixe de variante : évite de cocher deux fois le même
      modèle (ex. gpt-oss-120b sur Groq ET sa variante :free sur OpenRouter). */
   function baseModelId(id) {
@@ -1816,6 +1830,18 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
        n'apporte (le quatrième appel est un doublon d'angle, facturé plein tarif). */
     var drafts = bestModels(pool, free ? BEST_FREE_DRAFTS : BEST_PAID_DRAFTS, free ? 4 : 3, []);
     var synth = bestModels(pool, free ? BEST_FREE_SYNTH : BEST_PAID_SYNTH, 1, drafts)[0] ||
+      drafts[0] || null;
+    return {
+      drafts: drafts.map(function (m) { return m.key; }),
+      synth: synth ? synth.key : null
+    };
+  }
+
+  /* Panneau « haut de gamme » : 3 brouillons frontière + 1 synthèse Opus. */
+  function bestPanelTier(mode) {
+    var pool = pools()[mode];
+    var drafts = bestModels(pool, mode === "free" ? BEST_FREE_DRAFTS : BEST_TOP_DRAFTS, 3, []);
+    var synth = bestModels(pool, mode === "free" ? BEST_FREE_SYNTH : BEST_TOP_SYNTH, 1, drafts)[0] ||
       drafts[0] || null;
     return {
       drafts: drafts.map(function (m) { return m.key; }),
@@ -4647,14 +4673,22 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       renderPanelDialog();
       return;
     }
-    if (kind === "top") {
+    if (kind === "top-tier") {
+      var tier = bestPanelTier(state.mode);
+      if (tier.drafts.length) {
+        state.pending.drafts = tier.drafts.slice();
+        state.pending.synth = tier.synth;
+        state.panelCustom[state.mode] = false;
+        showToast("Haut de gamme : " + tier.drafts.length + " modèles frontière + synthèse Opus 5.5.", "ok");
+      }
+    } else if (kind === "top") {
       /* « Les meilleurs » : 4 brouillons + 1 synthèse, choisis par la maison. */
       var ideal = bestPanel(state.mode);
       if (ideal.drafts.length) {
         state.pending.drafts = ideal.drafts.slice();
         state.pending.synth = ideal.synth;
         state.panelCustom[state.mode] = false;
-        showToast("Panneau « meilleur des meilleurs » appliqué : " +
+        showToast("Mon choix (0,010 $ / question) : " +
           state.pending.drafts.length + " brouillons + 1 synthèse.", "ok");
       }
     } else if (kind === "top-bis") {
