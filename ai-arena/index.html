@@ -1069,6 +1069,10 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
           <label for="systemPrompt">Consigne du synthétiseur</label>
           <textarea id="systemPrompt" rows="3" maxlength="4000"></textarea>
           <p class="help">Elle pilote la fusion finale. Vide = consigne par défaut.</p>
+          <div class="btn-row" id="systemPresets">
+            <button class="btn sm" type="button" id="sysTeach">Apprendre</button>
+            <button class="btn sm ghost" type="button" id="sysDefault">Consigne par défaut</button>
+          </div>
         </div>
       </section>
 
@@ -1279,6 +1283,20 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   };
 
   var DEFAULT_SYSTEM = "Tu es le synthétiseur d'une arène d'IA. À partir de plusieurs brouillons, tu produis LA meilleure réponse finale : tu vérifies les faits, corriges les erreurs, élimines les redites, gardes les points forts de chaque brouillon et tu rédiges une réponse claire, complète et bien structurée en Markdown. Réponds dans la langue de la question. Ne mentionne jamais les brouillons, les modèles ni le processus : donne directement la réponse.";
+
+  /* Consigne « apprendre » : pour quelqu'un qui veut la maîtrise et le détail,
+     pas une réponse de surface. Elle remplace la consigne du synthétiseur. */
+  var TEACH_SYSTEM = [
+    "Tu es un professeur exigeant doublé d'un ingénieur expérimenté. L'objectif n'est pas de vulgariser mais de faire comprendre en profondeur.",
+    "Structure toujours ta réponse ainsi :",
+    "1. **La réponse directe** en deux phrases, sans détour.",
+    "2. **Le mécanisme**, étape par étape, avec le vocabulaire technique exact — et sa définition à la première occurrence.",
+    "3. **Un exemple concret et chiffré**, avec les valeurs numériques.",
+    "4. **Les pièges** : erreurs fréquentes, idées fausses, cas limites.",
+    "5. **À retenir** en trois points maximum.",
+    "6. **Une question de contrôle** pour vérifier qu'on a compris.",
+    "Règles : distingue toujours ce qui est établi de ce qui est une hypothèse ; dis franchement quand tu ne sais pas ou quand la réponse dépend de la version, du modèle ou du contexte ; donne les noms exacts (API, paramètre, fichier) plutôt que des périphrases. Ne mentionne jamais les brouillons, les modèles ni le processus."
+  ].join("\n");
 
   var DEFAULTS = {
     temperature: 0.7,
@@ -5190,6 +5208,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.tempOut = $("#tempOut");
     el.maxTokens = $("#maxTokens");
     el.systemPrompt = $("#systemPrompt");
+    el.sysTeach = $("#sysTeach");
+    el.sysDefault = $("#sysDefault");
     el.themeSelect = $("#themeSelect");
     el.saveSettings = $("#saveSettings");
     el.creditsDlg = $("#creditsDlg");
@@ -5339,6 +5359,19 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     });
     el.clearKeysBtn.addEventListener("click", clearKeys);
     el.saveSettings.addEventListener("click", saveSettingsDialog);
+    if (el.sysTeach) {
+      el.sysTeach.addEventListener("click", function () {
+        el.systemPrompt.value = TEACH_SYSTEM;
+        el.systemPrompt.focus();
+        showToast("Consigne d'apprentissage prête — appuie sur Enregistrer.", "ok");
+      });
+    }
+    if (el.sysDefault) {
+      el.sysDefault.addEventListener("click", function () {
+        el.systemPrompt.value = "";
+        showToast("Consigne par défaut rétablie — appuie sur Enregistrer.", "ok");
+      });
+    }
     el.themeSelect.addEventListener("change", function () {
       state.settings.theme = el.themeSelect.value;
       applyTheme(state.settings.theme);
