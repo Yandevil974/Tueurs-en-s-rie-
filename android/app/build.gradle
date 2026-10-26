@@ -10,16 +10,34 @@ android {
         applicationId "com.arenax.app"
         minSdk 26
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        /* À incrémenter à chaque publication : Android refuse un « downgrade ». */
+        versionCode 2
+        versionName "1.1"
+    }
+
+    /* Clé de signature STABLE, versionnée avec le projet.
+       Sans elle, chaque build de la CI générait une clé de debug différente :
+       Android refusait alors d'installer la nouvelle version par-dessus
+       l'ancienne (signatures différentes) et imposait une désinstallation.
+       Ce n'est pas une clé de publication Play Store : ne pas la réutiliser ailleurs. */
+    signingConfigs {
+        stable {
+            storeFile file("keystore.p12")
+            storeType "PKCS12"
+            storePassword "arenax2026"
+            keyAlias "arenax"
+            keyPassword "arenax2026"
+        }
     }
 
     buildTypes {
         debug {
             applicationIdSuffix ""
+            signingConfig signingConfigs.stable
         }
         release {
             minifyEnabled false
+            signingConfig signingConfigs.stable
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }

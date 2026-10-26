@@ -49,6 +49,12 @@ jobs:
           echo "== signature =="
           SIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | tail -1)
           "$SIGNER" verify --print-certs "$APK" | head -6
+          echo "== empreinte attendue =="
+          EXPECTED="3a4946d3898508a607ab4bf4666a27d12c6797614a558ce51e616b1f6a49a61d"
+          GOT=$("$SIGNER" verify --print-certs "$APK" | grep -i "SHA-256" | head -1 | awk -F': ' '{print $NF}' | tr -d ':' | tr 'A-F' 'a-f' | tr -d ' ')
+          echo "obtenu   : $GOT"
+          echo "attendu  : $EXPECTED"
+          test "$GOT" = "$EXPECTED" || { echo "SIGNATURE INSTABLE : les mises a jour casseront"; exit 1; }
 
       - name: Preparer le fichier
         run: |
