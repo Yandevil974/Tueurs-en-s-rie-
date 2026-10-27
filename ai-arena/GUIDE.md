@@ -357,10 +357,14 @@ ajoute jusqu'à **3 photos** et **2 fichiers texte** par question.
   1 Mo maximum, **24 000 caractères** conservés — le reste est coupé et l'interface le dit.
 - **Vision réelle, pas supposée** : OpenRouter publie `architecture.input_modalities`.
   Si l'image n'y figure pas, le modèle ne reçoit pas la photo. Le panneau est donc
-  **restreint aux modèles qui lisent les images** le temps du tour ; en solo, un modèle
-  non vision est remplacé par le premier modèle vision du panneau. Si aucun modèle n'est
-  vision (typiquement en gratuit avec Groq seul), l'envoi est **bloqué** avec un message
-  explicite au lieu d'envoyer une photo que personne ne lira.
+  **restreint aux modèles qui lisent les images** le temps du tour, classés par
+  `BEST_VISION_FREE` / `BEST_VISION_PAID` (Gemma 4 31B et Nemotron Nano Omni en gratuit,
+  Gemini 3.1 Pro / GPT‑5.6 Sol / Opus 5.5 en premium). En solo, un modèle non vision est
+  remplacé par le meilleur modèle vision du panneau. Si aucun modèle n'est vision, l'envoi
+  est **bloqué** avec un message qui dit *quelle clé manque* : côté Groq, Llama 4 (le seul
+  modèle image du fournisseur) a été retiré du palier gratuit le 17 juillet 2026, donc
+  « gratuit avec Groq seul » ne peut pas lire une photo. Avec une **clé OpenRouter
+  gratuite** (sans carte), Gemma 4 31B la lit pour 0 $ — c'est le chemin recommandé.
 - **Format du message** : contenu multimodal standard OpenAI, donc accepté par Groq comme
   par OpenRouter : `[{type:"text"}, {type:"image_url", image_url:{url:"data:image/jpeg;base64,…"}}]`.
   Les fichiers texte, eux, sont insérés dans le prompt sous `--- FICHIER JOINT : nom ---`.

@@ -1538,6 +1538,13 @@ body.drawer-open { overflow: hidden; }
   /* Repli si le catalogue réseau est indisponible. */
   /* Liste de secours : tous les modèles gratuits utilisables, Groq et routeur
      en tête. Le panneau par défaut, lui, privilégie Groq + routeur. */
+  /* Liste de secours : quelles familles lisent vraiment une image.
+     Côté Groq, seul Llama 4 le faisait ; Groq l'a retiré du palier gratuit le
+     17 juillet 2026. Côté OpenRouter, les modèles gratuits Gemma 4, Nemotron
+     Omni, Inkling et le routeur gratuit acceptent bien une image en entrée. */
+  var OR_VISION_IDS = /gemma-4|nemotron-3-nano-omni|inkling|qwen3\.8|llama-4|claude|gpt-4o|gpt-5|gemini|openrouter\/free/i;
+  var GROQ_VISION_IDS = /llama-4/i;
+
   var FALLBACK = [
     f("openrouter", "openrouter/free", "Routeur gratuit", true, 0, 0),
     f("openrouter", "openai/gpt-oss-120b:free", "GPT-OSS 120B (free)", true, 0, 0),
@@ -1564,7 +1571,7 @@ body.drawer-open { overflow: hidden; }
       key: provider + "::" + id, provider: provider, id: id, name: name,
       free: !!free, inPrice: inPrice || 0, outPrice: outPrice || 0,
       ctx: 0, created: 0, fallback: true,
-      vision: /claude|gpt-4o|gemini/i.test(id)
+      vision: provider === "groq" ? GROQ_VISION_IDS.test(id) : OR_VISION_IDS.test(id)
     };
   }
 
@@ -1979,6 +1986,19 @@ body.drawer-open { overflow: hidden; }
   ];
   var BEST_FREE_SYNTH = [/openrouter\/free/i, /inkling(?!.*small)/i, /gpt-oss-120b/i];
   var BEST_FREE_SOLO = [/gpt-oss-120b/i, /qwen3\.8-27b/i, /nemotron[^/]*ultra/i];
+
+  /* Photo jointe : on garde les modèles qui lisent l'image ET qui restent bons.
+     Gratuit = Gemma 4 31B (262K, image + vidéo) puis Nemotron Omni (image,
+     audio, vidéo) ; les deux sont à 0 $. Premium = un laboratoire différent
+     par brouillon, pour que la synthèse ait trois lectures distinctes. */
+  var BEST_VISION_FREE = [
+    /gemma-4-31b/i, /nemotron-3-nano-omni/i, /gemma-4-26b/i,
+    /qwen3\.8-27b/i, /inkling/i, /openrouter\/free/i
+  ];
+  var BEST_VISION_PAID = [
+    /gemini.*3\.[0-9]+.*pro/i, /gpt-5\.6-sol/i, /claude.*opus.*5\.5/i,
+    /gemini.*pro/i, /gpt-5\.6/i, /claude.*sonnet/i
+  ];
 
   /* Premium : le choix retenu après le rapport qualité/coût.
      Brouillons = les modèles qui offrent le plus d'indice par dollar, dans des
@@ -3735,7 +3755,9 @@ body.drawer-open { overflow: hidden; }
         "Écris une question — les modèles consultent, le synthétiseur rédige.";
     }
     if (el.dockNote) {
-      if (state.style === "solo") {
+      if (hasAttach()) {
+        el.dockNote.textContent = attachNote();
+      } else if (state.style === "solo") {
         var soloName = modelByKey(state.soloModels[state.mode]);
         el.dockNote.textContent = "Mode solo · 1 modèle" + (soloName ? " (" + shortName(prettyName(soloName.name, soloName.id)) + ")" : "") +
           " · " + (state.mode === "paid" ? "facturé au tarif" : "gratuit");
@@ -3997,18 +4019,27 @@ body.drawer-open { overflow: hidden; }
   function visionKeys(keys) {
     var pool = visionPool(keys.mode);
     if (!pool.length) return null;
+    var prefs = keys.mode === "free" ? BEST_VISION_FREE : BEST_VISION_PAID;
     if (keys.solo) {
       var current = modelByKey(keys.solo);
       if (current && seesImages(current)) return keys;
-      return { drafts: keys.drafts, synth: null, solo: pool[0].key, mode: keys.mode, swapped: true };
+      var best = bestModels(pool, prefs, 1, [])[0];
+      return { drafts: keys.drafts, synth: null, solo: best ? best.key : pool[0].key, mode: keys.mode, swapped: true };
     }
+    /* Les modèles déjà choisis qui voient l'image sont gardés tels quels. */
     var drafts = keys.drafts.filter(function (k) { return seesImages(modelByKey(k)); });
-    var synth = keys.synth && seesImages(modelByKey(keys.synth)) ? keys.synth : null;
-    var swapped = drafts.length !== keys.drafts.length || !synth;
+    var keptSynth = keys.synth && seesImages(modelByKey(keys.synth)) ? keys.synth : null;
+    var swapped = drafts.length !== keys.drafts.length || !keptSynth;
+    /* Trois brouillons suffisent : un appel image est plus lent et plus lourd. */
+    var extra = bestModels(pool, prefs, 3, drafts.map(function (k) { return modelByKey(k); }).filter(Boolean));
+    extra.forEach(function (m) {
+      if (drafts.length < 3 && drafts.indexOf(m.key) === -1) drafts.push(m.key);
+    });
     if (!drafts.length) drafts = pool.slice(0, Math.min(3, pool.length)).map(function (m) { return m.key; });
+    var synth = keptSynth;
     if (!synth) {
-      var left = pool.filter(function (m) { return drafts.indexOf(m.key) === -1; });
-      synth = (left[0] || pool[0]).key;
+      var left = bestModels(pool, prefs, 1, drafts.map(function (k) { return modelByKey(k); }).filter(Boolean))[0];
+      synth = left ? left.key : drafts[0];
     }
     drafts = drafts.slice(0, MAX_DRAFTS);
     return { drafts: drafts, synth: synth, solo: null, mode: keys.mode, swapped: swapped };
@@ -4171,6 +4202,27 @@ body.drawer-open { overflow: hidden; }
     return state.attach.images.length > 0 || state.attach.files.length > 0;
   }
 
+  /* Une ligne sous le champ qui dit, avant l'envoi, qui va lire la pièce jointe. */
+  function attachNote() {
+    var imgs = state.attach.images.length;
+    var files = state.attach.files.length;
+    var parts = [];
+    if (imgs) {
+      var vk = visionKeys(currentKeys());
+      if (!vk) {
+        parts.push(imgs > 1 ? imgs + " photos : aucun modèle ne lit les images" : "Photo : aucun modèle ne lit les images");
+      } else {
+        var who = bestModels(visionPool(state.mode), state.mode === "free" ? BEST_VISION_FREE : BEST_VISION_PAID, 1, [])[0];
+        var readable = vk.solo ? modelByKey(vk.solo) : (who || modelByKey(vk.synth));
+        parts.push((imgs > 1 ? imgs + " photos" : "Photo") + " lue par " +
+          (readable ? shortName(prettyName(readable.name, readable.id)) : "les modèles vision") +
+          " · " + (state.mode === "paid" && hasPaidAccess() ? "facturé au tarif" : "0 $"));
+      }
+    }
+    if (files) parts.push(files > 1 ? files + " fichiers texte" : "1 fichier texte");
+    return parts.join(" · ");
+  }
+
   /* 17. Pipeline : appels, streaming, démonstration ------------------------ */
   var DRAFT_SYSTEM = "Tu participes à une arène d'IA : plusieurs modèles répondent à la même question, puis une synthèse est rédigée. Réponds de façon autonome, précise et structurée. Utilise le Markdown quand c'est utile. Ne mentionne ni le processus, ni les autres modèles, ni le fait que tu produis un brouillon.";
 
@@ -4182,10 +4234,25 @@ body.drawer-open { overflow: hidden; }
     return Math.max(0, Math.round(String(text || "").trim().length / 4));
   }
 
+  /* Une photo coûte des tokens d'entrée : compter « [object Object] » comme du
+     texte donnerait un coût faux. On estime le texte, puis 900 tokens par image. */
+  function contentText(content) {
+    if (typeof content === "string") return content;
+    if (!Array.isArray(content)) return "";
+    return content.map(function (p) { return p && p.type === "text" ? String(p.text || "") : ""; }).join(" ");
+  }
+
+  function contentImages(content) {
+    if (!Array.isArray(content)) return 0;
+    return content.filter(function (p) { return p && p.type === "image_url"; }).length;
+  }
+
   function computeMetrics(args) {
     var usage = args.usage || null;
+    var msgs = args.messages || [];
+    var picTokens = msgs.reduce(function (n, m) { return n + contentImages(m.content) * 900; }, 0);
     var promptTokens = usage && Number.isFinite(usage.prompt_tokens) ? usage.prompt_tokens :
-      estimateTokens((args.messages || []).map(function (m) { return m.content; }).join(" "));
+      estimateTokens(msgs.map(function (m) { return contentText(m.content); }).join(" ")) + picTokens;
     var completion = usage && Number.isFinite(usage.completion_tokens) ? usage.completion_tokens :
       estimateTokens(args.raw);
     var ttft = args.firstAt ? Math.max(0, args.firstAt - args.t0) : null;
@@ -5014,8 +5081,15 @@ body.drawer-open { overflow: hidden; }
     if (media.images.length) {
       var vk = visionKeys(keys);
       if (!vk) {
-        showToast("Aucun modèle du panneau ne lit les images. Ajoute une clé OpenRouter (Claude, Gemini, GPT) ou choisis un modèle vision.", "err");
-        openPanelDialog();
+        if (!state.keys.openrouter.trim()) {
+          showToast("Gratuit avec Groq seul : ces modèles ne lisent pas les photos (Llama 4 a été retiré de Groq). Une clé OpenRouter gratuite, sans carte, débloque Gemma 4 31B qui les lit.", "err");
+          setTimeout(function () { renderSettingsDialog(); openDialog(el.settingsDlg); }, 900);
+        } else {
+          showToast(state.mode === "free" ?
+            "Aucun modèle gratuit du catalogue ne lit les images pour l'instant. Passe en Premium (≈ 0,01 $) ou rafraîchis le catalogue." :
+            "Aucun modèle du panneau ne lit les images : rafraîchis le catalogue dans les réglages.", "err");
+          openPanelDialog();
+        }
         return;
       }
       if (vk.swapped) {
