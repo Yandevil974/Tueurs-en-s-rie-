@@ -600,6 +600,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 #presetRow { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
 #presetRow::-webkit-scrollbar { display: none; }
 #presetRow .btn { flex: none; white-space: nowrap; }
+#presetRow .btn[hidden] { display: none; }
 .test-result { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
 .test-row { display: flex; align-items: flex-start; gap: 7px; color: var(--muted); font-size: 11px; }
 .test-row .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--faint); flex: none; margin-top: 5px; }
@@ -637,6 +638,12 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 .model-row .nm { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; font-weight: 650; }
 .model-row .sub { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--faint); font: 9.5px/1.5 var(--mono); }
 .model-row .price { flex: none; color: var(--faint); font: 9.5px/1.4 var(--mono); text-align: right; }
+.model-row .vis {
+  flex: none; display: inline-grid; place-items: center; width: 20px; height: 20px;
+  margin-right: 2px; border-radius: 6px; border: 1px solid rgba(125, 211, 252, 0.28);
+  color: var(--sky); background: rgba(125, 211, 252, 0.07);
+}
+.model-row .vis .icon { width: 12px; height: 12px; }
 .model-row .checkmark { flex: none; display: grid; place-items: center; width: 18px; height: 18px; border: 1px solid var(--line-2); border-radius: 6px; color: transparent; }
 .model-row.on .checkmark { border-color: var(--mint); background: var(--mint); color: var(--on-accent); }
 .model-row .checkmark .icon { width: 11px; height: 11px; stroke-width: 2.6; }
@@ -973,6 +980,7 @@ body.drawer-open { overflow: hidden; }
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h11"/></symbol>
   <symbol id="i-clip" viewBox="0 0 24 24"><path d="M20 11.5 12 19.5a5 5 0 0 1-7-7l8.2-8.2a3.3 3.3 0 0 1 4.7 4.7l-8.2 8.2a1.7 1.7 0 0 1-2.4-2.4l7.5-7.5"/></symbol>
   <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.6" cy="9.6" r="1.5"/><path d="m4 17.5 4.6-4.6 3.9 3.9 2.6-2.6L20 19"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19 3.6a4.9 4.9 0 0 0-.1-3.6s-1.1-.3-3.7 1.4a12.7 12.7 0 0 0-6.4 0C6.2-.3 5.1 0 5.1 0A4.9 4.9 0 0 0 5 3.6 5.2 5.2 0 0 0 3.7 7.2c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V21"/></symbol>
   <symbol id="i-google-drive" viewBox="0 0 24 24"><path d="m8 3 8 0 5 9-4 7H7l-4-7 5-9Z"/><path d="M8 3 12 10l8 2M16 3l-4 7 5 9M3 12h18"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 6-15 16-16 0 10-5 16-13 16"/><path d="M4 20c3-5 7-8 12-10"/></symbol>
@@ -1174,6 +1182,9 @@ body.drawer-open { overflow: hidden; }
       </div>
       <div class="btn-row" id="presetRow">
         <button class="btn sm" type="button" data-preset="code">Créer</button>
+        <button class="btn sm" type="button" data-preset="photo">
+          <svg class="icon" aria-hidden="true"><use href="#i-image"></use></svg> Photo
+        </button>
         <button class="btn sm" type="button" data-preset="top-tier">★ Meilleures</button>
         <button class="btn sm" type="button" data-preset="top">✦ Mon choix</button>
         <button class="btn sm" type="button" data-preset="top-bis">Compléter</button>
@@ -1609,7 +1620,7 @@ body.drawer-open { overflow: hidden; }
     streaming: false,
     controllers: new Map(),
     stick: true,
-    pending: { drafts: [], synth: null, solo: null, style: "collab", tab: "drafts", query: "" },
+    pending: { drafts: [], synth: null, solo: null, style: "collab", tab: "drafts", query: "", photo: false },
     github: { repo: "Yandevil974/Tueurs-en-s-rie-", branch: "main", path: "arena-x/sauvegarde.json", token: "", last: 0 },
     ui: { openDrafts: new Set(), showDrafts: new Set() }
   };
@@ -1652,16 +1663,19 @@ body.drawer-open { overflow: hidden; }
   var EST_IN = 1000;
   var EST_OUT = 500;
 
-  function estimateCallCost(m) {
+  var EST_IMAGE = 900;   /* tokens d'entrée comptés par photo jointe */
+
+  function estimateCallCost(m, images) {
     if (!m || m.free) return 0;
-    return (EST_IN * (m.inPrice || 0) + EST_OUT * (m.outPrice || 0)) / 1e6;
+    var inTok = EST_IN + Math.max(0, Number(images) || 0) * EST_IMAGE;
+    return (inTok * (m.inPrice || 0) + EST_OUT * (m.outPrice || 0)) / 1e6;
   }
 
-  function estimateTurnCost(draftKeys, synthKey, soloKey) {
-    if (soloKey) return estimateCallCost(modelByKey(soloKey));
+  function estimateTurnCost(draftKeys, synthKey, soloKey, images) {
+    if (soloKey) return estimateCallCost(modelByKey(soloKey), images);
     var total = 0;
-    (draftKeys || []).forEach(function (k) { total += estimateCallCost(modelByKey(k)); });
-    if (synthKey) total += estimateCallCost(modelByKey(synthKey));
+    (draftKeys || []).forEach(function (k) { total += estimateCallCost(modelByKey(k), images); });
+    if (synthKey) total += estimateCallCost(modelByKey(synthKey), images);
     return total;
   }
 
@@ -1999,6 +2013,22 @@ body.drawer-open { overflow: hidden; }
     /gemini.*3\.[0-9]+.*pro/i, /gpt-5\.6-sol/i, /claude.*opus.*5\.5/i,
     /gemini.*pro/i, /gpt-5\.6/i, /claude.*sonnet/i
   ];
+  /* Preset « Photo » : le meilleur lecteur d'image en synthèse, trois regards
+     différents en brouillons. Gratuit = Gemma 4 31B rédige, Nemotron Omni /
+     Gemma 26B / Qwen3.8 regardent. Premium = Sonnet 5.5 rédige, Gemini Pro /
+     Luna / Flash regardent (≈ 0,02 $ la question). */
+  var BEST_VISION_FREE_DRAFTS = [
+    /nemotron-3-nano-omni/i, /gemma-4-26b/i, /qwen3\.8-27b/i, /inkling/i
+  ];
+  var BEST_VISION_FREE_SYNTH = [/gemma-4-31b/i, /openrouter\/free/i, /gemma-4-26b/i];
+  var BEST_VISION_PAID_DRAFTS = [
+    /gemini.*3\.[0-9]+.*pro/i, /gpt-5\.6-luna/i, /gemini.*flash/i
+  ];
+  var BEST_VISION_PAID_SYNTH = [/claude.*sonnet.*5\.5/i, /claude.*sonnet/i, /claude.*opus.*5\.5/i, /gpt-5\.6-sol/i];
+  /* En solo, pas de synthèse pour rattraper : on prend directement le meilleur
+     lecteur d'image — Opus 5.5 en premium, Gemma 4 31B en gratuit. */
+  var BEST_VISION_SOLO_FREE = [/gemma-4-31b/i, /nemotron-3-nano-omni/i, /gemma-4-26b/i, /qwen3\.8-27b/i, /openrouter\/free/i];
+  var BEST_VISION_SOLO_PAID = [/claude.*opus.*5\.5/i, /claude.*sonnet.*5\.5/i, /gpt-5\.6-sol/i, /gemini.*pro/i];
 
   /* Premium : le choix retenu après le rapport qualité/coût.
      Brouillons = les modèles qui offrent le plus d'indice par dollar, dans des
@@ -2079,6 +2109,27 @@ body.drawer-open { overflow: hidden; }
   }
 
   /* Le panneau idéal d'un mode, indépendant de la sélection en cours. */
+  /* Panneau « Photo » : uniquement des modèles qui lisent une image. */
+  function bestPhotoPanel(mode) {
+    var pool = visionPool(mode);
+    if (!pool.length) return { drafts: [], synth: null, pool: 0 };
+    var drafts = bestModels(pool, mode === "free" ? BEST_VISION_FREE_DRAFTS : BEST_VISION_PAID_DRAFTS, 3, []);
+    var synth = bestModels(pool, mode === "free" ? BEST_VISION_FREE_SYNTH : BEST_VISION_PAID_SYNTH, 1, drafts)[0] ||
+      drafts[0] || null;
+    return {
+      drafts: drafts.map(function (m) { return m.key; }),
+      synth: synth ? synth.key : null,
+      pool: pool.length
+    };
+  }
+
+  function bestPhotoSolo(mode) {
+    var pool = visionPool(mode);
+    var best = bestModels(pool, mode === "free" ? BEST_VISION_SOLO_FREE : BEST_VISION_SOLO_PAID, 1, [])[0] ||
+      bestModels(pool, mode === "free" ? BEST_VISION_FREE_SYNTH : BEST_VISION_PAID_SYNTH, 1, [])[0];
+    return best ? best.key : null;
+  }
+
   function bestPanel(mode) {
     var pool = pools()[mode];
     var free = mode === "free";
@@ -3768,7 +3819,7 @@ body.drawer-open { overflow: hidden; }
           "Premium non activé : crédits épuisés · réponse avec Groq + routeur" :
           "Premium non activé : réponse avec les modèles Groq · 0 $";
       } else {
-        var turnCost = estimateTurnCost(state.panels[state.mode], state.synths[state.mode], null);
+        var turnCost = estimateTurnCost(state.panels[state.mode], state.synths[state.mode], null, state.attach.images.length);
         var calls = state.panels[state.mode].length + (state.synths[state.mode] ? 1 : 0);
         el.dockNote.textContent = "Premium · " + calls + " appels ≈ " + fmtMoney4(turnCost) + " la question" +
           (state.keys.management.trim() ? " · solde suivi" : "");
@@ -3817,6 +3868,13 @@ body.drawer-open { overflow: hidden; }
       meta.appendChild(elem("span", "sub", providerLabel(m.provider) + (m.ctx ? " · " + Math.round(m.ctx / 1000) + "K ctx" : "")));
       row.appendChild(meta);
       row.appendChild(elem("span", "price", m.free ? "gratuit" : fmtPerM(m.inPrice).replace(" $/M", "") + " → " + fmtPerM(m.outPrice)));
+      /* Repère visuel : ce modèle lit-il une image ? */
+      if (seesImages(m)) {
+        var vis = elem("span", "vis");
+        vis.title = "Lit les images";
+        vis.appendChild(iconEl("image"));
+        row.appendChild(vis);
+      }
       var mark = elem("span", "checkmark");
       mark.appendChild(iconEl("check"));
       row.appendChild(mark);
@@ -3841,9 +3899,12 @@ body.drawer-open { overflow: hidden; }
         "Mode solo gratuit : un seul modèle répond, sans brouillons ni synthèse. Une requête par question." :
         "Mode solo premium : un seul appel facturé au tarif du modèle choisi.";
       if (el.panelTabs) el.panelTabs.hidden = true;
-      if (el.presetRow) el.presetRow.hidden = true;
+      if (el.presetRow) {
+        el.presetRow.hidden = false;
+        $all("[data-preset]", el.presetRow).forEach(function (b) { b.hidden = b.dataset.preset !== "photo"; });
+      }
     } else {
-      var est = estimateTurnCost(state.pending.drafts, state.pending.synth, null);
+      var est = estimateTurnCost(state.pending.drafts, state.pending.synth, null, state.attach.images.length);
       el.panelCount.textContent = n + " brouillon" + (n > 1 ? "s" : "") +
         (state.pending.synth ? " · 1 synthèse" : " · aucune synthèse") +
         " · " + fmtMoney4(est) + " / question";
@@ -3864,8 +3925,16 @@ body.drawer-open { overflow: hidden; }
           ? "Le meilleur rendement : brouillons bon marché, bonne synthèse. Sur une question simple, la réponse sera quasi identique au haut de gamme ; sur du code complexe, les modèles frontière gardent l'avantage."
           : "Économique : budget protégé, mais brouillons plus faibles sur le raisonnement long et le code.";
     }
+      if (state.pending.photo) {
+        el.panelNotice.textContent = state.mode === "free" ?
+          "Photo : seuls les modèles qui lisent une image sont retenus — 0 $ avec la clé OpenRouter. Joins la photo avec le trombone, en bas du fil." :
+          "Photo : chaque appel reçoit l'image, donc le coût est plus élevé qu'une question texte. Le modèle de synthèse rédige ce que les autres ont vu.";
+      }
       if (el.panelTabs) el.panelTabs.hidden = false;
-      if (el.presetRow) el.presetRow.hidden = false;
+      if (el.presetRow) {
+        el.presetRow.hidden = false;
+        $all("[data-preset]", el.presetRow).forEach(function (b) { b.hidden = false; });
+      }
     }
     if (el.panelDlgTitle) {
       el.panelDlgTitle.textContent = soloMode ? "Choisir un seul modèle" : "Panneau de collaboration";
@@ -4019,11 +4088,12 @@ body.drawer-open { overflow: hidden; }
   function visionKeys(keys) {
     var pool = visionPool(keys.mode);
     if (!pool.length) return null;
-    var prefs = keys.mode === "free" ? BEST_VISION_FREE : BEST_VISION_PAID;
+    var prefs = keys.mode === "free" ? BEST_VISION_FREE_DRAFTS : BEST_VISION_PAID_DRAFTS;
+    var synthPrefs = keys.mode === "free" ? BEST_VISION_FREE_SYNTH : BEST_VISION_PAID_SYNTH;
     if (keys.solo) {
       var current = modelByKey(keys.solo);
       if (current && seesImages(current)) return keys;
-      var best = bestModels(pool, prefs, 1, [])[0];
+      var best = bestModels(pool, synthPrefs, 1, [])[0] || bestModels(pool, prefs, 1, [])[0];
       return { drafts: keys.drafts, synth: null, solo: best ? best.key : pool[0].key, mode: keys.mode, swapped: true };
     }
     /* Les modèles déjà choisis qui voient l'image sont gardés tels quels. */
@@ -4038,7 +4108,7 @@ body.drawer-open { overflow: hidden; }
     if (!drafts.length) drafts = pool.slice(0, Math.min(3, pool.length)).map(function (m) { return m.key; });
     var synth = keptSynth;
     if (!synth) {
-      var left = bestModels(pool, prefs, 1, drafts.map(function (k) { return modelByKey(k); }).filter(Boolean))[0];
+      var left = bestModels(pool, synthPrefs, 1, drafts.map(function (k) { return modelByKey(k); }).filter(Boolean))[0];
       synth = left ? left.key : drafts[0];
     }
     drafts = drafts.slice(0, MAX_DRAFTS);
@@ -4212,7 +4282,7 @@ body.drawer-open { overflow: hidden; }
       if (!vk) {
         parts.push(imgs > 1 ? imgs + " photos : aucun modèle ne lit les images" : "Photo : aucun modèle ne lit les images");
       } else {
-        var who = bestModels(visionPool(state.mode), state.mode === "free" ? BEST_VISION_FREE : BEST_VISION_PAID, 1, [])[0];
+        var who = bestModels(visionPool(state.mode), state.mode === "free" ? BEST_VISION_FREE_SYNTH : BEST_VISION_PAID_SYNTH, 1, [])[0];
         var readable = vk.solo ? modelByKey(vk.solo) : (who || modelByKey(vk.synth));
         parts.push((imgs > 1 ? imgs + " photos" : "Photo") + " lue par " +
           (readable ? shortName(prettyName(readable.name, readable.id)) : "les modèles vision") +
@@ -5604,6 +5674,7 @@ body.drawer-open { overflow: hidden; }
     state.pending.style = state.style;
     state.pending.tab = "drafts";
     state.pending.query = "";
+    state.pending.photo = false;
     el.modelSearch.value = "";
     switchPanelTab("drafts");
     renderPanelDialog();
@@ -5620,6 +5691,7 @@ body.drawer-open { overflow: hidden; }
   }
 
   function togglePendingModel(key) {
+    state.pending.photo = false;
     if (state.pending.style === "solo") {
       state.pending.solo = key;
       renderPanelDialog();
@@ -5643,18 +5715,57 @@ body.drawer-open { overflow: hidden; }
     renderPanelDialog();
   }
 
+  /* Pourquoi le preset photo ne peut pas choisir de modèle. */
+  function photoPresetMessage() {
+    if (state.mode === "paid" && !hasPaidAccess()) {
+      return "Photo : le premium répond avec les modèles gratuits faute de crédits. Passe en gratuit ou recharge OpenRouter.";
+    }
+    if (!state.keys.openrouter.trim()) {
+      return "Photo : aucun modèle du panneau ne lit les images avec la seule clé Groq. Ajoute la clé OpenRouter (gratuite) pour débloquer Gemma 4 31B.";
+    }
+    return "Photo : aucun modèle vision dans le catalogue. Réglages → Actualiser le catalogue, puis réessaie.";
+  }
+
   function applyPanelPreset(kind) {
     var p = pools()[state.mode];
     var ordered = rankModels(p, state.mode === "free" ? FREE_ORDER : PAID_ORDER);
     if (state.pending.style === "solo") {
       if (kind === "clear") state.pending.solo = null;
-      else {
+      else if (kind === "photo") {
+        var soloVision = bestPhotoSolo(state.mode);
+        if (!soloVision) {
+          showToast(photoPresetMessage(), "err");
+          return;
+        }
+        state.pending.solo = soloVision;
+        state.pending.photo = true;
+        renderPanelDialog();
+        var smv = modelByKey(soloVision);
+        showToast("Modèle photo : " + (smv ? prettyName(smv.name, smv.id) : "solo") + " · lit les images.", "ok");
+        return;
+      } else {
         state.pending.solo = bestSolo(state.mode) || (ordered.length ? ordered[0].key : null);
       }
       renderPanelDialog();
       return;
     }
-    if (kind === "code") {
+    if (kind === "photo") {
+      /* Preset « Photo » : le panneau ne garde que les modèles qui lisent une image. */
+      var photo = bestPhotoPanel(state.mode);
+      if (!photo.drafts.length) {
+        showToast(photoPresetMessage(), "err");
+        return;
+      }
+      state.pending.drafts = photo.drafts.slice();
+      state.pending.synth = photo.synth;
+      state.pending.photo = true;
+      state.panelCustom[state.mode] = false;
+      var synthName = modelByKey(photo.synth);
+      showToast("Panneau photo : " + photo.drafts.length + " modèles qui lisent l'image → " +
+        (synthName ? shortName(prettyName(synthName.name, synthName.id)) : "synthèse") +
+        " · " + fmtMoney4(estimateTurnCost(photo.drafts, photo.synth, null, state.attach.images.length)) +
+        " / question. Joins la photo avec le trombone.", "ok");
+    } else if (kind === "code") {
       var code = bestCodePanel(state.mode);
       if (code.drafts.length) {
         state.pending.drafts = code.drafts.slice();

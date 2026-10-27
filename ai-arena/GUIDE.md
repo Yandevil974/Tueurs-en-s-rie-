@@ -335,6 +335,25 @@ arenax.chats.v3 = {
 - **Sauvegarde JSON** : `backupPayload()` ajoute `chats` (toutes les conversations) à côté
   de `turns` (la conversation ouverte, conservé pour la compatibilité). Une restauration
   qui contient `chats` remplace l'historique, sinon l'ancien format reste accepté.
+### Preset « Photo »
+
+Un cinquième bouton dans le panneau (`data-preset="photo"`, icône appareil photo) pré-sélectionne
+d'un coup les modèles qui **lisent une image**, sans toucher au reste :
+
+| Mode | Brouillons | Synthèse | Coût d'une question avec 1 photo |
+| --- | --- | --- | --- |
+| Gratuit | Nemotron 3 Nano Omni, Gemma 4 26B, Qwen3.8 27B | **Gemma 4 31B** | **0 $** |
+| Premium | Gemini 3.1 Pro, GPT‑5.6 Luna, Gemini 3.5 Flash | **Claude Sonnet 5.5** | **≈ 0,027 $** |
+| Solo premium | — | **Claude Opus 5.5** | ≈ 0,052 $ |
+
+- En solo, seul ce bouton reste visible : les autres presets n'ont pas de sens sans brouillons.
+- Un clic sur un modèle à la main désactive le preset (on repasse en sélection libre).
+- Chaque ligne du sélecteur affiche une **pastille image** quand le modèle déclare lire les images.
+- L'estimation de coût compte **900 tokens d'entrée par photo** (`EST_IMAGE`), sinon le prix
+  affiché serait celui d'une question texte.
+- Si aucun modèle du panneau ne lit les images, le bouton refuse avec la raison exacte :
+  clé OpenRouter absente, crédits épuisés, ou catalogue sans modèle vision.
+
 - **Pourquoi `localStorage` et pas IndexedDB** : l'écriture est synchrone, donc un
   `pagehide` sur Android peut sauver la dernière réponse ; pas de transaction à gérer,
   pas de dépendance, et le fichier reste unique.
