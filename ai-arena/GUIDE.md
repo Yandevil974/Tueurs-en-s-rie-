@@ -345,6 +345,39 @@ du haut ne garde que le hamburger (le bouton « + » y est masqué) pour ne pas 
 
 ---
 
+## 5 quinquies. Pièces jointes : photos et fichiers texte
+
+Le bouton trombone du champ d'écriture (ou un collage `Ctrl+V`, ou un glisser-déposer)
+ajoute jusqu'à **3 photos** et **2 fichiers texte** par question.
+
+- **Photos** : redimensionnées à 1 400 px sur le côté long en JPEG 82 %, l'aperçu envoyé
+  au modèle fait donc quelques centaines de Ko au plus. Une photo de téléphone de 4 000 px
+  coûte cher en tokens d'entrée pour aucun gain de lecture.
+- **Fichiers texte** : `.txt .md .csv .json .log` et code (`.js .py .html .css .sql…`),
+  1 Mo maximum, **24 000 caractères** conservés — le reste est coupé et l'interface le dit.
+- **Vision réelle, pas supposée** : OpenRouter publie `architecture.input_modalities`.
+  Si l'image n'y figure pas, le modèle ne reçoit pas la photo. Le panneau est donc
+  **restreint aux modèles qui lisent les images** le temps du tour ; en solo, un modèle
+  non vision est remplacé par le premier modèle vision du panneau. Si aucun modèle n'est
+  vision (typiquement en gratuit avec Groq seul), l'envoi est **bloqué** avec un message
+  explicite au lieu d'envoyer une photo que personne ne lira.
+- **Format du message** : contenu multimodal standard OpenAI, donc accepté par Groq comme
+  par OpenRouter : `[{type:"text"}, {type:"image_url", image_url:{url:"data:image/jpeg;base64,…"}}]`.
+  Les fichiers texte, eux, sont insérés dans le prompt sous `--- FICHIER JOINT : nom ---`.
+- **Historique** : seule la **vignette 240 px** est conservée en `localStorage`, jamais
+  l'image pleine définition (24 conversations feraient exploser le quota). Le texte des
+  fichiers joints n'est pas rejoué non plus : la bulle garde le nom et le nombre de
+  caractères. La photo reste donc visible dans le fil après rechargement, mais l'original
+  n'est pas rejouable vers les modèles.
+- **Limite assumée** : l'application lit les images, elle n'en produit pas. Les modèles du
+  panneau (Opus 5.5, GPT‑5.6, Gemini 3.1 Pro, DeepSeek) renvoient **du texte
+  uniquement**. Une retouche photo demande un modèle image (`gemini-3.1-flash-image`,
+  `gpt-image`…) et une vidéo un modèle vidéo (Veo 3.1, Sora) : ce sont d'autres appels,
+  facturés à l'image (≈ 0,04 à 0,15 $) ou à la seconde (≈ 0,05 à 0,40 $). Hors périmètre
+  de ce panneau pour l'instant.
+
+---
+
 ## 6. Passer en production (site public)
 
 Un fichier statique ne peut pas cacher une clé. Le schéma minimal :

@@ -328,7 +328,26 @@ body:not(.has-chat) .panelbar, body:not(.has-chat) .empty { display: none; }
   border-radius: 8px; border: 1px solid var(--line-2); background: var(--panel-solid);
   color: var(--muted); font: 700 9.5px/1 var(--mono); letter-spacing: 0.06em;
 }
-.you p { flex: 1; min-width: 0; margin-top: 1px; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.55; }
+.you-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
+.you p { margin: 1px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14.5px; line-height: 1.55; }
+.you-shots { display: flex; flex-wrap: wrap; gap: 7px; }
+.you-shots img {
+  display: block; height: 92px; width: auto; max-width: 46%;
+  border: 1px solid var(--line-2); border-radius: 9px; object-fit: cover;
+}
+.you-files { display: flex; flex-wrap: wrap; gap: 6px; }
+.you-file {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  padding: 4px 9px 4px 7px; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); color: var(--muted); font: 11px/1.3 var(--mono);
+}
+.you-file .icon { width: 13px; height: 13px; flex: none; color: var(--sky); }
+.you-file b { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.you-flag {
+  display: inline-flex; align-items: center; gap: 5px; align-self: flex-start;
+  padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(125, 211, 252, 0.28);
+  color: var(--sky); font: 10px/1.6 var(--sans); letter-spacing: 0.02em;
+}
 .you time { flex: none; margin-top: 3px; color: var(--faint); font: 10px/1.5 var(--mono); }
 
 .collab { margin-top: 10px; padding: 13px 14px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255, 255, 255, 0.014); }
@@ -457,6 +476,36 @@ body:not(.has-chat) .panelbar, body:not(.has-chat) .empty { display: none; }
   color: var(--text); font: 15px/1.55 var(--sans); resize: none; overflow-y: auto;
 }
 #prompt::placeholder { color: var(--faint); }
+.attach-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 12px 14px 0; }
+.attach-row[hidden] { display: none; }
+.attach-chip {
+  position: relative; display: flex; align-items: center; gap: 7px;
+  max-width: 100%; height: 42px; padding: 0 26px 0 6px;
+  border: 1px solid var(--line-2); border-radius: 10px; background: var(--panel-2);
+}
+.attach-chip img { width: 30px; height: 30px; border-radius: 7px; object-fit: cover; }
+.attach-chip .icon { width: 15px; height: 15px; flex: none; color: var(--sky); }
+.attach-chip .txt { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.attach-chip b {
+  font: 600 11.5px/1.2 var(--sans); color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 190px;
+}
+.attach-chip small { font: 9.5px/1.2 var(--mono); color: var(--faint); }
+.attach-x {
+  position: absolute; top: 3px; right: 3px; width: 18px; height: 18px;
+  display: grid; place-items: center; border: 0; border-radius: 999px;
+  background: rgba(5, 6, 10, 0.6); color: var(--muted); cursor: pointer; padding: 0;
+}
+.attach-x:hover { color: var(--danger); background: rgba(251, 113, 133, 0.16); }
+.attach-x .icon { width: 10px; height: 10px; color: inherit; }
+.attach-btn {
+  flex: none; display: grid; place-items: center; width: 32px; height: 32px;
+  border: 1px solid var(--line); border-radius: 9px; background: var(--panel);
+  color: var(--muted); cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease;
+}
+.attach-btn:hover { color: var(--mint); border-color: rgba(110, 242, 200, 0.45); }
+.attach-btn .icon { width: 16px; height: 16px; }
+.attach-btn[disabled] { opacity: 0.4; pointer-events: none; }
 .composer-row { display: flex; align-items: center; gap: 9px; padding: 4px 8px 8px 13px; }
 .composer-row .count { color: var(--faint); font: 10px/1 var(--mono); }
 .composer-row .count.warn { color: var(--amber); }
@@ -922,6 +971,8 @@ body.drawer-open { overflow: hidden; }
   <symbol id="i-thumb-down" viewBox="0 0 24 24"><path d="M17 14V4h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3Zm0 0-4.2 6.3a1.6 1.6 0 0 1-2.9-1V15H5.6a2 2 0 0 1-2-2.4l1.3-6.6a2 2 0 0 1 2-1.6H17"/></symbol>
   <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/><path d="M12 7v5l3 2"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h11"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="M20 11.5 12 19.5a5 5 0 0 1-7-7l8.2-8.2a3.3 3.3 0 0 1 4.7 4.7l-8.2 8.2a1.7 1.7 0 0 1-2.4-2.4l7.5-7.5"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19 3.6a4.9 4.9 0 0 0-.1-3.6s-1.1-.3-3.7 1.4a12.7 12.7 0 0 0-6.4 0C6.2-.3 5.1 0 5.1 0A4.9 4.9 0 0 0 5 3.6 5.2 5.2 0 0 0 3.7 7.2c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V21"/></symbol>
   <symbol id="i-google-drive" viewBox="0 0 24 24"><path d="m8 3 8 0 5 9-4 7H7l-4-7 5-9Z"/><path d="M8 3 12 10l8 2M16 3l-4 7 5 9M3 12h18"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 6-15 16-16 0 10-5 16-13 16"/><path d="M4 20c3-5 7-8 12-10"/></symbol>
@@ -1068,9 +1119,15 @@ body.drawer-open { overflow: hidden; }
       <svg class="icon sm" aria-hidden="true"><use href="#i-arrow-down"></use></svg> Dernière réponse
     </button>
     <div class="composer-box">
+      <div class="attach-row" id="attachRow" hidden></div>
       <label class="sr-only" for="prompt">Ta question</label>
       <textarea id="prompt" rows="1" maxlength="8000" placeholder="Pose ta question au panneau…"></textarea>
       <div class="composer-row">
+        <button class="attach-btn" id="attachBtn" type="button" title="Joindre une photo ou un fichier texte" aria-label="Joindre une photo ou un fichier texte">
+          <svg class="icon" aria-hidden="true"><use href="#i-clip"></use></svg>
+        </button>
+        <input id="attachInput" type="file" multiple hidden
+               accept="image/png,image/jpeg,image/webp,image/gif,.txt,.md,.csv,.json,.log,.js,.mjs,.ts,.py,.html,.css,.sql,.yml,.yaml">
         <span class="count" id="count">0 / 8000</span>
         <span class="hint"><kbd>Ctrl</kbd> <kbd>↵</kbd> envoyer</span>
         <span class="spacer"></span>
@@ -1506,7 +1563,8 @@ body.drawer-open { overflow: hidden; }
     return {
       key: provider + "::" + id, provider: provider, id: id, name: name,
       free: !!free, inPrice: inPrice || 0, outPrice: outPrice || 0,
-      ctx: 0, created: 0, fallback: true
+      ctx: 0, created: 0, fallback: true,
+      vision: /claude|gpt-4o|gemini/i.test(id)
     };
   }
 
@@ -1531,6 +1589,7 @@ body.drawer-open { overflow: hidden; }
     chats: [],            /* historique : [{id, title, ts, updated, mode, style, turns}] */
     currentId: null,      /* identifiant de la conversation ouverte */
     chatQuery: "",
+    attach: { images: [], files: [] },   /* pièces jointes en attente d'envoi */
     settings: Object.assign({}, DEFAULTS),
     keys: { openrouter: "", management: "", groq: "" },
     catalog: [],
@@ -2211,7 +2270,11 @@ body.drawer-open { overflow: hidden; }
         ctx: Number(m.context_length) || 0,
         created: Number(m.created) || 0,
         noChat: noChat && !/:(free)$/i.test(m.id),
-        batch: batch && !/:(free)$/i.test(m.id)
+        batch: batch && !/:(free)$/i.test(m.id),
+        /* Seuls les modèles qui déclarent l'image en entrée reçoivent une photo. */
+        vision: (function (ins) {
+          return Array.isArray(ins) && ins.some(function (x) { return String(x).toLowerCase() === "image"; });
+        })(m.architecture && m.architecture.input_modalities)
       };
     }).filter(Boolean);
   }
@@ -2230,7 +2293,8 @@ body.drawer-open { overflow: hidden; }
         inPrice: 0,
         outPrice: 0,
         ctx: Number(m.context_window) || 0,
-        created: Number(m.created) || 0
+        created: Number(m.created) || 0,
+        vision: /llama-4|llama-3\.2|llama-3\.3|-vl\b|vision/i.test(m.id)
       };
     });
   }
@@ -2471,6 +2535,14 @@ body.drawer-open { overflow: hidden; }
     return {
       id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo, solo: !!t.solo, degraded: !!t.degraded,
       creditsAfter: t.creditsAfter, creditsUsed: t.creditsUsed, steps: t.steps,
+      /* Aperçu seulement : l'image pleine définition reste en mémoire du tour,
+         sinon 24 conversations feraient exploser le quota du navigateur. */
+      images: (t.images || []).map(function (i) {
+        return { name: i.name, thumb: i.thumb, w: i.w, h: i.h, srcW: i.srcW, srcH: i.srcH, bytes: i.bytes };
+      }),
+      files: (t.files || []).map(function (f) {
+        return { name: f.name, chars: f.chars, kept: f.kept || f.chars, bytes: f.bytes };
+      }),
       drafts: (t.drafts || []).map(function (d) {
         return { key: d.key, status: d.status, content: d.content, metrics: d.metrics, error: d.error };
       }),
@@ -2609,11 +2681,32 @@ body.drawer-open { overflow: hidden; }
         s.solo = isSolo || !!t.synth.solo;
         synth = s;
       }
+      var images = (Array.isArray(t.images) ? t.images : []).slice(0, 3).map(function (i) {
+        if (!i || typeof i.thumb !== "string" || i.thumb.indexOf("data:image/") !== 0) return null;
+        return {
+          name: String(i.name || "photo.jpg").slice(0, 120),
+          thumb: i.thumb.slice(0, 400000),
+          w: Number(i.w) || 0, h: Number(i.h) || 0,
+          srcW: Number(i.srcW) || 0, srcH: Number(i.srcH) || 0,
+          bytes: Number(i.bytes) || 0
+        };
+      }).filter(Boolean);
+      var files = (Array.isArray(t.files) ? t.files : []).slice(0, 2).map(function (f) {
+        if (!f || typeof f.name !== "string") return null;
+        return {
+          name: f.name.slice(0, 120),
+          chars: Math.max(0, Number(f.chars) || 0),
+          kept: Math.max(0, Number(f.kept) || Number(f.chars) || 0),
+          bytes: Math.max(0, Number(f.bytes) || 0)
+        };
+      }).filter(Boolean);
       out.push({
         id: Number(t.id) || Math.random(),
         ts: Number(t.ts) || Date.now(),
         mode: t.mode === "paid" ? "paid" : "free",
         prompt: t.prompt.slice(0, 8000),
+        images: images,
+        files: files,
         drafts: cleanDrafts.slice(0, MAX_DRAFTS),
         synth: synth,
         solo: isSolo,
@@ -3429,7 +3522,34 @@ body.drawer-open { overflow: hidden; }
 
     var you = elem("div", "you");
     you.appendChild(elem("span", "you-mark", "VOUS"));
-    you.appendChild(elem("p", "", turn.prompt));
+    var youBody = elem("div", "you-body");
+    youBody.appendChild(elem("p", "", turn.prompt));
+    if (turn.images && turn.images.length) {
+      var shots = elem("div", "you-shots");
+      turn.images.forEach(function (im) {
+        var imEl = document.createElement("img");
+        imEl.src = im.thumb || im.dataUrl || "";
+        imEl.alt = im.name ? "Photo jointe : " + im.name : "Photo jointe";
+        imEl.loading = "lazy";
+        shots.appendChild(imEl);
+      });
+      youBody.appendChild(shots);
+      youBody.appendChild(elem("span", "you-flag", "photo jointe aux modèles vision"));
+    }
+    if (turn.files && turn.files.length) {
+      var filesEl = elem("div", "you-files");
+      turn.files.forEach(function (f) {
+        var chip = elem("span", "you-file");
+        chip.appendChild(iconEl("file"));
+        var nameEl = document.createElement("b");
+        nameEl.textContent = f.name;
+        chip.appendChild(nameEl);
+        chip.appendChild(document.createTextNode(" · " + fmtInt(f.chars) + " car."));
+        filesEl.appendChild(chip);
+      });
+      youBody.appendChild(filesEl);
+    }
+    you.appendChild(youBody);
     you.appendChild(elem("time", "", fmtTime(turn.ts)));
     article.appendChild(you);
 
@@ -3602,7 +3722,8 @@ body.drawer-open { overflow: hidden; }
     var v = el.prompt.value;
     el.count.textContent = v.length + " / 8000";
     el.count.classList.toggle("warn", v.length > 7600);
-    el.sendBtn.disabled = state.streaming || !v.trim();
+    el.sendBtn.disabled = state.streaming || (!v.trim() && !hasAttach());
+    if (el.attachBtn) el.attachBtn.disabled = state.streaming;
     el.sendBtn.hidden = state.streaming;
     el.stopBtn.hidden = !state.streaming;
     el.prompt.placeholder = state.streaming ? "Réponses en cours…" :
@@ -3805,6 +3926,249 @@ body.drawer-open { overflow: hidden; }
     renderBackupUI();
     renderCatalogStatus();
     updateSendState();
+  }
+
+  /* 16 bis. Pièces jointes : photos et fichiers texte --------------------- */
+  var ATTACH_IMAGES = 3;        /* photos par question */
+  var ATTACH_FILES = 2;         /* fichiers texte par question */
+  var ATTACH_IMAGE_MAX = 1400;  /* côté le plus long envoyé au modèle */
+  var ATTACH_THUMB = 240;       /* aperçu conservé dans l'historique */
+  var ATTACH_CHARS = 24000;     /* texte conservé par fichier */
+  var ATTACH_FILE_MAX = 1048576;
+
+  function humanBytes(n) {
+    n = Number(n) || 0;
+    if (n < 1024) return n + " o";
+    if (n < 1048576) return (n / 1024).toFixed(n < 10240 ? 1 : 0) + " Ko";
+    return (n / 1048576).toFixed(1) + " Mo";
+  }
+
+  function readAs(file, mode) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onload = function () { resolve(fr.result); };
+      fr.onerror = function () { reject(fr.error || new Error("Lecture impossible.")); };
+      if (mode === "text") fr.readAsText(file); else fr.readAsDataURL(file);
+    });
+  }
+
+  function loadPhoto(src) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject(new Error("Image illisible.")); };
+      img.src = src;
+    });
+  }
+
+  /* Redimensionne : une photo de téléphone (4 000 px) coûte trop cher en tokens
+     et en mémoire. On garde le cadrage, on réduit la définition. */
+  function scaledJpeg(img, max, quality) {
+    var w = img.naturalWidth || img.width;
+    var h = img.naturalHeight || img.height;
+    if (!w || !h) throw new Error("Image vide.");
+    var k = Math.min(1, max / Math.max(w, h));
+    var cw = Math.max(1, Math.round(w * k));
+    var ch = Math.max(1, Math.round(h * k));
+    var cv = document.createElement("canvas");
+    cv.width = cw;
+    cv.height = ch;
+    var ctx = cv.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, cw, ch);
+    ctx.drawImage(img, 0, 0, cw, ch);
+    return { url: cv.toDataURL("image/jpeg", quality), w: cw, h: ch, srcW: w, srcH: h };
+  }
+
+  /* Un modèle « voit » seulement s'il l'annonce : drapeau du catalogue OpenRouter,
+     ou identifiant connu côté Groq. Pas de supposition. */
+  function seesImages(model) {
+    if (!model) return false;
+    if (model.vision === true) return true;
+    if (model.vision === false) return false;
+    return model.provider === "groq" && /llama-4|llama-3\.2|llama-3\.3|-vl\b|vision/i.test(String(model.id || ""));
+  }
+
+  function visionPool(mode) {
+    return pools()[mode].filter(function (m) { return seesImages(m) && !m.noChat; });
+  }
+
+  /* Le panneau du tour est restreint aux modèles qui lisent l'image. */
+  function visionKeys(keys) {
+    var pool = visionPool(keys.mode);
+    if (!pool.length) return null;
+    if (keys.solo) {
+      var current = modelByKey(keys.solo);
+      if (current && seesImages(current)) return keys;
+      return { drafts: keys.drafts, synth: null, solo: pool[0].key, mode: keys.mode, swapped: true };
+    }
+    var drafts = keys.drafts.filter(function (k) { return seesImages(modelByKey(k)); });
+    var synth = keys.synth && seesImages(modelByKey(keys.synth)) ? keys.synth : null;
+    var swapped = drafts.length !== keys.drafts.length || !synth;
+    if (!drafts.length) drafts = pool.slice(0, Math.min(3, pool.length)).map(function (m) { return m.key; });
+    if (!synth) {
+      var left = pool.filter(function (m) { return drafts.indexOf(m.key) === -1; });
+      synth = (left[0] || pool[0]).key;
+    }
+    drafts = drafts.slice(0, MAX_DRAFTS);
+    return { drafts: drafts, synth: synth, solo: null, mode: keys.mode, swapped: swapped };
+  }
+
+  function fileBlock(turn) {
+    if (!turn.files || !turn.files.length) return "";
+    return turn.files.map(function (f) {
+      return "\n\n--- FICHIER JOINT : " + f.name + " ---\n" + String(f.text || "");
+    }).join("");
+  }
+
+  function withImages(text, turn, model) {
+    var imgs = (turn.images || []).filter(function (i) { return i && i.dataUrl; });
+    if (!imgs.length || !seesImages(model)) return text;
+    var parts = [{ type: "text", text: text }];
+    imgs.forEach(function (i) { parts.push({ type: "image_url", image_url: { url: i.dataUrl } }); });
+    return parts;
+  }
+
+  async function addPhoto(file) {
+    if (state.attach.images.length >= ATTACH_IMAGES) {
+      showToast("Maximum " + ATTACH_IMAGES + " photos par question.", "err");
+      return;
+    }
+    try {
+      var src = await readAs(file, "data");
+      var img = await loadPhoto(src);
+      var big = scaledJpeg(img, ATTACH_IMAGE_MAX, 0.82);
+      var small = scaledJpeg(img, ATTACH_THUMB, 0.62);
+      state.attach.images.push({
+        name: file.name || "photo.jpg",
+        bytes: file.size || 0,
+        srcW: big.srcW, srcH: big.srcH,
+        w: big.w, h: big.h,
+        dataUrl: big.url,
+        thumb: small.url
+      });
+      renderAttach();
+      updateSendState();
+      var m = visionPool(state.mode).length;
+      if (!m) showToast("Photo prête — mais aucun modèle du panneau ne lit les images : ajoute une clé OpenRouter.", "err");
+    } catch (e) {
+      showToast("Photo impossible à lire : " + (e && e.message ? e.message : "format inconnu"), "err");
+    }
+  }
+
+  async function addTextFile(file) {
+    if (state.attach.files.length >= ATTACH_FILES) {
+      showToast("Maximum " + ATTACH_FILES + " fichiers par question.", "err");
+      return;
+    }
+    if (file.size > ATTACH_FILE_MAX) {
+      showToast("Fichier trop lourd (" + humanBytes(file.size) + ") : 1 Mo maximum.", "err");
+      return;
+    }
+    try {
+      var raw = String(await readAs(file, "text") || "");
+      var cut = raw.length > ATTACH_CHARS;
+      state.attach.files.push({
+        name: file.name || "fichier.txt",
+        text: cut ? raw.slice(0, ATTACH_CHARS) : raw,
+        chars: raw.length,
+        kept: Math.min(raw.length, ATTACH_CHARS),
+        bytes: file.size || 0
+      });
+      renderAttach();
+      updateSendState();
+      if (cut) showToast("Fichier long : seuls les " + fmtInt(ATTACH_CHARS) + " premiers caractères sont envoyés.", "ok");
+    } catch (e) {
+      showToast("Fichier impossible à lire : " + (e && e.message ? e.message : "format inconnu"), "err");
+    }
+  }
+
+  async function addFiles(list) {
+    var files = Array.prototype.slice.call(list || []);
+    for (var i = 0; i < files.length; i++) {
+      var f = files[i];
+      var type = String(f.type || "");
+      var name = String(f.name || "").toLowerCase();
+      if (type.indexOf("image/") === 0) await addPhoto(f);
+      else if (type.indexOf("text/") === 0 || /\.(txt|md|csv|json|log|js|mjs|ts|py|html|css|sql|yml|yaml)$/.test(name)) await addTextFile(f);
+      else showToast("Format non pris en charge : " + (f.name || "fichier") + " (photo ou fichier texte).", "err");
+    }
+    if (el.attachInput) el.attachInput.value = "";
+  }
+
+  function renderAttach() {
+    if (!el.attachRow) return;
+    el.attachRow.textContent = "";
+    var n = 0;
+    state.attach.images.forEach(function (im, i) {
+      n++;
+      var chip = document.createElement("div");
+      chip.className = "attach-chip";
+      var thumb = document.createElement("img");
+      thumb.src = im.thumb || im.dataUrl;
+      thumb.alt = "";
+      chip.appendChild(thumb);
+      var txt = document.createElement("span");
+      txt.className = "txt";
+      var b = document.createElement("b");
+      b.textContent = im.name;
+      var small = document.createElement("small");
+      small.textContent = im.srcW + "×" + im.srcH +
+        (im.w !== im.srcW || im.h !== im.srcH ? " → " + im.w + "×" + im.h : "");
+      txt.appendChild(b);
+      txt.appendChild(small);
+      chip.appendChild(txt);
+      chip.appendChild(removeBtn("Retirer cette photo", function () {
+        state.attach.images.splice(i, 1);
+        renderAttach();
+        updateSendState();
+      }));
+      el.attachRow.appendChild(chip);
+    });
+    state.attach.files.forEach(function (f, i) {
+      n++;
+      var chip = document.createElement("div");
+      chip.className = "attach-chip";
+      chip.appendChild(iconEl("file"));
+      var txt = document.createElement("span");
+      txt.className = "txt";
+      var b = document.createElement("b");
+      b.textContent = f.name;
+      var small = document.createElement("small");
+      small.textContent = (f.kept < f.chars ? fmtInt(f.kept) + " / " + fmtInt(f.chars) : fmtInt(f.chars)) + " car. · " + humanBytes(f.bytes);
+      txt.appendChild(b);
+      txt.appendChild(small);
+      chip.appendChild(txt);
+      chip.appendChild(removeBtn("Retirer ce fichier", function () {
+        state.attach.files.splice(i, 1);
+        renderAttach();
+        updateSendState();
+      }));
+      el.attachRow.appendChild(chip);
+    });
+    el.attachRow.hidden = !n;
+  }
+
+  function removeBtn(label, onClick) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "attach-x";
+    b.title = label;
+    b.setAttribute("aria-label", label);
+    b.appendChild(iconEl("x"));
+    b.addEventListener("click", onClick);
+    return b;
+  }
+
+  function clearAttach() {
+    state.attach.images = [];
+    state.attach.files = [];
+    renderAttach();
+    updateSendState();
+  }
+
+  function hasAttach() {
+    return state.attach.images.length > 0 || state.attach.files.length > 0;
   }
 
   /* 17. Pipeline : appels, streaming, démonstration ------------------------ */
@@ -4259,14 +4623,14 @@ body.drawer-open { overflow: hidden; }
     });
   }
 
-  function draftMessages(prompt) {
+  function draftMessages(turn, model) {
     return [
       { role: "system", content: DRAFT_SYSTEM },
-      { role: "user", content: prompt }
+      { role: "user", content: withImages(turn.prompt + fileBlock(turn), turn, model) }
     ];
   }
 
-  function synthMessages(turn, doneDrafts) {
+  function synthMessages(turn, doneDrafts, model) {
     /* Le prompt de synthèse doit tenir sous la limite de 8 000 tokens/minute
        de Groq : plus il y a de brouillons, plus chacun est raccourci. */
     var per = Math.min(6000, Math.max(1200, Math.floor(7000 / Math.max(1, doneDrafts.length))));
@@ -4274,23 +4638,23 @@ body.drawer-open { overflow: hidden; }
       var m = modelByKey(d.key);
       return "### " + (m ? m.name : d.key) + "\n" + clip(d.content, per);
     }).join("\n\n---\n\n");
-    var user = "QUESTION :\n" + turn.prompt + "\n\nBROUILLONS :\n" + blocks +
+    var user = "QUESTION :\n" + turn.prompt + fileBlock(turn) + "\n\nBROUILLONS :\n" + blocks +
       "\n\nRédige maintenant la réponse finale. Corrige les erreurs factuelles, fusionne les apports, " +
       "supprime les redites et les mentions des modèles. Réponds directement, en Markdown.";
     var system = (state.settings.system || "").trim() || DEFAULT_SYSTEM;
     return [
       { role: "system", content: system },
-      { role: "user", content: user }
+      { role: "user", content: withImages(user, turn, model) }
     ];
   }
 
   var SOLO_SYSTEM = "Tu réponds directement à la question de l'utilisateur, seul, sans mentionner d'autres modèles ni de processus interne. Sois précis, structuré et utile. Utilise le Markdown quand c'est pertinent. Réponds dans la langue de la question.";
 
-  function soloMessages(prompt) {
+  function soloMessages(turn, model) {
     var system = (state.settings.system || "").trim() || SOLO_SYSTEM;
     return [
       { role: "system", content: system },
-      { role: "user", content: prompt }
+      { role: "user", content: withImages(turn.prompt + fileBlock(turn), turn, model) }
     ];
   }
 
@@ -4337,7 +4701,7 @@ body.drawer-open { overflow: hidden; }
     var finish = null;
     var frame = 0;
     var timeout = false;
-    var messages = soloMessages(turn.prompt);
+    var messages = soloMessages(turn, model);
     var timer = setTimeout(function () { timeout = true; try { ctrl.abort(); } catch (e) { /* ignore */ } }, 150000);
 
     function flush() {
@@ -4434,7 +4798,7 @@ body.drawer-open { overflow: hidden; }
     var finish = null;
     var frame = 0;
     var timeout = false;
-    var messages = draftMessages(turn.prompt);
+    var messages = draftMessages(turn, model);
     var timer = setTimeout(function () { timeout = true; try { ctrl.abort(); } catch (e) { /* ignore */ } }, 150000);
 
     function flush() {
@@ -4534,7 +4898,7 @@ body.drawer-open { overflow: hidden; }
     var finish = null;
     var frame = 0;
     var timeout = false;
-    var messages = synthMessages(turn, doneDrafts);
+    var messages = synthMessages(turn, doneDrafts, model);
     var timer = setTimeout(function () { timeout = true; try { ctrl.abort(); } catch (e) { /* ignore */ } }, 150000);
 
     function flush() {
@@ -4629,8 +4993,41 @@ body.drawer-open { overflow: hidden; }
   async function startTurn(prompt) {
     if (state.streaming) return;
     state.stopRequested = false;
+
+    /* 1. On fige les pièces jointes du tour : elles ne dépendent pas du panneau. */
+    var media = {
+      images: state.attach.images.slice(),
+      files: state.attach.files.slice()
+    };
+    var text = String(prompt || "").trim();
+    if (!text) {
+      text = media.images.length ? "Analyse cette image." :
+        media.files.length ? "Analyse ce fichier joint." : "";
+    }
+    if (!text) return;
+    prompt = text;
+
     var keys = currentKeys();
     var mode = state.mode;
+
+    /* 2. Une photo ne part que vers les modèles qui déclarent lire les images. */
+    if (media.images.length) {
+      var vk = visionKeys(keys);
+      if (!vk) {
+        showToast("Aucun modèle du panneau ne lit les images. Ajoute une clé OpenRouter (Claude, Gemini, GPT) ou choisis un modèle vision.", "err");
+        openPanelDialog();
+        return;
+      }
+      if (vk.swapped) {
+        showToast("Photo jointe : seuls les modèles qui lisent les images répondent (" + vk.drafts.length + " brouillon" + (vk.drafts.length > 1 ? "s" : "") + ").", "ok");
+      }
+      var hasKey = vk.drafts.concat(vk.synth ? [vk.synth] : []).some(function (k) {
+        var m = modelByKey(k);
+        return m && keyFor(m.provider);
+      });
+      if (!hasKey) showToast("Mode démonstration : la photo ne sera pas réellement analysée.", "err");
+      keys = vk;
+    }
 
     if (state.style === "solo") {
       if (!keys.solo) {
@@ -4644,6 +5041,8 @@ body.drawer-open { overflow: hidden; }
         ts: Date.now(),
         mode: mode,
         prompt: prompt,
+        images: media.images,
+        files: media.files,
         solo: true,
         degraded: mode === "paid" && !hasPaidAccess(),
         demo: soloModel ? !keyFor(soloModel.provider) : true,
@@ -4655,6 +5054,7 @@ body.drawer-open { overflow: hidden; }
       };
       state.streaming = true;
       el.prompt.value = "";
+      clearAttach();
       autoGrow();
       updateSendState();
       appendTurn(soloTurn);
@@ -4695,6 +5095,8 @@ body.drawer-open { overflow: hidden; }
       ts: Date.now(),
       mode: mode,
       prompt: prompt,
+      images: media.images,
+      files: media.files,
       demo: demoTurn,
       degraded: mode === "paid" && !hasPaidAccess(),
       drafts: keys.drafts.map(function (k) {
@@ -4706,6 +5108,7 @@ body.drawer-open { overflow: hidden; }
     };
     state.streaming = true;
     el.prompt.value = "";
+    clearAttach();
     autoGrow();
     updateSendState();
     appendTurn(turn);
@@ -5653,6 +6056,9 @@ body.drawer-open { overflow: hidden; }
     el.creditsAmount = $("#creditsAmount");
     el.creditsCap = $("#creditsCap");
     el.newBtn = $("#newBtn");
+    el.attachRow = $("#attachRow");
+    el.attachBtn = $("#attachBtn");
+    el.attachInput = $("#attachInput");
     el.menuBtn = $("#menuBtn");
     el.drawer = $("#drawer");
     el.drawerScrim = $("#drawerScrim");
@@ -5782,16 +6188,45 @@ body.drawer-open { overflow: hidden; }
     el.composer.addEventListener("submit", function (e) {
       e.preventDefault();
       var v = el.prompt.value.trim();
-      if (!v || state.streaming) return;
+      if ((!v && !hasAttach()) || state.streaming) return;
       if (v.length > 8000) { showToast("Prompt trop long (8 000 caractères).", "err"); return; }
       startTurn(v);
+    });
+    if (el.attachBtn && el.attachInput) {
+      el.attachBtn.addEventListener("click", function () { el.attachInput.click(); });
+      el.attachInput.addEventListener("change", function () { addFiles(el.attachInput.files); });
+    }
+    /* Coller une capture d'écran ou glisser une photo sur la zone d'écriture. */
+    el.prompt.addEventListener("paste", function (e) {
+      var items = e.clipboardData && e.clipboardData.items;
+      if (!items) return;
+      var imgs = [];
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].kind === "file" && String(items[i].type).indexOf("image/") === 0) {
+          var f = items[i].getAsFile();
+          if (f) imgs.push(f);
+        }
+      }
+      if (!imgs.length) return;
+      e.preventDefault();
+      addFiles(imgs);
+    });
+    el.composer.addEventListener("dragover", function (e) {
+      if (e.dataTransfer && Array.prototype.some.call(e.dataTransfer.types || [], function (t) { return t === "Files"; })) {
+        e.preventDefault();
+      }
+    });
+    el.composer.addEventListener("drop", function (e) {
+      if (!e.dataTransfer || !e.dataTransfer.files || !e.dataTransfer.files.length) return;
+      e.preventDefault();
+      addFiles(e.dataTransfer.files);
     });
     el.prompt.addEventListener("input", function () { autoGrow(); updateSendState(); });
     el.prompt.addEventListener("keydown", function (e) {
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         var v = el.prompt.value.trim();
-        if (v && !state.streaming) startTurn(v);
+        if ((v || hasAttach()) && !state.streaming) startTurn(v);
       }
     });
     el.stopBtn.addEventListener("click", stopAll);
