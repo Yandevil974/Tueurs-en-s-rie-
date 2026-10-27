@@ -681,6 +681,113 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 .md th { background: var(--panel); font-size: 0.84em; letter-spacing: 0.03em; text-transform: uppercase; color: var(--muted); }
 .md tr:last-child td { border-bottom: 0; }
 
+/* 9 bis. Tiroir : historique des conversations ------------------------------ */
+.drawer-scrim {
+  position: fixed; inset: 0; z-index: 88;
+  background: rgba(2, 3, 7, 0.6);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s;
+}
+.drawer-scrim.on { opacity: 1; visibility: visible; }
+.drawer {
+  position: fixed; z-index: 92; top: 0; left: 0; bottom: 0;
+  width: min(320px, 87vw);
+  display: flex; flex-direction: column;
+  background: var(--bg-2);
+  border-right: 1px solid var(--line);
+  box-shadow: 24px 0 64px rgba(0, 0, 0, 0.55);
+  transform: translateX(-102%);
+  visibility: hidden;
+  transition: transform 0.24s cubic-bezier(0.22, 0.61, 0.36, 1), visibility 0.24s;
+  padding-top: env(safe-area-inset-top);
+}
+.drawer.on { transform: none; visibility: visible; }
+.drawer-head {
+  display: flex; align-items: center; gap: 8px;
+  height: 58px; padding: 0 10px 0 16px; flex: none;
+  border-bottom: 1px solid var(--line);
+}
+.drawer-head h2 { margin: 0; font-size: 13px; font-weight: 700; letter-spacing: 0.02em; }
+.drawer-head .spacer { flex: 1; }
+.drawer-head .icon-btn { width: 32px; height: 32px; }
+.drawer-new {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 12px 14px 6px; height: 38px; flex: none;
+  border: 1px solid var(--line-2); border-radius: 11px;
+  background: var(--grad-soft); color: var(--text);
+  font: 600 12.5px/1 var(--sans); cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.drawer-new:hover { border-color: rgba(110, 242, 200, 0.5); }
+.drawer-new:active { transform: scale(0.985); }
+.drawer-search { margin: 8px 14px 4px; flex: none; position: relative; }
+.drawer-search .icon {
+  position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; color: var(--faint); pointer-events: none;
+}
+.drawer-search input {
+  width: 100%; height: 34px; padding: 0 10px 0 31px;
+  border: 1px solid var(--line); border-radius: 9px;
+  background: var(--panel); color: var(--text); font: 12.5px/1 var(--sans);
+}
+.drawer-search input:focus { outline: none; border-color: var(--line-2); background: var(--panel-2); }
+.drawer-list { flex: 1; overflow-y: auto; padding: 6px 8px 12px; overscroll-behavior: contain; }
+.chat-group {
+  margin: 10px 8px 4px; color: var(--faint);
+  font: 600 9.5px/1 var(--sans); letter-spacing: 0.12em; text-transform: uppercase;
+}
+.chat-row {
+  display: flex; align-items: stretch; gap: 2px;
+  border-radius: 10px; transition: background 0.13s ease;
+}
+.chat-row:hover { background: var(--panel); }
+.chat-row.on { background: var(--panel-2); box-shadow: inset 0 0 0 1px var(--line-2); }
+.chat-open {
+  flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px;
+  padding: 9px 8px 9px 10px; border: 0; border-radius: 10px;
+  background: transparent; color: var(--text); text-align: left; cursor: pointer;
+  font-family: var(--sans);
+}
+.chat-name {
+  display: block; font-size: 12.5px; font-weight: 550; line-height: 1.35;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.chat-row.on .chat-name { color: var(--mint); }
+.chat-meta {
+  display: flex; align-items: center; gap: 5px;
+  color: var(--faint); font: 10px/1 var(--mono);
+  overflow: hidden; white-space: nowrap;
+}
+.chat-meta .tag {
+  padding: 1px 5px; border-radius: 5px; border: 1px solid var(--line);
+  font: 9px/1.4 var(--sans); letter-spacing: 0.02em;
+}
+.chat-meta .tag.free { color: var(--free); border-color: rgba(74, 222, 128, 0.28); }
+.chat-meta .tag.paid { color: var(--paid); border-color: rgba(251, 191, 36, 0.28); }
+.chat-del {
+  flex: none; width: 30px; border: 0; border-radius: 9px; margin: 4px 4px 4px 0;
+  background: transparent; color: var(--faint); cursor: pointer;
+  display: grid; place-items: center; opacity: 0.45;
+  transition: opacity 0.13s ease, color 0.13s ease, background 0.13s ease;
+}
+.chat-row:hover .chat-del, .chat-row.on .chat-del { opacity: 1; }
+.chat-del:hover { color: var(--danger); background: rgba(251, 113, 133, 0.1); }
+.chat-del .icon { width: 14px; height: 14px; }
+.chat-empty { padding: 22px 16px; color: var(--faint); font-size: 12px; text-align: center; line-height: 1.6; }
+.drawer-foot {
+  flex: none; display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line); color: var(--faint); font-size: 10.5px;
+}
+.drawer-foot .spacer { flex: 1; }
+.drawer-foot button {
+  border: 0; background: none; color: var(--muted); cursor: pointer;
+  font: 11px/1 var(--sans); padding: 4px 2px;
+}
+.drawer-foot button:hover { color: var(--text); }
+body.drawer-open { overflow: hidden; }
+
 /* 10. Responsive / impression ----------------------------------------------- */
 @media (max-width: 900px) {
   .brand-tag { display: none; }
@@ -814,6 +921,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   <symbol id="i-thumb-up" viewBox="0 0 24 24"><path d="M7 10v10H4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h3Zm0 0 4.2-6.3a1.6 1.6 0 0 1 2.9 1V9h4.3a2 2 0 0 1 2 2.4l-1.3 6.6a2 2 0 0 1-2 1.6H7"/></symbol>
   <symbol id="i-thumb-down" viewBox="0 0 24 24"><path d="M17 14V4h3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-3Zm0 0-4.2 6.3a1.6 1.6 0 0 1-2.9-1V15H5.6a2 2 0 0 1-2-2.4l1.3-6.6a2 2 0 0 1 2-1.6H17"/></symbol>
   <symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h11"/></symbol>
   <symbol id="i-github" viewBox="0 0 24 24"><path d="M9 19c-4 1.5-4-2.5-6-3m12 5v-3.9a3.4 3.4 0 0 0-.9-2.6c3-.3 6.2-1.5 6.2-6.7A5.2 5.2 0 0 0 19 3.6a4.9 4.9 0 0 0-.1-3.6s-1.1-.3-3.7 1.4a12.7 12.7 0 0 0-6.4 0C6.2-.3 5.1 0 5.1 0A4.9 4.9 0 0 0 5 3.6 5.2 5.2 0 0 0 3.7 7.2c0 5.2 3.2 6.4 6.2 6.7a3.4 3.4 0 0 0-.9 2.6V21"/></symbol>
   <symbol id="i-google-drive" viewBox="0 0 24 24"><path d="m8 3 8 0 5 9-4 7H7l-4-7 5-9Z"/><path d="M8 3 12 10l8 2M16 3l-4 7 5 9M3 12h18"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M4 20c0-9 6-15 16-16 0 10-5 16-13 16"/><path d="M4 20c3-5 7-8 12-10"/></symbol>
@@ -823,7 +931,35 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 <a class="skip-link" href="#prompt">Aller au prompt</a>
 <div class="aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
 
+<div class="drawer-scrim" id="drawerScrim"></div>
+<aside class="drawer" id="drawer" aria-label="Historique des conversations" aria-hidden="true">
+  <div class="drawer-head">
+    <h2>Conversations</h2>
+    <span class="spacer"></span>
+    <button class="icon-btn" id="drawerClose" type="button" title="Fermer" aria-label="Fermer l'historique">
+      <svg class="icon lg" aria-hidden="true"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+  <button class="drawer-new" id="drawerNew" type="button">
+    <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+    Nouvelle conversation
+  </button>
+  <div class="drawer-search">
+    <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+    <input id="chatSearch" type="search" placeholder="Rechercher…" aria-label="Rechercher dans l'historique">
+  </div>
+  <div class="drawer-list" id="chatList" role="list"></div>
+  <div class="drawer-foot">
+    <span id="chatCount">0 conversation</span>
+    <span class="spacer"></span>
+    <button type="button" id="drawerBackup">Sauvegarde</button>
+  </div>
+</aside>
+
 <header class="topbar">
+  <button class="icon-btn" id="menuBtn" type="button" title="Historique des conversations" aria-label="Ouvrir l'historique" aria-expanded="false" aria-controls="drawer">
+    <svg class="icon lg" aria-hidden="true"><use href="#i-menu"></use></svg>
+  </button>
   <div class="brand">
     <span class="brand-mark" aria-hidden="true"><span>A</span></span>
     <span class="brand-name">ARENA//X</span>
@@ -845,7 +981,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       <span class="amount" id="creditsAmount">—</span>
       <span class="cap" id="creditsCap">crédits</span>
     </button>
-    <button class="icon-btn" id="newBtn" type="button" title="Nouvelle conversation" aria-label="Nouvelle conversation">
+    <button class="icon-btn hide-mobile" id="newBtn" type="button" title="Nouvelle conversation" aria-label="Nouvelle conversation">
       <svg class="icon lg" aria-hidden="true"><use href="#i-plus"></use></svg>
     </button>
     <button class="icon-btn" id="backupBtn" type="button" title="Sauvegardes JSON" aria-label="Sauvegardes JSON">
@@ -1278,6 +1414,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     settings: "arenax.settings.v3",
     keys: "arenax.keys.v3",
     chat: "arenax.chat.v3",
+    chats: "arenax.chats.v3",
     catalog: "arenax.catalog.v3",
     credits: "arenax.credits.v3",
     github: "arenax.github.v3"
@@ -1391,6 +1528,9 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     panelCustom: { free: false, paid: false },
     synths: { free: null, paid: null },
     turns: [],
+    chats: [],            /* historique : [{id, title, ts, updated, mode, style, turns}] */
+    currentId: null,      /* identifiant de la conversation ouverte */
+    chatQuery: "",
     settings: Object.assign({}, DEFAULTS),
     keys: { openrouter: "", management: "", groq: "" },
     catalog: [],
@@ -2254,11 +2394,175 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     storageSet(state.settings.remember ? localStorage : sessionStorage, LS.keys, state.keys);
   }
 
-  function loadChat() {
+  /* ---- Historique des conversations ------------------------------------- */
+  var MAX_CHATS = 24;           /* conversations conservées */
+  var MAX_CHAT_TURNS = 8;       /* échanges conservés par conversation inactive */
+  var MAX_ACTIVE_TURNS = 32;    /* échanges conservés pour la conversation ouverte */
+  var chatsTrimmed = false;     /* message affiché une seule fois quand on dépasse le quota */
+
+  function chatId() {
+    return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  }
+
+  function chatTitle(turns) {
+    var t = (turns && turns[0] && turns[0].prompt) || "";
+    t = String(t).replace(/\s+/g, " ").trim();
+    if (!t) return "Nouvelle conversation";
+    return t.length > 54 ? t.slice(0, 54).trim() + "…" : t;
+  }
+
+  function findChat(id) {
+    if (!id) return null;
+    for (var i = 0; i < state.chats.length; i++) {
+      if (state.chats[i].id === id) return state.chats[i];
+    }
+    return null;
+  }
+
+  /* Empreinte du contenu : sert à ne pas rafraîchir la date d'un échange inchangé. */
+  function turnsSig(turns) {
+    var last = turns[turns.length - 1];
+    var tail = last ? String(last.prompt || "").length + ":" + (last.synth ? (last.synth.status || "") + (last.synth.content || "").length : "-") : "";
+    return turns.length + "|" + (last ? last.id : "0") + "|" + tail;
+  }
+
+  function chatEntry(c) {
+    return {
+      id: c.id,
+      title: c.title || chatTitle(c.turns),
+      ts: Number(c.ts) || Date.now(),
+      updated: Number(c.updated) || Number(c.ts) || Date.now(),
+      mode: c.mode === "paid" ? "paid" : "free",
+      style: c.style === "solo" ? "solo" : "collab",
+      turns: c.turns || [],
+      sig: c.sig || turnsSig(c.turns || [])
+    };
+  }
+
+  /* Recopie la conversation ouverte dans l'historique, ou la retire si elle est vide. */
+  function syncCurrentChat() {
+    var c = findChat(state.currentId);
+    if (!state.turns.length) {
+      if (c) state.chats = state.chats.filter(function (x) { return x.id !== state.currentId; });
+      return;
+    }
+    if (!state.currentId) state.currentId = chatId();
+    c = findChat(state.currentId);
+    var sig = turnsSig(state.turns);
+    var entry = chatEntry({
+      id: state.currentId,
+      title: chatTitle(state.turns),
+      ts: c ? c.ts : Date.now(),
+      updated: (c && c.sig === sig) ? c.updated : Date.now(),
+      mode: state.mode,
+      style: state.style,
+      turns: state.turns,
+      sig: sig
+    });
+    if (c) {
+      state.chats = state.chats.map(function (x) { return x.id === entry.id ? entry : x; });
+    } else {
+      state.chats.unshift(entry);
+    }
+    state.chats.sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
+  }
+
+  function turnForStore(t) {
+    return {
+      id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo, solo: !!t.solo, degraded: !!t.degraded,
+      creditsAfter: t.creditsAfter, creditsUsed: t.creditsUsed, steps: t.steps,
+      drafts: (t.drafts || []).map(function (d) {
+        return { key: d.key, status: d.status, content: d.content, metrics: d.metrics, error: d.error };
+      }),
+      synth: t.synth ? {
+        key: t.synth.key, status: t.synth.status, content: t.synth.content,
+        metrics: t.synth.metrics, error: t.synth.error, vote: t.synth.vote, fallback: t.synth.fallback
+      } : null
+    };
+  }
+
+  function chatForStore(c, maxTurns) {
+    var e = chatEntry(c);
+    return {
+      id: e.id, title: e.title, ts: e.ts, updated: e.updated, mode: e.mode, style: e.style,
+      turns: e.turns.slice(-maxTurns).map(turnForStore)
+    };
+  }
+
+  function writeChats(list) {
+    try {
+      localStorage.setItem(LS.chats, JSON.stringify({ v: SCHEMA, current: state.currentId, list: list }));
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /* Écrit l'historique en réduisant progressivement si le stockage est plein. */
+  function saveChats() {
+    syncCurrentChat();
+    var total = Math.min(state.chats.length, MAX_CHATS);
+    /* Aucune conversation en mémoire : on ne touche pas au stockage, pour ne pas
+       effacer un historique qui n'aurait pas pu être relu (autre onglet, quota…). */
+    if (!total) return;
+    var keep = total;
+    var perChat = MAX_CHAT_TURNS;
+    var perActive = MAX_ACTIVE_TURNS;
+    for (var pass = 0; pass < 6; pass++) {
+      var list = state.chats.slice(0, keep).map(function (c) {
+        return chatForStore(c, c.id === state.currentId ? perActive : perChat);
+      });
+      if (writeChats(list)) {
+        if (keep < state.chats.length) {
+          state.chats = state.chats.slice(0, keep);
+          if (!chatsTrimmed) {
+            chatsTrimmed = true;
+            showToast("L'historique garde " + keep + " conversations : les plus anciennes ont été retirées.", "ok");
+          }
+        }
+        return;
+      }
+      if (keep > 1) keep = Math.max(1, Math.floor(keep / 2));
+      else if (perChat > 3) { perChat = 3; perActive = 8; }
+      else break;
+    }
+    showToast("Stockage plein : l'historique le plus ancien n'a pas pu être enregistré.", "err");
+  }
+
+  function loadChats() {
+    var box = storageGet(localStorage, LS.chats, null);
+    if (box && Array.isArray(box.list)) {
+      state.chats = box.list.map(function (c) {
+        if (!c || !c.id) return null;
+        var turns = sanitizeTurns(Array.isArray(c.turns) ? c.turns : []);
+        if (!turns.length) return null;
+        return chatEntry({
+          id: String(c.id), title: typeof c.title === "string" ? c.title.slice(0, 140) : "",
+          ts: c.ts, updated: c.updated, mode: c.mode, style: c.style, turns: turns
+        });
+      }).filter(Boolean);
+      state.chats.sort(function (a, b) { return (b.updated || 0) - (a.updated || 0); });
+      var cur = findChat(box.current) || state.chats[0] || null;
+      if (cur) {
+        state.currentId = cur.id;
+        state.turns = cur.turns;
+        if (cur.mode === "paid" || cur.mode === "free") state.mode = cur.mode;
+        if (cur.style === "solo" || cur.style === "collab") state.style = cur.style;
+      } else {
+        state.currentId = null;
+      }
+      return;
+    }
+    /* Migration : l'ancienne version ne gardait qu'une seule conversation. */
     var raw = storageGet(localStorage, LS.chat, null);
-    if (!raw || !Array.isArray(raw.turns) || !raw.turns.length) return;
-    state.turns = sanitizeTurns(raw.turns);
-    if (raw.mode === "paid" || raw.mode === "free") state.mode = raw.mode;
+    if (raw && Array.isArray(raw.turns) && raw.turns.length) {
+      state.currentId = chatId();
+      state.turns = sanitizeTurns(raw.turns);
+      if (raw.mode === "paid" || raw.mode === "free") state.mode = raw.mode;
+      syncCurrentChat();
+      saveChats();
+      try { localStorage.removeItem(LS.chat); } catch (e) { /* ignore */ }
+    }
   }
 
   function sanitizeResponse(r) {
@@ -2324,45 +2628,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
   }
 
   function persistChat() {
-    if (!state.turns.length) {
-      try { localStorage.removeItem(LS.chat); } catch (e) { /* ignore */ }
-      return;
-    }
-    var payload = {
-      v: SCHEMA,
-      mode: state.mode,
-      updated: Date.now(),
-      turns: state.turns.map(function (t) {
-        return {
-          id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo, solo: !!t.solo, degraded: !!t.degraded,
-          creditsAfter: t.creditsAfter, creditsUsed: t.creditsUsed, steps: t.steps,
-          drafts: t.drafts.map(function (d) {
-            return { key: d.key, status: d.status, content: d.content, metrics: d.metrics, error: d.error };
-          }),
-          synth: t.synth ? {
-            key: t.synth.key, status: t.synth.status, content: t.synth.content,
-            metrics: t.synth.metrics, error: t.synth.error, vote: t.synth.vote, fallback: t.synth.fallback
-          } : null
-        };
-      })
-    };
-    var text;
-    try { text = JSON.stringify(payload); } catch (e) { return; }
-    try {
-      localStorage.setItem(LS.chat, text);
-      return;
-    } catch (e) { /* quota */ }
-    var kept = state.turns.slice(-4);
-    try {
-      localStorage.setItem(LS.chat, JSON.stringify(Object.assign({}, payload, { turns: payload.turns.slice(-4) })));
-      if (kept.length < state.turns.length) {
-        state.turns = kept;
-        renderThread();
-        showToast("Stockage plein : seuls les 4 derniers échanges sont gardés.", "err");
-      }
-    } catch (e2) {
-      showToast("Historique trop lourd pour le stockage local.", "err");
-    }
+    saveChats();
+    renderHistory();
   }
   var saveTimer = 0;
   function saveChatSoon() {
@@ -2579,19 +2846,8 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
         free: state.synths.free,
         paid: state.synths.paid
       },
-      turns: state.turns.map(function (t) {
-        return {
-          id: t.id, ts: t.ts, mode: t.mode, prompt: t.prompt, demo: t.demo,
-          creditsAfter: t.creditsAfter, creditsUsed: t.creditsUsed, steps: t.steps,
-          drafts: t.drafts.map(function (d) {
-            return { key: d.key, status: d.status, content: d.content, metrics: d.metrics, error: d.error };
-          }),
-          synth: t.synth ? {
-            key: t.synth.key, status: t.synth.status, content: t.synth.content,
-            metrics: t.synth.metrics, error: t.synth.error, vote: t.synth.vote, fallback: t.synth.fallback
-          } : null
-        };
-      })
+      turns: state.turns.map(turnForStore),
+      chats: state.chats.map(function (c) { return chatForStore(c, MAX_ACTIVE_TURNS); })
     };
   }
 
@@ -2690,7 +2946,23 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       if (typeof data.synths.paid === "string") state.synths.paid = data.synths.paid;
     }
     if (Array.isArray(data.turns)) {
+      if (state.turns.length) state.currentId = chatId();
       state.turns = sanitizeTurns(data.turns);
+    }
+    if (Array.isArray(data.chats)) {
+      var restored = data.chats.map(function (c) {
+        if (!c || !c.id) return null;
+        var turns = sanitizeTurns(Array.isArray(c.turns) ? c.turns : []);
+        if (!turns.length) return null;
+        return chatEntry({ id: String(c.id), title: c.title, ts: c.ts, updated: c.updated, mode: c.mode, style: c.style, turns: turns });
+      }).filter(Boolean);
+      if (restored.length) {
+        state.chats = restored;
+        var first = restored[0];
+        state.currentId = first.id;
+        state.turns = first.turns;
+        if (first.mode === "paid" || first.mode === "free") state.mode = first.mode;
+      }
     }
     ensurePanels();
     applyTheme(state.settings.theme);
@@ -3526,6 +3798,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
   function renderAll() {
     syncModeButtons();
+    renderHistory();
     renderPanelbar();
     renderThread();
     renderCredits();
@@ -4628,17 +4901,194 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     }
   }
 
+  /* ---- Tiroir latéral : historique des conversations --------------------- */
+  var drawerOpenFlag = false;
+
+  function relTime(ts) {
+    var diff = Date.now() - (Number(ts) || 0);
+    if (diff < 60000) return "à l'instant";
+    var min = Math.floor(diff / 60000);
+    if (min < 60) return "il y a " + min + " min";
+    var h = Math.floor(min / 60);
+    if (h < 24 && new Date(ts).toDateString() === new Date().toDateString()) return "il y a " + h + " h";
+    var days = Math.floor(diff / 86400000);
+    var d = new Date(ts);
+    var hm = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    if (days < 1) return "hier, " + hm;
+    if (days < 7) return days + " j";
+    return d.toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  }
+
+  function chatGroup(ts) {
+    var now = new Date();
+    var d = new Date(Number(ts) || 0);
+    var startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    if (d.getTime() >= startToday) return "Aujourd'hui";
+    if (d.getTime() >= startToday - 86400000) return "Hier";
+    if (d.getTime() >= startToday - 7 * 86400000) return "7 derniers jours";
+    return "Plus ancien";
+  }
+
+  function chatMatches(c, q) {
+    if (!q) return true;
+    if (String(c.title || "").toLowerCase().indexOf(q) !== -1) return true;
+    for (var i = 0; i < c.turns.length; i++) {
+      if (String(c.turns[i].prompt || "").toLowerCase().indexOf(q) !== -1) return true;
+      var syn = c.turns[i].synth && c.turns[i].synth.content;
+      if (syn && String(syn).toLowerCase().indexOf(q) !== -1) return true;
+    }
+    return false;
+  }
+
+  function renderHistory() {
+    if (!el.chatList) return;
+    syncCurrentChat();
+    var q = String(state.chatQuery || "").trim().toLowerCase();
+    var items = state.chats.filter(function (c) { return chatMatches(c, q); });
+    el.chatList.textContent = "";
+    if (!items.length) {
+      var empty = document.createElement("p");
+      empty.className = "chat-empty";
+      empty.textContent = q ? "Aucune conversation ne contient « " + state.chatQuery.trim() + " »." :
+        "Aucune conversation enregistrée. Pose une question : elle apparaîtra ici.";
+      el.chatList.appendChild(empty);
+    } else {
+      var group = "";
+      items.forEach(function (c) {
+        var g = chatGroup(c.updated || c.ts);
+        if (g !== group) {
+          group = g;
+          var head = document.createElement("div");
+          head.className = "chat-group";
+          head.textContent = g;
+          el.chatList.appendChild(head);
+        }
+        el.chatList.appendChild(chatRow(c));
+      });
+    }
+    var n = state.chats.length;
+    el.chatCount.textContent = n + (n > 1 ? " conversations" : " conversation");
+  }
+
+  function chatRow(c) {
+    var row = document.createElement("div");
+    row.className = "chat-row" + (c.id === state.currentId ? " on" : "");
+    row.setAttribute("role", "listitem");
+
+    var open = document.createElement("button");
+    open.type = "button";
+    open.className = "chat-open";
+    open.title = c.title || "Conversation";
+    var name = document.createElement("span");
+    name.className = "chat-name";
+    name.textContent = c.title || "Conversation";
+    var meta = document.createElement("span");
+    meta.className = "chat-meta";
+    var tag = document.createElement("span");
+    tag.className = "tag " + (c.mode === "paid" ? "paid" : "free");
+    tag.textContent = c.mode === "paid" ? "premium" : "gratuit";
+    meta.appendChild(tag);
+    var turnsLabel = document.createElement("span");
+    turnsLabel.textContent = c.turns.length + (c.turns.length > 1 ? " échanges · " : " échange · ") + relTime(c.updated || c.ts);
+    meta.appendChild(turnsLabel);
+    open.appendChild(name);
+    open.appendChild(meta);
+    open.addEventListener("click", function () { selectChat(c.id); });
+
+    var del = document.createElement("button");
+    del.type = "button";
+    del.className = "chat-del";
+    del.title = "Supprimer cette conversation";
+    del.setAttribute("aria-label", "Supprimer " + (c.title || "cette conversation"));
+    del.innerHTML = '<svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>';
+    del.addEventListener("click", function (e) { e.stopPropagation(); deleteChat(c.id); });
+
+    row.appendChild(open);
+    row.appendChild(del);
+    return row;
+  }
+
+  function setDrawer(open) {
+    if (!el.drawer) return;
+    drawerOpenFlag = !!open;
+    el.drawer.classList.toggle("on", drawerOpenFlag);
+    el.drawerScrim.classList.toggle("on", drawerOpenFlag);
+    el.drawer.setAttribute("aria-hidden", drawerOpenFlag ? "false" : "true");
+    document.body.classList.toggle("drawer-open", drawerOpenFlag);
+    el.menuBtn.setAttribute("aria-expanded", drawerOpenFlag ? "true" : "false");
+  }
+
+  function openDrawer() {
+    renderHistory();
+    setDrawer(true);
+    setTimeout(function () { if (el.chatSearch) el.chatSearch.focus({ preventScroll: true }); }, 220);
+  }
+
+  function closeDrawer() {
+    setDrawer(false);
+    if (el.menuBtn) el.menuBtn.focus({ preventScroll: true });
+  }
+
+  function selectChat(id) {
+    var c = findChat(id);
+    if (!c) return;
+    if (state.streaming) { showToast("Attends la fin de la manche avant de changer de conversation."); return; }
+    if (c.id === state.currentId) { closeDrawer(); return; }
+    saveChats();
+    state.currentId = c.id;
+    state.turns = c.turns;
+    if (c.mode === "paid" || c.mode === "free") state.mode = c.mode;
+    if (c.style === "solo" || c.style === "collab") { state.style = c.style; state.pending.style = c.style; }
+    state.ui.openDrafts.clear();
+    syncModeButtons();
+    if (typeof syncStyleButtons === "function") syncStyleButtons();
+    renderThread();
+    renderPanelbar();
+    updateSendState();
+    saveChats();
+    renderHistory();
+    closeDrawer();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    showToast("Conversation ouverte : " + (c.title || "sans titre"), "ok");
+  }
+
+  function deleteChat(id) {
+    var c = findChat(id);
+    if (!c) return;
+    if (!window.confirm("Supprimer « " + (c.title || "cette conversation") + " » ? Cette action est définitive.")) return;
+    state.chats = state.chats.filter(function (x) { return x.id !== id; });
+    if (!state.chats.length) {
+      try { localStorage.removeItem(LS.chats); } catch (e) { /* ignore */ }
+    }
+    if (state.currentId === id) {
+      state.controllers.forEach(function (x) { try { x.abort(); } catch (e) { /* ignore */ } });
+      state.controllers.clear();
+      state.streaming = false;
+      state.currentId = null;
+      state.turns = [];
+      state.ui.openDrafts.clear();
+      renderThread();
+      updateSendState();
+    }
+    saveChats();
+    renderHistory();
+    showToast("Conversation supprimée.", "ok");
+  }
+
   function newChat() {
-    if (!state.turns.length) { focusPrompt(); return; }
-    if (!window.confirm("Effacer la conversation ? Le panneau, les clés et les sauvegardes sont conservés.")) return;
+    if (state.streaming) { showToast("Attends la fin de la manche avant d'ouvrir une autre conversation."); return; }
+    if (state.turns.length) persistChat();
     state.controllers.forEach(function (c) { try { c.abort(); } catch (e) { /* ignore */ } });
     state.controllers.clear();
     state.streaming = false;
     state.turns = [];
+    state.currentId = null;
     state.ui.openDrafts.clear();
-    try { localStorage.removeItem(LS.chat); } catch (e) { /* ignore */ }
+    saveChats();
     renderThread();
     updateSendState();
+    renderHistory();
+    if (drawerOpenFlag) closeDrawer();
     window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(focusPrompt, 250);
   }
@@ -5203,6 +5653,15 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
     el.creditsAmount = $("#creditsAmount");
     el.creditsCap = $("#creditsCap");
     el.newBtn = $("#newBtn");
+    el.menuBtn = $("#menuBtn");
+    el.drawer = $("#drawer");
+    el.drawerScrim = $("#drawerScrim");
+    el.drawerClose = $("#drawerClose");
+    el.drawerNew = $("#drawerNew");
+    el.drawerBackup = $("#drawerBackup");
+    el.chatList = $("#chatList");
+    el.chatCount = $("#chatCount");
+    el.chatSearch = $("#chatSearch");
     el.backupBtn = $("#backupBtn");
     el.themeBtn = $("#themeBtn");
     el.settingsBtn = $("#settingsBtn");
@@ -5299,6 +5758,22 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
 
     el.creditsBtn.addEventListener("click", openCredits);
     el.newBtn.addEventListener("click", newChat);
+    if (el.menuBtn) el.menuBtn.addEventListener("click", function () { drawerOpenFlag ? closeDrawer() : openDrawer(); });
+    if (el.drawerClose) el.drawerClose.addEventListener("click", closeDrawer);
+    if (el.drawerScrim) el.drawerScrim.addEventListener("click", closeDrawer);
+    if (el.drawerNew) el.drawerNew.addEventListener("click", newChat);
+    if (el.drawerBackup) el.drawerBackup.addEventListener("click", function () { closeDrawer(); openBackup(); });
+    if (el.chatSearch) el.chatSearch.addEventListener("input", function () {
+      state.chatQuery = el.chatSearch.value;
+      renderHistory();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && drawerOpenFlag) { e.preventDefault(); closeDrawer(); }
+      if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === "h" || e.key === "H")) {
+        e.preventDefault();
+        drawerOpenFlag ? closeDrawer() : openDrawer();
+      }
+    });
     el.backupBtn.addEventListener("click", openBackup);
     el.themeBtn.addEventListener("click", toggleTheme);
     el.settingsBtn.addEventListener("click", function () { renderSettingsDialog(); openDialog(el.settingsDlg); });
@@ -5564,7 +6039,7 @@ dialog::backdrop { background: rgba(2, 3, 7, 0.7); -webkit-backdrop-filter: blur
       state.catalogSource = "repli";
     }
     ensurePanels();
-    loadChat();
+    loadChats();
     state.credits = state.creditsCache && state.creditsCache.at ? state.creditsCache : null;
     applyTheme(state.settings.theme);
     buildExamples();

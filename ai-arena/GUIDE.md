@@ -304,6 +304,47 @@ PUT  /repos/{repo}/contents/{path}                → { message, content (base64
 
 ---
 
+## 5 quater. Historique : plusieurs conversations, un tiroir à gauche
+
+L'application garde désormais **plusieurs conversations**, listées dans un tiroir qui
+s'ouvre par le bouton hamburger en haut à gauche (ou `Ctrl` + `Maj` + `H`).
+
+```
+arenax.chats.v3 = {
+  v: 3,
+  current: "cmvq…",                    // conversation ouverte
+  list: [{ id, title, ts, updated, mode, style, turns: [ … ] }, …]
+}
+```
+
+- **Migration silencieuse** : au premier démarrage de cette version, l'ancienne clé unique
+  `arenax.chat.v3` est convertie en une conversation, puis supprimée. Rien à faire à la main.
+- **Titre = premier prompt** (54 caractères max, tronqué proprement) : pas de titre inventé
+  par un modèle, donc pas d'appel payant rien que pour nommer un fil.
+- **Date honnête** : `turnsSig()` (nombre d'échanges + identifiant et taille de la dernière
+  réponse) décide si `updated` bouge. Un simple rendu de l'interface ne fait pas remonter
+  une conversation dans la liste.
+- **Volumes** : 24 conversations, 8 échanges pour les conversations fermées, 32 pour celle
+  qui est ouverte. Si le quota du navigateur est atteint, l'écriture réessaie en divisant
+  le nombre de conversations puis le nombre d'échanges, et prévient une seule fois.
+  Aucune écriture n'est tentée quand la mémoire est vide : un état transitoire ne peut pas
+  effacer un historique relu partiellement.
+- **Ce qui est sauvegardé** : conversation ouverte (identifiant + mode + style), puis
+  réouverture directe au rechargement. Supprimer demande confirmation et est définitif ;
+  il n'y a pas encore de renommage.
+- **Sauvegarde JSON** : `backupPayload()` ajoute `chats` (toutes les conversations) à côté
+  de `turns` (la conversation ouverte, conservé pour la compatibilité). Une restauration
+  qui contient `chats` remplace l'historique, sinon l'ancien format reste accepté.
+- **Pourquoi `localStorage` et pas IndexedDB** : l'écriture est synchrone, donc un
+  `pagehide` sur Android peut sauver la dernière réponse ; pas de transaction à gérer,
+  pas de dépendance, et le fichier reste unique.
+
+Le tiroir est du HTML simple (`aside#drawer` + `div#drawerScrim`), animé par
+`transform: translateX()`, refermé par le voile, `Échap` ou la croix. Sur mobile, la barre
+du haut ne garde que le hamburger (le bouton « + » y est masqué) pour ne pas la surcharger.
+
+---
+
 ## 6. Passer en production (site public)
 
 Un fichier statique ne peut pas cacher une clé. Le schéma minimal :
