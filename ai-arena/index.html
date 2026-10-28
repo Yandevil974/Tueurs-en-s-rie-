@@ -1994,12 +1994,19 @@ body.drawer-open { overflow: hidden; }
      du catalogue, la suivante prend sa place (pas de panneau vide). */
   var AVOID_MODEL = /safeguard|content[-_. ]?safety|whisper|\btts\b|orpheus|lyria|embed|rerank|guard/i;
 
+  /* Gratuit, classé par indice AA v4.3.2 (une seule échelle) :
+     Qwen3.8 27B 34 > Inkling 25 > Nemotron 3 Ultra 22,9 > gpt-oss-120b 11,6.
+     Qwen3.8 27B est donc la SYNTHÈSE par défaut (il rédige), et il ne figure
+     pas dans les brouillons : bestModels() écarte un modèle déjà pris, il ne
+     faut pas qu'il soit consommé avant la synthèse. Le routeur gratuit ne sert
+     plus de synthèse par défaut : il tire un modèle au hasard à chaque appel. */
   var BEST_FREE_DRAFTS = [
-    /gpt-oss-120b/i, /qwen3\.8-27b/i, /nemotron[^/]*ultra/i,
-    /inkling(?!.*small)/i, /gemma-4-31b/i, /nemotron-3-super/i, /gpt-oss-20b/i
+    /nemotron[^/]*ultra/i, /gpt-oss-120b/i, /gemma-4-31b/i,
+    /inkling(?!.*small)/i, /nemotron-3-super/i, /gemma-4-26b/i, /gpt-oss-20b/i
   ];
-  var BEST_FREE_SYNTH = [/openrouter\/free/i, /inkling(?!.*small)/i, /gpt-oss-120b/i];
-  var BEST_FREE_SOLO = [/gpt-oss-120b/i, /qwen3\.8-27b/i, /nemotron[^/]*ultra/i];
+  var BEST_FREE_SYNTH = [/qwen3\.8-27b/i, /gemma-4-31b/i, /nemotron[^/]*ultra/i, /openrouter\/free/i, /gpt-oss-120b/i];
+  /* Solo gratuit : Qwen3.8 27B sur Groq, pas le routeur (aléatoire) ni gpt-oss-120b (indice 12). */
+  var BEST_FREE_SOLO = [/qwen3\.8-27b/i, /gemma-4-31b/i, /nemotron[^/]*ultra/i, /gpt-oss-120b/i];
 
   /* Photo jointe : on garde les modèles qui lisent l'image ET qui restent bons.
      Gratuit = Gemma 4 31B (262K, image + vidéo) puis Nemotron Omni (image,

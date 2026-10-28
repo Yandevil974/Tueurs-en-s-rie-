@@ -264,10 +264,19 @@ state.style = "collab"                 state.style = "solo"
   onglets Brouillons/Synthèse ainsi que les presets disparaissent — pas de bouton inutile.
 - **Catalogue piloté par les clés** : `pools()` masque un fournisseur dont la clé est absente
   (sauf si aucune clé n'existe, pour garder la démo utilisable). Le panneau gratuit par
-  défaut privilégie **2 modèles Groq + le routeur `openrouter/free` en synthèse** (un Groq
-  prend le relais sans clé OpenRouter). Avec une clé Groq seule, on reste à 2 brouillons +
-  1 synthèse (palier 8 000 tokens/minute) et `ensurePanels()` revalide brouillons, synthèse
-  **et** modèle solo après chaque changement de clé.
+  défaut prend **quatre brouillons répartis sur les deux fournisseurs** (Nemotron 3 Ultra,
+  Gemma 4 31B et Inkling sur OpenRouter, gpt-oss-120b sur Groq) et **Qwen3.8 27B · Groq
+  en synthèse**. Avec une clé Groq seule, on reste à 2 brouillons + 1 synthèse (palier
+  8 000 tokens/minute) et `ensurePanels()` revalide brouillons, synthèse **et** modèle solo
+  après chaque changement de clé.
+- **Pourquoi Qwen3.8 27B et pas le routeur gratuit** : `openrouter/free` n'est pas un modèle,
+  c'est un **routeur qui tire un modèle libre au hasard** à chaque requête (en filtrant sur
+  les capacités demandées). Deux questions identiques peuvent donc recevoir deux qualités
+  très différentes, et la limite est de **50 requêtes par jour** (1 000 après 10 $ de crédits
+  achetés une fois) contre ~1 000 par jour chez Groq. Qwen3.8 27B est en plus le mieux noté
+  des modèles gratuits : **34** sur l'indice AA v4.3.2, contre 12 pour gpt-oss-120b, 25 pour
+  Inkling et 22,9 pour Nemotron 3 Ultra. Il reste joignable à la main pour qui préfère le
+  routeur, et il est toujours utilisé en secours.
 - **Premium sans crédits = repli réel, pas démo** : `hasPaidAccess()` exige une clé
   OpenRouter et, si le solde est connu, un solde > 0. Sinon `pools().paid` renvoie le roster
   gratuit, la manche porte `degraded: true` et l'interface affiche « premium non activé ».
