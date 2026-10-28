@@ -12,8 +12,11 @@
   (function () {
     try {
       var s = JSON.parse(localStorage.getItem("arenax.settings.v3") || "{}");
-      var t = s.theme || "dark";
+      /* ARÈNE par défaut ; une installation qui avait « sombre » y passe une fois. */
+      var t = s.theme || "arena";
+      if (t === "dark" && !s.arenaSeen) t = "arena";
       if (t === "auto") t = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+      if (t !== "light" && t !== "arena") t = "dark";
       document.documentElement.dataset.theme = t;
     } catch (e) {}
   })();
@@ -110,6 +113,133 @@ body {
 .aurora .a1 { width: 46vw; height: 46vw; min-width: 340px; min-height: 340px; left: -12vw; top: -16vw; background: radial-gradient(circle, rgba(110, 242, 200, 0.4), transparent 65%); animation: drift1 22s ease-in-out infinite alternate; }
 .aurora .a2 { width: 42vw; height: 42vw; min-width: 320px; min-height: 320px; right: -14vw; top: -10vw; background: radial-gradient(circle, rgba(167, 139, 250, 0.42), transparent 65%); animation: drift2 26s ease-in-out infinite alternate; }
 .aurora .a3 { width: 34vw; height: 34vw; min-width: 260px; min-height: 260px; left: 40vw; top: 34vh; background: radial-gradient(circle, rgba(125, 211, 252, 0.22), transparent 65%); animation: drift3 30s ease-in-out infinite alternate; }
+/* Thème ARÈNE — repris des captures du projet Zfold5 : fond nuit bleu, accent cyan,
+   tout en monospace, cadres 1 px et angles presque droits. */
+[data-theme="arena"] {
+  --bg: #03060b;
+  --bg-2: #050810;
+  --panel: rgba(102, 194, 220, 0.045);
+  --panel-2: rgba(102, 194, 220, 0.085);
+  --panel-solid: #050a11;
+  --glass: rgba(3, 6, 11, 0.88);
+  --line: rgba(102, 194, 220, 0.20);
+  --line-2: rgba(102, 194, 220, 0.42);
+  --line-soft: rgba(102, 194, 220, 0.09);
+  --text: #e8f0f8;
+  --muted: #b0b8c0;
+  --faint: #6b7480;
+  --mint: #66c2dc;
+  --sky: #7fd0e6;
+  --violet: #93a9c8;
+  --amber: #d8b86a;
+  --rose: #e0798b;
+  --free: #66c2dc;
+  --paid: #d8b86a;
+  --danger: #e0798b;
+  --on-accent: #04121a;
+  --grad: linear-gradient(180deg, #66c2dc 0%, #57b3cd 100%);
+  --grad-soft: linear-gradient(180deg, rgba(102, 194, 220, 0.12), rgba(102, 194, 220, 0.035));
+  --shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.9);
+  --radius: 5px;
+  --radius-sm: 4px;
+  --mono: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  --sans: ui-monospace, "SF Mono", "Roboto Mono", "DejaVu Sans Mono", Menlo, Consolas, monospace;
+}
+[data-theme="arena"] .aurora { display: none; }
+[data-theme="arena"] body::before { background-image: radial-gradient(rgba(102, 194, 220, 0.07) 1px, transparent 1px); }
+[data-theme="arena"] .btn,
+[data-theme="arena"] .btn.sm,
+[data-theme="arena"] .icon-btn,
+[data-theme="arena"] .credits-chip,
+[data-theme="arena"] .mode-switch,
+[data-theme="arena"] .mode-btn,
+[data-theme="arena"] .composer-box,
+[data-theme="arena"] .hero-card,
+[data-theme="arena"] .hero-card .tag,
+[data-theme="arena"] .turn,
+[data-theme="arena"] .collab,
+[data-theme="arena"] .you,
+[data-theme="arena"] .you-file,
+[data-theme="arena"] .you-shots img,
+[data-theme="arena"] .synth,
+[data-theme="arena"] .draft,
+[data-theme="arena"] .drafts-toggle,
+[data-theme="arena"] .panelbar,
+[data-theme="arena"] .dlg-card,
+[data-theme="arena"] .model-row,
+[data-theme="arena"] .model-row .checkmark,
+[data-theme="arena"] .model-row .vis,
+[data-theme="arena"] .notice,
+[data-theme="arena"] .seg,
+[data-theme="arena"] .seg button,
+[data-theme="arena"] .search-wrap input,
+[data-theme="arena"] .attach-chip,
+[data-theme="arena"] .attach-btn,
+[data-theme="arena"] .attach-x,
+[data-theme="arena"] .chat-row,
+[data-theme="arena"] .chat-open,
+[data-theme="arena"] .drawer-search input,
+[data-theme="arena"] .drawer-new,
+[data-theme="arena"] .backup-status,
+[data-theme="arena"] .backup-option,
+[data-theme="arena"] .credit-hero,
+[data-theme="arena"] .stat,
+[data-theme="arena"] .field input,
+[data-theme="arena"] .field select,
+[data-theme="arena"] .field textarea,
+[data-theme="arena"] .key-state,
+[data-theme="arena"] .avatar,
+[data-theme="arena"] .brand-mark { border-radius: 4px; }
+[data-theme="arena"] .brand-name,
+[data-theme="arena"] .turn-tag,
+[data-theme="arena"] .chat-group,
+[data-theme="arena"] .you-mark,
+[data-theme="arena"] .field-label,
+[data-theme="arena"] .drawer-head h2 { text-transform: uppercase; letter-spacing: 0.13em; }
+[data-theme="arena"] .heyebrow, [data-theme="arena"] .eyebrow { letter-spacing: 0.16em; }
+[data-theme="arena"] .send,
+[data-theme="arena"] .btn.accent { box-shadow: none; }
+[data-theme="arena"] .send { border-radius: 4px; }
+[data-theme="arena"] .send:hover, [data-theme="arena"] .btn:hover { transform: none; }
+[data-theme="arena"] .topbar { border-bottom: 1px solid var(--line); }
+[data-theme="arena"] .md code, [data-theme="arena"] .md .code, [data-theme="arena"] .md .tbl { border-radius: 3px; }
+/* Dans ARÈNE, les pastilles de modèle sont des carrés cyan, pas des dégradés. */
+[data-theme="arena"] .avatar,
+[data-theme="arena"] .avatar[data-tone="1"],
+[data-theme="arena"] .avatar[data-tone="2"],
+[data-theme="arena"] .avatar[data-tone="3"],
+[data-theme="arena"] .avatar[data-tone="4"],
+[data-theme="arena"] .avatar[data-tone="5"] {
+  background: rgba(102, 194, 220, 0.12);
+  color: var(--mint);
+  border: 1px solid rgba(102, 194, 220, 0.45);
+  box-shadow: none;
+  border-radius: 3px;
+}
+[data-theme="arena"] .avatar.dim { filter: none; opacity: 0.45; }
+[data-theme="arena"] .composer-box:focus-within { border-color: var(--line-2); box-shadow: none; }
+[data-theme="arena"] .send[disabled] { opacity: 0.35; }
+[data-theme="arena"] .step .n { border-radius: 3px; }
+[data-theme="arena"] .credit-hero { background: var(--panel); }
+[data-theme="arena"] .panelbar,
+[data-theme="arena"] .collab,
+[data-theme="arena"] .you { box-shadow: none; }
+[data-theme="arena"] .aurora i { display: none; }
+/* La réponse finale : cadre cyan net, sans liseré dégradé ni halo. */
+[data-theme="arena"] .synth {
+  background: var(--panel-solid);
+  border: 1px solid rgba(102, 194, 220, 0.55);
+  box-shadow: none;
+}
+[data-theme="arena"] .synth.is-error { background: var(--panel-solid); border-color: rgba(224, 121, 139, 0.55); }
+[data-theme="arena"] .synth-label { border-color: rgba(102, 194, 220, 0.5); border-radius: 3px; }
+[data-theme="arena"] .step { border-radius: 3px; }
+[data-theme="arena"] .step[data-state="run"] { border-color: rgba(102, 194, 220, 0.5); }
+[data-theme="arena"] .step[data-state="run"] .n { background: rgba(102, 194, 220, 0.16); }
+[data-theme="arena"] .turn-tag { border-radius: 3px; }
+[data-theme="arena"] .draft.is-streaming { border-color: rgba(102, 194, 220, 0.5); }
+[data-theme="arena"] .eyebrow .spark { text-shadow: none; }
+[data-theme="arena"] ::selection { background: rgba(102, 194, 220, 0.3); }
 [data-theme="light"] .aurora i { opacity: 0.34; filter: blur(100px); }
 @keyframes drift1 { to { transform: translate3d(6vw, 5vh, 0) scale(1.08); } }
 @keyframes drift2 { to { transform: translate3d(-5vw, 7vh, 0) scale(1.12); } }
@@ -1289,6 +1419,7 @@ body.drawer-open { overflow: hidden; }
           <label for="themeSelect">Thème</label>
           <select id="themeSelect">
             <option value="dark">Sombre</option>
+            <option value="arena">ARÈNE — cyan monospace</option>
             <option value="light">Clair</option>
             <option value="auto">Système</option>
           </select>
@@ -1509,7 +1640,7 @@ body.drawer-open { overflow: hidden; }
     maxTokens: 1024,
     system: DEFAULT_SYSTEM,
     remember: true,
-    theme: "dark",
+    theme: "arena",
     backup: { auto: true, minutes: 10 },
     mode: "free",
     style: "collab"
@@ -2474,6 +2605,7 @@ body.drawer-open { overflow: hidden; }
 
   /* 7. Clés / réglages / stockage ------------------------------------------ */
   function loadSettings() {
+    var migrateTheme = false;
     var raw = storageGet(localStorage, LS.settings, null);
     var s = raw && typeof raw === "object" ? raw : {};
     state.settings = Object.assign({}, DEFAULTS, s);
@@ -2481,7 +2613,14 @@ body.drawer-open { overflow: hidden; }
     state.settings.maxTokens = Math.round(clampNum(s.maxTokens, 128, 8192, DEFAULTS.maxTokens));
     state.settings.system = typeof s.system === "string" ? s.system.slice(0, 4000) : DEFAULTS.system;
     state.settings.remember = s.remember !== false;
-    state.settings.theme = ["dark", "light", "auto"].indexOf(s.theme) !== -1 ? s.theme : "dark";
+    state.settings.theme = ["dark", "light", "auto", "arena"].indexOf(s.theme) !== -1 ? s.theme : "arena";
+    /* Migration douce : l'ancien réglage « sombre » devient ARÈNE une seule fois,
+       puis le choix de l'utilisateur est respecté (drapeau arenaSeen). */
+    state.settings.arenaSeen = true;
+    if (state.settings.theme === "dark" && !s.arenaSeen) {
+      state.settings.theme = "arena";
+      migrateTheme = true;
+    }
     var b = s.backup && typeof s.backup === "object" ? s.backup : {};
     state.settings.backup = {
       auto: b.auto !== false,
@@ -2499,6 +2638,7 @@ body.drawer-open { overflow: hidden; }
     state.synths.paid = typeof s.synthPaid === "string" ? s.synthPaid : null;
     state.lastBackup = Number(s.lastBackup) || 0;
     state.creditsCache = storageGet(localStorage, LS.credits, null);
+    if (migrateTheme) persistSettings();
   }
 
   function persistSettings() {
@@ -2810,22 +2950,29 @@ body.drawer-open { overflow: hidden; }
 
   /* 8. Thème --------------------------------------------------------------- */
   var systemTheme = null;
+  var THEMES = ["dark", "arena", "light"];
   function applyTheme(pref) {
     var resolved = pref === "auto" ? (systemTheme || (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark")) : pref;
-    document.documentElement.dataset.theme = resolved === "light" ? "light" : "dark";
+    if (resolved !== "light" && resolved !== "arena") resolved = "dark";
+    document.documentElement.dataset.theme = resolved;
     var meta = $('meta[name="theme-color"]');
-    if (meta) meta.setAttribute("content", resolved === "light" ? "#f4f5f0" : "#05060a");
+    if (meta) meta.setAttribute("content", resolved === "light" ? "#f4f5f0" : resolved === "arena" ? "#03060b" : "#05060a");
     syncThemeIcon();
   }
   function syncThemeIcon() {
     if (!el.themeBtn) return;
-    var dark = document.documentElement.dataset.theme !== "light";
-    var label = dark ? "Passer en thème clair" : "Passer en thème sombre";
+    var cur = document.documentElement.dataset.theme || "dark";
+    var label = cur === "dark" ? "Thème : sombre — passer à ARÈNE" :
+      cur === "arena" ? "Thème : ARÈNE — passer au clair" : "Thème : clair — passer au sombre";
     el.themeBtn.title = label;
     el.themeBtn.setAttribute("aria-label", label);
   }
   function toggleTheme() {
-    var next = document.documentElement.dataset.theme === "light" ? "dark" : "light";
+    /* Le bouton fait le tour des trois thèmes : sombre → ARÈNE → clair. */
+    var cur = document.documentElement.dataset.theme || "dark";
+    var next = THEMES[(THEMES.indexOf(cur) + 1) % THEMES.length];
+    showToast(next === "arena" ? "Thème ARÈNE : cyan sur nuit, monospace." :
+      next === "light" ? "Thème clair." : "Thème sombre.", "ok");
     state.settings.theme = next;
     applyTheme(next);
     persistSettings();
@@ -3101,7 +3248,7 @@ body.drawer-open { overflow: hidden; }
       if (typeof s.temperature === "number") state.settings.temperature = clampNum(s.temperature, 0, 2, 0.7);
       if (typeof s.maxTokens === "number") state.settings.maxTokens = Math.round(clampNum(s.maxTokens, 128, 8192, 1024));
       if (typeof s.system === "string") state.settings.system = s.system.slice(0, 4000);
-      if (["dark", "light", "auto"].indexOf(s.theme) !== -1) state.settings.theme = s.theme;
+      if (["dark", "light", "auto", "arena"].indexOf(s.theme) !== -1) state.settings.theme = s.theme;
       if (s.backup && typeof s.backup === "object") {
         state.settings.backup.auto = s.backup.auto !== false;
         if ([5, 10, 30, 60].indexOf(Number(s.backup.minutes)) !== -1) state.settings.backup.minutes = Number(s.backup.minutes);
