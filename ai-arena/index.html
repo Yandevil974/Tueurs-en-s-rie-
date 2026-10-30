@@ -440,6 +440,8 @@ body:not(.has-chat) .panelbar, body:not(.has-chat) .empty { display: none; }
 .synth-foot { display: flex; align-items: center; gap: 6px 9px; flex-wrap: wrap; margin-top: 13px; padding-top: 10px; border-top: 1px solid var(--line-soft); color: var(--faint); font: 10px/1.5 var(--mono); }
 .synth-foot .sep { width: 2px; height: 2px; border-radius: 50%; background: var(--faint); opacity: 0.6; }
 .synth-foot .spacer { flex: 1; }
+.synth-foot .cut-note { color: var(--danger); }
+.synth-foot .cut-btn { height: 23px; padding: 0 9px; border-radius: 7px; font-size: 10.5px; }
 .synth-actions { display: flex; align-items: center; gap: 3px; }
 .synth-actions .icon-btn { width: 28px; height: 28px; border-radius: 8px; }
 .synth-actions .icon-btn.on { color: var(--free); background: rgba(74, 222, 128, 0.1); }
@@ -1268,7 +1270,7 @@ body.drawer-open { overflow: hidden; }
         </div>
         <div class="field">
           <label for="maxTokens">Longueur maximale des réponses (tokens)</label>
-          <input id="maxTokens" type="number" min="128" max="8192" step="128" value="1024">
+          <input id="maxTokens" type="number" min="128" max="8192" step="128" value="4096">
         </div>
         <div class="field">
           <label for="systemPrompt">Consigne du synthétiseur</label>
@@ -1506,7 +1508,8 @@ body.drawer-open { overflow: hidden; }
 
   var DEFAULTS = {
     temperature: 0.7,
-    maxTokens: 1024,
+    /* 1 024 coupait la moitié des réponses longues : 4 096 laisse finir. */
+    maxTokens: 4096,
     system: DEFAULT_SYSTEM,
     remember: true,
     theme: "dark",
@@ -2474,11 +2477,19 @@ body.drawer-open { overflow: hidden; }
 
   /* 7. Clés / réglages / stockage ------------------------------------------ */
   function loadSettings() {
+    var migrateBudget = false;
     var raw = storageGet(localStorage, LS.settings, null);
     var s = raw && typeof raw === "object" ? raw : {};
     state.settings = Object.assign({}, DEFAULTS, s);
     state.settings.temperature = clampNum(s.temperature, 0, 2, DEFAULTS.temperature);
     state.settings.maxTokens = Math.round(clampNum(s.maxTokens, 128, 8192, DEFAULTS.maxTokens));
+    /* Ancien plafond par défaut (1 024) : les réponses s'arrêtaient au milieu.
+       On le relève UNE fois, puis le réglage de l'utilisateur est respecté. */
+    if (state.settings.maxTokens <= 1024 && !s.budgetUp) {
+      state.settings.maxTokens = DEFAULTS.maxTokens;
+      migrateBudget = true;
+    }
+    state.settings.budgetUp = true;
     state.settings.system = typeof s.system === "string" ? s.system.slice(0, 4000) : DEFAULTS.system;
     state.settings.remember = s.remember !== false;
     state.settings.theme = ["dark", "light", "auto"].indexOf(s.theme) !== -1 ? s.theme : "dark";
@@ -2499,6 +2510,7 @@ body.drawer-open { overflow: hidden; }
     state.synths.paid = typeof s.synthPaid === "string" ? s.synthPaid : null;
     state.lastBackup = Number(s.lastBackup) || 0;
     state.creditsCache = storageGet(localStorage, LS.credits, null);
+    if (migrateBudget) persistSettings();
   }
 
   function persistSettings() {
@@ -3099,7 +3111,7 @@ body.drawer-open { overflow: hidden; }
     if (data.settings && typeof data.settings === "object") {
       var s = data.settings;
       if (typeof s.temperature === "number") state.settings.temperature = clampNum(s.temperature, 0, 2, 0.7);
-      if (typeof s.maxTokens === "number") state.settings.maxTokens = Math.round(clampNum(s.maxTokens, 128, 8192, 1024));
+      if (typeof s.maxTokens === "number") state.settings.maxTokens = Math.round(clampNum(s.maxTokens, 128, 8192, DEFAULTS.maxTokens));
       if (typeof s.system === "string") state.settings.system = s.system.slice(0, 4000);
       if (["dark", "light", "auto"].indexOf(s.theme) !== -1) state.settings.theme = s.theme;
       if (s.backup && typeof s.backup === "object") {
@@ -3549,6 +3561,20 @@ body.drawer-open { overflow: hidden; }
         usage.title = "Sans clé de gestion, OpenRouter ne donne que l'usage cumulé de la clé.";
         foot.appendChild(usage);
       }
+    }
+
+    /* Le modèle s'est arrêté sur la limite de longueur, même après reprise :
+       on le dit franchement et on propose la suite en un clic. */
+    if (synth.status === "done" && synth.metrics && synth.metrics.truncated) {
+      foot.appendChild(elem("span", "sep"));
+      var cut = elem("span", "cut-note", "coupée");
+      cut.title = "Le modèle a atteint la limite de longueur avant d'avoir fini.";
+      foot.appendChild(cut);
+      var more = elem("button", "btn cut-btn", "Continuer");
+      more.type = "button";
+      more.dataset.continueSynth = String(turn.id);
+      more.title = "Demander la suite exacte de la réponse.";
+      foot.appendChild(more);
     }
 
     foot.appendChild(elem("span", "spacer"));
@@ -4348,7 +4374,8 @@ body.drawer-open { overflow: hidden; }
       cost: cost,
       demo: !!args.demo,
       estimated: !usage,
-      truncated: args.finish === "length"
+      truncated: args.finish === "length",
+      resumes: Number(args.resumes) || 0
     };
   }
 
@@ -4479,29 +4506,107 @@ body.drawer-open { overflow: hidden; }
     else groqActive = Math.max(0, groqActive - 1);
   }
 
-  async function streamModel(model, messages, signal, onDelta, onReasoning) {
+  /* Une réponse coupée par la limite de longueur n'est pas une réponse.
+     On relance le modèle sur sa propre suite, deux fois au maximum, et on
+     recolle les morceaux sans que l'utilisateur voie la jointure. */
+  var CONTINUE_MAX = 2;
+  var CONTINUE_PROMPT = "Ta réponse précédente a été interrompue par la limite de longueur. " +
+    "Continue EXACTEMENT là où tu t'es arrêté : reprends au milieu de la phrase ou de la liste en cours, " +
+    "sans répéter ce qui est déjà écrit, sans préambule et sans repartir du début.";
+
+  /* Deux morceaux de texte mis bout à bout : sans cette règle, « partie1 » et
+     « partie2 » deviendraient « partie1partie2 ». */
+  function joinSep(a, b) {
+    if (!a || !b) return "";
+    var tail = a.charAt(a.length - 1);
+    var head = b.charAt(0);
+    var tight = /[0-9A-Za-zÀ-ÖØ-öø-ÿ.,;:!?)]/.test(tail) && /[0-9A-Za-zÀ-ÖØ-öø-ÿ(«]/.test(head);
+    return tight ? " " : "";
+  }
+
+  function resumeJoin(a, b) { return (a || "") + joinSep(a, b) + (b || ""); }
+
+  function sumUsage(a, b) {
+    if (!b) return a;
+    if (!a) return Object.assign({}, b);
+    var out = Object.assign({}, a);
+    ["prompt_tokens", "completion_tokens", "total_tokens"].forEach(function (k) {
+      if (typeof a[k] === "number" || typeof b[k] === "number") {
+        out[k] = (Number(a[k]) || 0) + (Number(b[k]) || 0);
+      }
+    });
+    if (typeof a.cost === "number" || typeof b.cost === "number") {
+      out.cost = (Number(a.cost) || 0) + (Number(b.cost) || 0);
+    }
+    return out;
+  }
+
+  async function streamComplete(model, messages, signal, onDelta, onReasoning, floor) {
+    var text = "";
+    var usage = null;
+    var finish = null;
+    var resumes = 0;
+    var msgs = messages;
+    for (var pass = 0; pass <= CONTINUE_MAX; pass++) {
+      /* Le texte s'accumule ici, et nulle part ailleurs : l'affichage reçoit
+         exactement ce qui est compté, séparateur de reprise compris. */
+      var pendingSep = pass > 0;
+      var seen = false;
+      var sink = function (chunk) {
+        if (!chunk) return;
+        if (pendingSep && !seen) {
+          seen = true;
+          var sep = joinSep(text, chunk);
+          if (sep) { text += sep; onDelta(sep); }
+        }
+        text += chunk;
+        onDelta(chunk);
+      };
+      var r = await streamModel(model, msgs, signal, sink, onReasoning, floor);
+      if (r) {
+        usage = sumUsage(usage, r.usage);
+        finish = r.finish;
+      }
+      if (!r || finish !== "length" || !text.trim() || pass === CONTINUE_MAX) break;
+      if (!String(r.text || "").trim()) break;
+      resumes++;
+      msgs = messages.concat([
+        { role: "assistant", content: text },
+        { role: "user", content: CONTINUE_PROMPT }
+      ]);
+    }
+    return { text: text, usage: usage, finish: finish, resumes: resumes };
+  }
+
+  async function streamModel(model, messages, signal, onDelta, onReasoning, floor) {
     var key = keyFor(model.provider);
     if (!key) throw new ApiError("Aucune clé " + providerLabel(model.provider) + ".", "", 0);
     if (model.provider === "groq") {
       await acquireGroq(signal);
       try {
         await acquireBudget(model, messages, signal);
-        return await streamModelInner(model, messages, signal, onDelta, onReasoning, key);
+        return await streamModelInner(model, messages, signal, onDelta, onReasoning, key, floor);
       } finally {
         releaseGroq();
       }
     }
-    return streamModelInner(model, messages, signal, onDelta, onReasoning, key);
+    return streamModelInner(model, messages, signal, onDelta, onReasoning, key, floor);
   }
   /* Budget de tokens. Les modèles de raisonnement (gpt-oss) consomment leur
      budget en réflexion AVANT d'écrire : sans marge la réponse revient vide. */
   var REASONING_HEADROOM = 1536;
 
-  function requestBody(model, messages, retry) {
+  /* Plancher de la réponse finale (synthèse et solo). Même si le réglage est
+     resté bas, la réponse qu'on lit ne doit pas s'arrêter en plein milieu ;
+     les brouillons, eux, n'ont pas de plancher : ils sont du matériau brut. */
+  var ANSWER_FLOOR = 4096;
+
+  function requestBody(model, messages, retry, floor) {
     var id = model.id || "";
     var os = /gpt-oss/i.test(id);
     var qwen3 = /qwen3/i.test(id);
-    var base = Math.max(256, Number(state.settings.maxTokens) || 1024);
+    var base = Math.max(256, Number(state.settings.maxTokens) || DEFAULTS.maxTokens);
+    if (floor) base = Math.max(base, floor);
     var budget = base + (os ? REASONING_HEADROOM : 0);
     if (retry) budget = Math.max(budget, 4096);
     var body = { model: model.id, messages: messages, stream: true, stream_options: { include_usage: true } };
@@ -4517,11 +4622,11 @@ body.drawer-open { overflow: hidden; }
     return body;
   }
 
-  async function streamModelInner(model, messages, signal, onDelta, onReasoning, key) {
+  async function streamModelInner(model, messages, signal, onDelta, onReasoning, key, floor) {
     var url = (model.provider === "groq" ? GROQ : OR) + "/chat/completions";
     var headers = { "Content-Type": "application/json", "Authorization": "Bearer " + key };
     if (model.provider === "openrouter") headers["X-Title"] = "ARENA//X";
-    var body = requestBody(model, messages, false);
+    var body = requestBody(model, messages, false, floor);
     var text = "";
     var reasoning = "";
     var usage = null;
@@ -4563,7 +4668,7 @@ body.drawer-open { overflow: hidden; }
           delete body.stream_options;
           delete body.reasoning_effort;
           delete body.include_reasoning;
-          body.max_tokens = Math.max(256, Number(state.settings.maxTokens) || 1024) + REASONING_HEADROOM;
+          body.max_tokens = Math.max(256, Number(state.settings.maxTokens) || DEFAULTS.maxTokens, floor || 0) + REASONING_HEADROOM;
           res = await call();
           if (!res.ok) throw httpError(res.status, await res.text());
         } else {
@@ -4595,7 +4700,7 @@ body.drawer-open { overflow: hidden; }
         finish = out.finish;
       }
       if (text.trim() || finish !== "length" || pass === 1) break;
-      body = requestBody(model, messages, true);
+      body = requestBody(model, messages, true, floor);
     }
     return { usage: usage, finish: finish, text: text, reasoning: reasoning };
   }
@@ -4767,17 +4872,65 @@ body.drawer-open { overflow: hidden; }
     });
   }
 
+  /* ── Mémoire du fil ──────────────────────────────────────────────────────
+     Sans elle, chaque question repartait de zéro : « et la deuxième ? »
+     n'avait aucun sens pour le modèle. On renvoie donc les derniers tours
+     sous forme de vraies paires user / assistant : la question posée, puis la
+     réponse finale qui a été affichée.
+
+     Les bornes sont volontairement basses. La limite gratuite de Groq est
+     d'environ 8 000 tokens par minute et elle est partagée par les quatre
+     brouillons ; un historique complet la ferait exploser et l'appli
+     attendrait des minutes avant chaque réponse. */
+  var HISTORY_DRAFTS_TURNS = 2;      /* brouillons : juste le fil immédiat */
+  var HISTORY_SYNTH_TURNS = 4;       /* la synthèse a besoin de plus de recul */
+  var HISTORY_Q_CHARS = 500;
+  var HISTORY_DRAFTS_A_CHARS = 900;
+  var HISTORY_SYNTH_A_CHARS = 1600;
+
+  /* La réponse qu'a vue l'utilisateur : la synthèse, ou à défaut le brouillon
+     le plus complet quand la synthèse a échoué. */
+  function turnAnswer(t) {
+    if (t.synth && t.synth.content && t.synth.status !== "error") return t.synth.content;
+    var best = (t.drafts || []).filter(function (d) {
+      return d.content && (d.status === "done" || d.status === "stopped");
+    }).sort(function (a, b) { return b.content.length - a.content.length; })[0];
+    return best ? best.content : "";
+  }
+
+  function historyMessages(turn, kind) {
+    var maxTurns = kind === "synth" ? HISTORY_SYNTH_TURNS : HISTORY_DRAFTS_TURNS;
+    var aChars = kind === "synth" ? HISTORY_SYNTH_A_CHARS : HISTORY_DRAFTS_A_CHARS;
+    var past = state.turns.filter(function (t) { return t.id < turn.id; });
+    var kept = [];
+    for (var i = past.length - 1; i >= 0 && kept.length < maxTurns; i--) {
+      if (!turnAnswer(past[i]).trim()) continue;
+      kept.unshift(past[i]);
+    }
+    var out = [];
+    kept.forEach(function (t) {
+      out.push({ role: "user", content: clip(String(t.prompt || "").trim(), HISTORY_Q_CHARS) });
+      out.push({ role: "assistant", content: clip(turnAnswer(t).trim(), aChars) });
+    });
+    return out;
+  }
+
+  function historyTokens(msgs) {
+    return msgs.reduce(function (n, m) { return n + estimateTokens(m.content) + 4; }, 0);
+  }
+
   function draftMessages(turn, model) {
-    return [
-      { role: "system", content: DRAFT_SYSTEM },
-      { role: "user", content: withImages(turn.prompt + fileBlock(turn), turn, model) }
-    ];
+    return [{ role: "system", content: DRAFT_SYSTEM }]
+      .concat(historyMessages(turn, "drafts"))
+      .concat([{ role: "user", content: withImages(turn.prompt + fileBlock(turn), turn, model) }]);
   }
 
   function synthMessages(turn, doneDrafts, model) {
     /* Le prompt de synthèse doit tenir sous la limite de 8 000 tokens/minute
-       de Groq : plus il y a de brouillons, plus chacun est raccourci. */
-    var per = Math.min(6000, Math.max(1200, Math.floor(7000 / Math.max(1, doneDrafts.length))));
+       de Groq : l'historique et les brouillons se partagent le même budget. */
+    var hist = historyMessages(turn, "synth");
+    var room = Math.max(2600, 7000 - historyTokens(hist));
+    var per = Math.min(6000, Math.max(900, Math.floor(room / Math.max(1, doneDrafts.length))));
     var blocks = doneDrafts.map(function (d) {
       var m = modelByKey(d.key);
       return "### " + (m ? m.name : d.key) + "\n" + clip(d.content, per);
@@ -4786,20 +4939,18 @@ body.drawer-open { overflow: hidden; }
       "\n\nRédige maintenant la réponse finale. Corrige les erreurs factuelles, fusionne les apports, " +
       "supprime les redites et les mentions des modèles. Réponds directement, en Markdown.";
     var system = (state.settings.system || "").trim() || DEFAULT_SYSTEM;
-    return [
-      { role: "system", content: system },
-      { role: "user", content: withImages(user, turn, model) }
-    ];
+    return [{ role: "system", content: system }]
+      .concat(hist)
+      .concat([{ role: "user", content: withImages(user, turn, model) }]);
   }
 
   var SOLO_SYSTEM = "Tu réponds directement à la question de l'utilisateur, seul, sans mentionner d'autres modèles ni de processus interne. Sois précis, structuré et utile. Utilise le Markdown quand c'est pertinent. Réponds dans la langue de la question.";
 
   function soloMessages(turn, model) {
     var system = (state.settings.system || "").trim() || SOLO_SYSTEM;
-    return [
-      { role: "system", content: system },
-      { role: "user", content: withImages(turn.prompt + fileBlock(turn), turn, model) }
-    ];
+    return [{ role: "system", content: system }]
+      .concat(historyMessages(turn, "synth"))
+      .concat([{ role: "user", content: withImages(turn.prompt + fileBlock(turn), turn, model) }]);
   }
 
   function demoSoloText(model, prompt) {
@@ -4843,6 +4994,7 @@ body.drawer-open { overflow: hidden; }
     var raw = "";
     var usage = null;
     var finish = null;
+    var resumes = 0;
     var frame = 0;
     var timeout = false;
     var messages = soloMessages(turn, model);
@@ -4875,8 +5027,8 @@ body.drawer-open { overflow: hidden; }
       if (demo) {
         await demoStream(demoSoloText(model, turn.prompt), ctrl.signal, onDelta);
       } else {
-        var r = await streamModel(model, messages, ctrl.signal, onDelta, onReasoning);
-        if (r) { usage = r.usage; finish = r.finish; }
+        var r = await streamComplete(model, messages, ctrl.signal, onDelta, onReasoning, ANSWER_FLOOR);
+        if (r) { usage = r.usage; finish = r.finish; resumes = r.resumes; }
       }
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
       if (!raw.trim()) {
@@ -4885,7 +5037,7 @@ body.drawer-open { overflow: hidden; }
       turn.synth = {
         key: key, status: "done", content: raw, metrics: computeMetrics({
           usage: usage, raw: raw, messages: messages, model: model,
-          t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish
+          t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish, resumes: resumes
         }), error: null, vote: null, solo: true, fallback: false
       };
     } catch (e) {
@@ -4895,7 +5047,7 @@ body.drawer-open { overflow: hidden; }
         turn.synth = {
           key: key, status: "stopped", content: raw, metrics: computeMetrics({
             usage: usage, raw: raw, messages: messages, model: model,
-            t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish
+            t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish, resumes: resumes
           }), error: null, vote: null, solo: true, fallback: false
         };
       } else {
@@ -5040,6 +5192,7 @@ body.drawer-open { overflow: hidden; }
     var raw = "";
     var usage = null;
     var finish = null;
+    var resumes = 0;
     var frame = 0;
     var timeout = false;
     var messages = synthMessages(turn, doneDrafts, model);
@@ -5072,8 +5225,8 @@ body.drawer-open { overflow: hidden; }
       if (demo) {
         await demoStream(demoSynthText(turn.prompt), ctrl.signal, onDelta);
       } else {
-        var r = await streamModel(model, messages, ctrl.signal, onDelta, onReasoning);
-        if (r) { usage = r.usage; finish = r.finish; }
+        var r = await streamComplete(model, messages, ctrl.signal, onDelta, onReasoning, ANSWER_FLOOR);
+        if (r) { usage = r.usage; finish = r.finish; resumes = r.resumes; }
       }
       if (frame) { cancelAnimationFrame(frame); frame = 0; }
       if (!raw.trim()) throw new ApiError("Synthèse vide.", "", 0);
@@ -5082,7 +5235,7 @@ body.drawer-open { overflow: hidden; }
         key: key, status: "done", content: raw, fallback: false, vote: null, error: null,
         metrics: computeMetrics({
           usage: usage, raw: raw, messages: messages, model: model,
-          t0: t0, firstAt: firstAt, end: end, demo: demo, finish: finish
+          t0: t0, firstAt: firstAt, end: end, demo: demo, finish: finish, resumes: resumes
         })
       };
       turn.steps.synth = "done";
@@ -5094,7 +5247,7 @@ body.drawer-open { overflow: hidden; }
           key: key, status: "stopped", content: raw, fallback: false, vote: null, error: null,
           metrics: computeMetrics({
             usage: usage, raw: raw, messages: messages, model: model,
-            t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish
+            t0: t0, firstAt: firstAt, end: performance.now(), demo: demo, finish: finish, resumes: resumes
           })
         };
         turn.steps.synth = "done";
@@ -5274,6 +5427,92 @@ body.drawer-open { overflow: hidden; }
     if (!state.controllers.size) return;
     state.controllers.forEach(function (c) { try { c.abort(); } catch (e) { /* ignore */ } });
     showToast("Génération interrompue.");
+  }
+
+  /* Reprise manuelle : on renvoie le contexte d'origine, la réponse déjà
+     écrite, puis la consigne de continuer. Le texte s'ajoute à la suite. */
+  function continueAnswer(turnId) {
+    if (state.streaming) { showToast("Une manche est déjà en cours."); return; }
+    var turn = state.turns.filter(function (t) { return t.id === turnId; })[0];
+    if (!turn || !turn.synth || !turn.synth.content || !turn.synth.content.trim()) return;
+    var model = modelByKey(turn.synth.key);
+    if (!model) { showToast("Modèle introuvable : relance la manche.", "err"); return; }
+    if (!keyFor(model.provider)) { showToast("Pas de clé pour ce modèle : impossible de continuer.", "err"); return; }
+
+    var base = turn.synth.content;
+    var doneDrafts = turn.drafts.filter(function (d) {
+      return (d.status === "done" || d.status === "stopped") && d.content.trim();
+    });
+    var messages = turn.solo ? soloMessages(turn, model) : synthMessages(turn, doneDrafts, model);
+    var convo = messages.concat([
+      { role: "assistant", content: base },
+      { role: "user", content: CONTINUE_PROMPT }
+    ]);
+
+    state.streaming = true;
+    updateSendState();
+    turn.synth.status = "streaming";
+    paintSynth(turn);
+
+    var ctrl = new AbortController();
+    state.controllers.set(turn.id + ":c", ctrl);
+    var t0 = performance.now();
+    var firstAt = 0;
+    var frame = 0;
+    var full = base;
+    var started = false;
+
+    function flush() {
+      frame = 0;
+      var root = turnEl(turn);
+      if (!root) return;
+      var body = root.querySelector(".synth-body");
+      if (body) body.textContent = plainStream(full);
+      follow();
+    }
+    function onDelta(t) {
+      if (!t) return;
+      if (!firstAt) firstAt = performance.now();
+      if (!started) { full = resumeJoin(full, t); started = true; }
+      else full += t;
+      if (!frame) frame = requestAnimationFrame(flush);
+    }
+
+    var prev = turn.synth.metrics || {};
+    streamComplete(model, convo, ctrl.signal, onDelta, null, ANSWER_FLOOR).then(function (r) {
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
+      var add = computeMetrics({
+        usage: r && r.usage, raw: full.slice(base.length), messages: convo, model: model,
+        t0: t0, firstAt: firstAt, end: performance.now(), demo: false,
+        finish: r ? r.finish : null, resumes: r ? r.resumes : 0
+      });
+      add.completionTokens = (prev.completionTokens || 0) + add.completionTokens;
+      add.cost = (prev.cost || 0) + add.cost;
+      add.resumes = (prev.resumes || 0) + (add.resumes || 0);
+      turn.synth = {
+        key: turn.synth.key, status: "done", content: full, metrics: add,
+        error: null, vote: turn.synth.vote, solo: !!turn.solo, fallback: false
+      };
+      showToast(add.truncated ? "La réponse a encore atteint la limite : clique de nouveau sur Continuer." : "Réponse complétée.", add.truncated ? "err" : "ok");
+    }).catch(function (e) {
+      if (frame) { cancelAnimationFrame(frame); frame = 0; }
+      turn.synth = {
+        key: turn.synth.key, status: "done", content: base, metrics: prev,
+        error: null, vote: turn.synth.vote, solo: !!turn.solo, fallback: false
+      };
+      if (e && e.name !== "AbortError") showToast("Reprise impossible : " + ((e && e.message) || "erreur réseau"), "err");
+    }).finally(function () {
+      state.streaming = false;
+      state.controllers.delete(turn.id + ":c");
+      updateSendState();
+      paintSynth(turn);
+      renderPanelbar();
+      persistChat();
+      saveChatSoon();
+      state.sessionSpend += (turn.synth.metrics && turn.synth.metrics.cost) || 0;
+      renderCredits();
+      maybeAutoBackup();
+    });
   }
 
   function retrySynth(turnId) {
@@ -5961,7 +6200,7 @@ body.drawer-open { overflow: hidden; }
     state.keys.groq = el.groqKey.value.trim();
     state.settings.remember = el.rememberKeys.checked;
     state.settings.temperature = Math.round(clampNum(parseFloat(el.temperature.value), 0, 2, 0.7) * 10) / 10;
-    state.settings.maxTokens = Math.round(clampNum(parseInt(el.maxTokens.value, 10), 128, 8192, 1024));
+    state.settings.maxTokens = Math.round(clampNum(parseInt(el.maxTokens.value, 10), 128, 8192, DEFAULTS.maxTokens));
     state.settings.system = el.systemPrompt.value.slice(0, 4000);
     state.settings.theme = el.themeSelect.value;
     applyTheme(state.settings.theme);
@@ -6464,6 +6703,8 @@ body.drawer-open { overflow: hidden; }
       }
       var retry = e.target.closest("[data-retry-synth]");
       if (retry) { retrySynth(Number(retry.dataset.retrySynth)); return; }
+      var cont = e.target.closest("[data-continue-synth]");
+      if (cont) { continueAnswer(Number(cont.dataset.continueSynth)); return; }
       var retryRound = e.target.closest("[data-retry-turn]");
       if (retryRound) { retryTurn(Number(retryRound.dataset.retryTurn)); return; }
     });

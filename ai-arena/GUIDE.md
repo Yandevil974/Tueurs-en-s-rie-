@@ -344,6 +344,65 @@ arenax.chats.v3 = {
 - **Sauvegarde JSON** : `backupPayload()` ajoute `chats` (toutes les conversations) à côté
   de `turns` (la conversation ouverte, conservé pour la compatibilité). Une restauration
   qui contient `chats` remplace l'historique, sinon l'ancien format reste accepté.
+### Le fil se suit : mémoire des tours précédents
+
+Avant, chaque question repartait de zéro : « et la deuxième ? » n'avait aucun
+sens pour le modèle, puisqu'il ne recevait que la question du moment. Le fil
+est désormais renvoyé au fournisseur sous forme de vraies paires
+`user` / `assistant` : la question posée, puis **la réponse finale qui a été
+affichée** (synthèse, ou à défaut le brouillon le plus complet).
+
+Trois fonctions, dans l'ordre d'appel :
+
+| Fonction | Rôle |
+|---|---|
+| `turnAnswer(t)` | la réponse visible d'un tour : synthèse, sinon meilleur brouillon |
+| `historyMessages(turn, kind)` | les N derniers tours, tronqués, prêts pour l'API |
+| `historyTokens(msgs)` | ce que cet historique coûte, pour ne pas dépasser la limite Groq |
+
+Les bornes sont basses **exprès** : `HISTORY_DRAFTS_TURNS = 2` (brouillons),
+`HISTORY_SYNTH_TURNS = 4` (synthèse), `HISTORY_Q_CHARS = 500`,
+`HISTORY_DRAFTS_A_CHARS = 900`, `HISTORY_SYNTH_A_CHARS = 1600`.
+
+Pourquoi si peu : la limite gratuite de Groq est d'environ **8 000 tokens par
+minute**, partagés par les quatre brouillons. Un historique complet ferait
+attendre l'utilisateur plusieurs minutes avant la première réponse. La synthèse
+a droit au double de recul parce qu'elle a besoin de comprendre l'enchaînement,
+pas les brouillons.
+
+Cas particulier : **une photo jointe n'est pas renvoyée** dans l'historique. Le
+texte de la question et de la réponse l'est, l'image non — sinon quatre
+brouillons paieraient l'image une deuxième fois.
+
+### Réponse coupée : plafond, reprise, bouton
+
+Deux causes distinctes, corrigées ensemble :
+
+1. **Le plafond était trop bas.** Toutes les réponses étaient limitées à
+   **1 024 tokens** (≈ 700 mots), et la limite n'était jamais relevée. Une
+   réponse en six parties — le format de la consigne d'auto-formation —
+   s'arrêtait donc vers la troisième. Nouveau défaut : **4 096**, et surtout
+   un plancher `ANSWER_FLOOR = 4096` appliqué à la **réponse finale** (synthèse
+   et solo), même si le réglage du panneau est resté bas. Les brouillons n'ont
+   pas ce plancher : ce sont des matériaux bruts, pas la réponse qu'on lit.
+2. **Rien ne reprenait.** Quand le fournisseur renvoie `finish_reason: "length"`,
+   l'application relance maintenant le modèle sur sa propre suite
+   (`streamComplete`, 2 reprises maximum) avec la consigne
+   `CONTINUE_PROMPT` — « continue exactement là où tu t'es arrêté, sans
+   répéter ». Les morceaux sont recollés par `resumeJoin`, qui ne colle un
+   espace que si nécessaire (`phrase.` + `Suite` → « phrase. Suite » mais
+   `phrase` + `, suite` → « phrase, suite »).
+
+Si la réponse est **encore** coupée après les deux reprises, l'application ne
+fait plus semblant : un bandeau **« coupée »** et un bouton **Continuer**
+apparaissent sous la réponse. Le compteur `metrics.resumes` indique au passage
+combien de reprises ont eu lieu.
+
+Coût : chaque reprise est un appel payant comme un autre. En gratuit, 0 $ ; en
+premium, compter le prix d'une seconde génération de la longueur du
+dépassement. C'est mesuré, pas estimé au doigt mouillé : `usage` des deux
+appels est additionné (`sumUsage`).
+
 ### Preset « Photo »
 
 Un cinquième bouton dans le panneau (`data-preset="photo"`, icône appareil photo) pré-sélectionne
